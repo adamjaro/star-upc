@@ -10,3 +10,4 @@ sched/filelist.list
 sched/submit_filelist.xml
 txt/
 trees/
+*.log
