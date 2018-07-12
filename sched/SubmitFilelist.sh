@@ -1,16 +1,16 @@
 #!/usr/bin/bash
 
 #top directory for outputs
-top="/gpfs01/star/pwg/jaroslav/StUPCLib/ver2/trees/test/muDst_test1"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/test/muDst_test0"
 
 runlist=(15129018 15098003 15094069 15140030)
 
 #full path to filelist
-filelist="/star/u/jaroslav/StUPCLib/ver2/sched/filelist.list"
+filelist="/star/u/jaroslav/star-upc/sched/filelist.list"
 
 #macro to run the maker
-#macro="RunFilterMaker.C"
-macro="RunConvElMaker.C"
+macro="RunFilterMaker.C"
+#macro="RunConvElMaker.C"
 
 #submit xml
 submit="SchedSubmitFilelist.xml"
