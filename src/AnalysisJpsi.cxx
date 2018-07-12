@@ -23,7 +23,6 @@
 
 // local headers
 #include "StUPCEvent.h"
-#include "StUPCTrgData.h"
 #include "StUPCTrack.h"
 #include "StUPCBemcCluster.h"
 #include "StUPCVertex.h"
@@ -109,16 +108,16 @@ void ShowProggress(Double_t xi, Double_t xall, const string& in, const string& o
 //_____________________________________________________________________________
 int main(void) {
 
-  string basedir = "/home/jaroslav/analyza/StUPCLib/ver2/"; // local
+  string basedir = "/home/jaroslav/analyza/star-upc/"; // local
   //string basedir = "/home/tmp/jaroslav/"; // rcf
 
   //string in = "trees/StUPC.root";
   //string in = "trees/muDst_run0/StUPC_muDst_run0_all.root";
   //string in = "StUPC_muDst_run3_all.root";
-  //string in = "trees/starsim/slight14b/StUPC_slight14b1_v4.root";
-  string in = "trees/starsim/slight14b/StUPC_slight14b2.root";
+  string in = "trees/test/StUPC_slight14b2.root";
+  //string in = "trees/starsim/slight14b/StUPC_slight14b2.root";
 
-  string out = "bin/output.root";
+  string out = "build/output.root";
   //string out = "output.root";
   //string out = "sel/starsim/sel3/ana_slight14b2_sel3.root";
 
@@ -508,21 +507,6 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   jBBCSmallWest = (Int_t) upcEvt->getBBCSmallWest();
   jBBCLargeEast = (Int_t) upcEvt->getBBCLargeEast();
   jBBCLargeWest = (Int_t) upcEvt->getBBCLargeWest();
-
-  StUPCTrgData *trgd = upcEvt->getTrgData();
-  //UShort_t tdcmin = 0;
-  //UShort_t tdcmax = 30000;
-  //UShort_t adcmin = 0;
-  UShort_t tdcmin = 100;
-  UShort_t tdcmax = 2400;
-  UShort_t adcmin = 20;
-  //UShort_t adcmin = 0;
-  if(trgd) {
-    jBbcSEc = (Int_t) trgd->getBBCSum(StUPCTrgData::kSmall, StUPCTrgData::kEast, tdcmin, tdcmax, adcmin);
-    jBbcSWc = (Int_t) trgd->getBBCSum(StUPCTrgData::kSmall, StUPCTrgData::kWest, tdcmin, tdcmax, adcmin);
-    jBbcLEc = (Int_t) trgd->getBBCSum(StUPCTrgData::kLarge, StUPCTrgData::kEast, tdcmin, tdcmax, adcmin);
-    jBbcLWc = (Int_t) trgd->getBBCSum(StUPCTrgData::kLarge, StUPCTrgData::kWest, tdcmin, tdcmax, adcmin);
-  }
 
   jZDCUnAttEast = (Int_t) upcEvt->getZDCUnAttEast();
   jZDCUnAttWest = (Int_t) upcEvt->getZDCUnAttWest();
@@ -996,105 +980,21 @@ void ShowProggress(Double_t xi, Double_t xall, const string& in, const string& o
 
 
 
-/*
-
-  parts of code to read and print values from UPC event
-
-    //trigger details
-    StUPCTrgData *trgDat = upcEvt->getTrgData();
-
-
-
-    if(trgDat) {
-      cout << "att: " << trgDat->getZDCAttEast() << " " << trgDat->getZDCAttWest() << endl;
-      cout << "sum: " << trgDat->getZDCadcSum(StUPCTrgData::kEast) << " " << trgDat->getZDCadcSum(StUPCTrgData::kWest) << endl;
-      cout << "ADC and TDC East: ";
-      cout << endl;
-      for(Int_t ipmt=1; ipmt<=3; ipmt++) cout << trgDat->getZDCadc(StUPCTrgData::kEast, ipmt) << " ";
-      cout <<  endl;
-      for(Int_t ipmt=1; ipmt<=3; ipmt++) cout << trgDat->getZDCPmtTdc(StUPCTrgData::kEast, ipmt) << " ";
-      cout << endl;
-      cout << "ADC and TDC West: ";
-      cout << endl;
-      for(Int_t ipmt=1; ipmt<=3; ipmt++) cout << trgDat->getZDCadc(StUPCTrgData::kWest, ipmt) << " ";
-      cout << endl;
-      for(Int_t ipmt=1; ipmt<=3; ipmt++) cout << trgDat->getZDCPmtTdc(StUPCTrgData::kWest, ipmt) << " ";
-      cout << endl;
-      cout << "TDC East, West and diff: ";
-      cout << trgDat->getZDCTdcEast() << " " << trgDat->getZDCTdcWest() << " " << trgDat->getZDCTimeDiff() << endl;
-    }
-
-    cout << endl;
 
 
 
 
 
-    cout << endl;
-
-    cout << "TOF mult: " << upcEvt->getTOFMultiplicity() << endl;
-    cout << endl;
 
 
 
-      if( !trk->getFlag( StUPCTrack::kTof ) ) continue;
-      cout << "TOF" << endl;
-      continue;
 
 
-      Double_t pT, eta, phi;
-      trk->getPtEtaPhi(pT, eta, phi);
-      cout << "  pTetaPhi: " << pT << " " << eta << " " << phi << endl;
-      cout << "  BEMC id, E: " << trk->getBemcClusterId() << " " << trk->getBemcHitE() << endl;// " " << trk->getBemcNHits() << endl;
-      Double_t bemcPt, bemcEta, bemcPhi;
-      trk->getBemcPtEtaPhi(bemcPt, bemcEta, bemcPhi);
-      StUPCBemcCluster *cls = trk->getBemcCluster();
-      Double_t clsEta = cls->getEta();
-      Double_t clsPhi = cls->getPhi();
-      cout << "  " << TMath::Abs(bemcEta-clsEta) << " " << TMath::Abs(bemcPhi-clsPhi) << endl;
 
 
-    //Int_t ncls = upcEvt->getNumberOfClusters();
-    //cout << "Clusters: " << ncls << endl;
-
-    //clusters loop
-    StUPCBemcCluster *cls=0x0;
-    TIterator *clsIter = upcEvt->makeClustersIter();
-    while( (cls = dynamic_cast<StUPCBemcCluster*>( clsIter->Next() )) != NULL ) {
-    //for(Int_t i=0; i<ncls; i++) {
-      //const StUPCBemcCluster *cls = upcEvt->getCluster(i);
-      //if(!cls) continue;
-
-      //cout << "ahoj" << endl;
-
-      cout << "  IDetaPhi: " << cls->getId() << " " << cls->getEta() << " " << cls->getPhi() << endl;
-
-    }//clusters loop
-    delete clsIter;
-
-    cls = upcEvt->getClusterId(5);
-    if(cls){
-      cout << "-----------------" << endl;
-      cout << "  IDetaPhi: " << cls->getId() << " " << cls->getEta() << " " << cls->getPhi() << endl;
-    }
 
 
-      cout << "  " << trk->getFlag( StUPCTrack::kBemc ) << " " << trk->getFlag( StUPCTrack::kTof )  << endl;
 
-      cout << "  vtx: " << trk->getVertexId() << endl;
-      StUPCVertex *vtx = trk->getVertex();
-      cout << "       " << vtx->getPosX() << " " << vtx->getPosY() << " " << vtx->getPosZ() << endl;
-
-    //vertex loop
-    for(Int_t ivtx=0; ivtx<upcEvt->getNumberOfVertices(); ivtx++) {
-      StUPCVertex *vtx = upcEvt->getVertex(ivtx);
-      if(!vtx) continue;
-
-      cout << "ID x y z: " << vtx->getId() << " " << vtx->getPosX() << " " << vtx->getPosY() << " " << vtx->getPosZ() << endl;
-      cout << "            " << vtx->getErrX() << " " << vtx->getErrY() << " " << vtx->getErrZ() << endl;
-    }
-
-*/
 
 
 

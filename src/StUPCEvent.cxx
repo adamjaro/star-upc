@@ -16,7 +16,6 @@
 
 //local headers
 #include "StUPCTrack.h"
-#include "StUPCTrgData.h"
 #include "StUPCBemcCluster.h"
 #include "StUPCVertex.h"
 
@@ -25,7 +24,6 @@
 ClassImp(StUPCEvent);
 
 TClonesArray *StUPCEvent::mgUPCTracks = 0;
-StUPCTrgData *StUPCEvent::mgUPCTrgData = 0;
 TClonesArray *StUPCEvent::mgUPCBemcClusters = 0;
 TClonesArray *StUPCEvent::mgUPCVertices = 0;
 TClonesArray *StUPCEvent::mgMCParticles = 0;
@@ -34,7 +32,7 @@ TClonesArray *StUPCEvent::mgMCParticles = 0;
 StUPCEvent::StUPCEvent():
   mTrg(0), mRunNum(0), mEvtNum(0), mFillNum(0), mbCrossId(0), mbCrossId7bit(0),
   mMagField(0), mZdcEastUA(0), mZdcWestUA(0), mBBCSmallEast(0), mBBCSmallWest(0),
-  mBBCLargeEast(0), mBBCLargeWest(0), mUPCTrgDat(0x0), mTofMult(0), mBemcMult(0),
+  mBBCLargeEast(0), mBBCLargeWest(0), mTofMult(0), mBemcMult(0),
   mUPCTracks(0x0), mNtracks(0),
   mUPCBemcClusters(0x0), mNclusters(0),
   mUPCVertices(0x0), mNvertices(0),
@@ -70,7 +68,6 @@ StUPCEvent::~StUPCEvent()
   //destructor
 
   if(mUPCTracks) {delete mUPCTracks; mUPCTracks = 0x0;}
-  if(mUPCTrgDat) {delete mUPCTrgDat; mUPCTrgDat = 0x0;}
   if(mUPCBemcClusters) {delete mUPCBemcClusters; mUPCBemcClusters = 0x0;}
   if(mUPCVertices) {delete mUPCVertices; mUPCVertices = 0x0;}
   if(mMCParticles) {delete mMCParticles; mMCParticles = 0x0;}
@@ -120,16 +117,6 @@ void StUPCEvent::setLastDSM(UShort_t dsm, UInt_t channel)
 
   mLastDSM[channel] = dsm;
 }//setLastDSM
-
-//_____________________________________________________________________________
-void StUPCEvent::setWriteTrgData()
-{
-  //set event to write the trigger details
-
-  mgUPCTrgData = new StUPCTrgData();
-  mUPCTrgDat = mgUPCTrgData;
-
-}//setWriteTrgData
 
 //_____________________________________________________________________________
 StUPCTrack *StUPCEvent::addTrack()

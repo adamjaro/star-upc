@@ -8,7 +8,6 @@
 
 class StUPCTrack;
 class TClonesArray;
-class StUPCTrgData;
 class StUPCBemcCluster;
 class TIterator;
 class StUPCVertex;
@@ -69,8 +68,6 @@ public:
   Double_t getMagneticField() const { return mMagField; }
   UShort_t getLastDSM(UInt_t channel) const;
 
-  StUPCTrgData *getTrgData() const { return mUPCTrgDat; }
-
   UShort_t getZDCUnAttEast() const { return mZdcEastUA; }
   UShort_t getZDCUnAttWest() const { return mZdcWestUA; }
 
@@ -123,9 +120,6 @@ private:
   UInt_t mBBCSmallWest; // BBC truncated sum, small tiles, west
   UInt_t mBBCLargeEast; // BBC truncated sum, large tiles, east
   UInt_t mBBCLargeWest; // BBC truncated sum, large tiles, west
-
-  static StUPCTrgData *mgUPCTrgData; // trigger details for BBC and ZDC
-  StUPCTrgData *mUPCTrgDat; // trigger details for BBC and ZDC
 
   UShort_t mTofMult; // TOF multiplicity
   UInt_t mBemcMult; // BEMC multiplicity, number of all BEMC clusters in event

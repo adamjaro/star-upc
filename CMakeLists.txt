@@ -6,7 +6,6 @@ cmake_minimum_required (VERSION 2.6)
 set (SRCS
   src/StUPCEvent.cxx
   src/StUPCTrack.cxx
-  src/StUPCTrgData.cxx
   src/StUPCBemcCluster.cxx
   src/StUPCVertex.cxx
   src/THB1D.cxx
