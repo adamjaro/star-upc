@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE job [
+  <!ENTITY basedir "__BASEDIR__">
+  <!ENTITY srcdir "/star/u/jaroslav/StUPCLib/ver2">
+]>
+<!--
+  star-submit SchedSubmit.xml
+  condor_q -submitter jaroslav
+-->
+<job maxFilesPerProcess="30" fileListSyntax="xrootd" simulateSubmission="false">
+
+  <command>
+    echo "Starting the job"
+    ls
+    hostname
+    starpro
+    echo $STAR
+    echo $OPTSTAR
+    cons
+    root4star -l -q -b RunConvElMaker.C\(\"$FILELIST\",$INPUTFILECOUNT,\"$SCRATCH/$JOBID.root\"\)
+  </command>
+
+
+
+  <input URL="catalog:star.bnl.gov?
+    production=P16id,trgsetupname=__TRG__,filetype=daq_reco_MuDst,filename~st_upc,storage=local,runnumber[]15078073-15167014"
+  nFiles="all" />
+
+  <!--
+  <input URL="catalog:star.bnl.gov?
+    production=P18ib,trgsetupname=__TRG__,filetype=daq_reco_muDst,filename~st_zerobias,storage=nfs"
+  nFiles="all" />
+  -->
+  <!--
+  <input URL="filelist:/star/u/jaroslav/StUPCLib/ver1/filelist_test1.list" />
+  -->
+
+  <output fromScratch="*.root" toURL="file:&basedir;/" />
+
+  <stdout URL="file:&basedir;/logs/$JOBID.out"/>
+  <stderr URL="file:&basedir;/logs/$JOBID.err"/>
+
+  <Generator>
+    <Location>&basedir;/sched</Location>
+  </Generator>
+
+  <SandBox installer="ZIP">
+  	<Package>
+  		<File>file:&srcdir;/RunConvElMaker.C</File>
+  		<File>file:&srcdir;/StRoot</File>
+  	</Package>
+  </SandBox>
+
+
+
+
+
+
+
+
+
+
+
+
+</job>
