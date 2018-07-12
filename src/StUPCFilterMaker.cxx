@@ -31,7 +31,6 @@
 
 //local headers
 #include "StUPCEvent.h"
-#include "StUPCTrgData.h"
 #include "StUPCTrack.h"
 #include "StUPCBemcCluster.h"
 #include "StUPCVertex.h"
@@ -122,7 +121,7 @@ Int_t StUPCFilterMaker::Init()
   //output UPC event and tree
   mUPCEvent = new StUPCEvent();
   //configure the UPC event
-  if( mWriteTrgData ) mUPCEvent->setWriteTrgData();
+  //if( mWriteTrgData ) mUPCEvent->setWriteTrgData();
   mUPCEvent->setIsMC( mIsMC );
 
   //create the tree

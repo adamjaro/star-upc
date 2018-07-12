@@ -16,7 +16,6 @@
 
 //local headers
 #include "StUPCEvent.h"
-#include "StUPCTrgData.h"
 
 #include "StUPCFilterTrgUtil.h"
 
@@ -52,26 +51,6 @@ void StUPCFilterTrgUtil::runZDC(const StTriggerData *trgdat, StUPCEvent *upcEvt)
   upcEvt->setZDCUnAttEast( trgdat->zdcUnAttenuated(east) );
   upcEvt->setZDCUnAttWest( trgdat->zdcUnAttenuated(west) );
 
-  //trigger details for UPC event
-  StUPCTrgData *upcTrg = upcEvt->getTrgData();
-
-  //ZDC trigger details
-  if( upcTrg ) {
-    for(Int_t ipmt=1; ipmt<=3; ipmt++) {
-      upcTrg->setZDCadc(StUPCTrgData::kEast, trgdat->zdcADC(east, ipmt), ipmt );
-      upcTrg->setZDCadc(StUPCTrgData::kWest, trgdat->zdcADC(west, ipmt), ipmt );
-
-      upcTrg->setZDCPmtTdc(StUPCTrgData::kEast, trgdat->zdcPmtTDC(east, ipmt), ipmt );
-      upcTrg->setZDCPmtTdc(StUPCTrgData::kWest, trgdat->zdcPmtTDC(west, ipmt), ipmt );
-    }
-    upcTrg->setZDCAttEast( trgdat->zdcAttenuated(east) );
-    upcTrg->setZDCAttWest( trgdat->zdcAttenuated(west) );
-    upcTrg->setZDCTdcEast( trgdat->zdcTDC(east) );
-    upcTrg->setZDCTdcWest( trgdat->zdcTDC(west) );
-    upcTrg->setZDCTimeDiff( trgdat->zdcTimeDifference() );
-  }
-
-
 }//runZDC
 
 
@@ -82,9 +61,6 @@ void StUPCFilterTrgUtil::runBBC(const StTriggerData *trgdat, StUPCEvent *upcEvt)
 
   //BBC small and large tiles truncated sum
   UInt_t bbcSmallE = 0, bbcSmallW = 0, bbcLargeE = 0, bbcLargeW = 0;
-
-  //trigger details for UPC event
-  StUPCTrgData *upcTrg = upcEvt->getTrgData();
 
   //BBC tile loop
   for(Int_t ipmt=1; ipmt<=24; ipmt++) {
@@ -105,15 +81,6 @@ void StUPCFilterTrgUtil::runBBC(const StTriggerData *trgdat, StUPCEvent *upcEvt)
     if( ipmt >  mIPmtLastSmall ) {
       if( bbcLimits(adcE, tdcE) ) bbcLargeE += adcE;
       if( bbcLimits(adcW, tdcW) ) bbcLargeW += adcW;
-    }
-
-    //write trigger details to StUPCEvent if requested
-    if( upcTrg ) {
-      upcTrg->setBBCadc(StUPCTrgData::kEast, adcE, ipmt);
-      upcTrg->setBBCadc(StUPCTrgData::kWest, adcW, ipmt);
-
-      upcTrg->setBBCtdc(StUPCTrgData::kEast, tdcE, ipmt);
-      upcTrg->setBBCtdc(StUPCTrgData::kWest, tdcW, ipmt);
     }
 
   }//BBC tile loop

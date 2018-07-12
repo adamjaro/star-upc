@@ -35,7 +35,6 @@
 
 //local headers
 #include "StUPCEvent.h"
-#include "StUPCTrgData.h"
 #include "StUPCTrack.h"
 #include "StUPCBemcCluster.h"
 #include "StUPCVertex.h"
