@@ -8,3 +8,5 @@ sched/filelist.list
 *.zip
 *.package
 sched/submit_filelist.xml
+txt/
+trees/

@@ -6,10 +6,10 @@
 
 
 //_____________________________________________________________________________
-void RunFilterMaker(string filelist="txt/zerobias_test.list", Int_t nFiles=4, string outfile="trees/StUPC_zerobias_test.root") {
+void RunFilterMaker(string filelist="txt/starsim_slight14b2.list", Int_t nFiles=200, string outfile="trees/test/StUPC_slight14b2.root") {
 
   //maker config
-  Bool_t isMC = kFALSE; // data or MC
+  Bool_t isMC = kTRUE; // data or MC
   Bool_t writeTrgDat = kFALSE; // write trigger details to UPC event
 
   Bool_t useClusterParam = kFALSE; // use BEMC cluster conditions below
