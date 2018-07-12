@@ -2,3 +2,9 @@ build/
 StRoot/
 .sl73_gcc485/
 temp_gccflags.c
+*.session.xml
+sched/filelist.list
+*.dataset
+*.zip
+*.package
+sched/submit_filelist.xml
