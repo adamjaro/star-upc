@@ -3,7 +3,7 @@
 
 void MergeFiles(const string pattern, const string outfile) {
 
-  gSystem->Load("../bin/libStUPCLib.so");
+  gSystem->Load("../build/libstar-upc.so");
 
   //list the output files to a temporary file
   string tmpnam = "files.tmp";
