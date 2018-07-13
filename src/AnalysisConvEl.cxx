@@ -88,7 +88,7 @@ void ShowProggress(Double_t xi, Double_t xall, const string& in, const string& o
 //_____________________________________________________________________________
 int main(void) {
 
-  string basedir = "/home/jaroslav/analyza/StUPCLib/ver2/"; // local
+  string basedir = "/home/jaroslav/analyza/star-upc/"; // local
   //string basedir = "/home/tmp/jaroslav/"; // rcf
 
 
@@ -98,7 +98,7 @@ int main(void) {
   //string in = "StUPC_muDst_run3_all.root";
   //string in = "trees/starsim/slight14a/StUPC_slight14a6.root";
 
-  string out = "bin/output.root";
+  string out = "build/output.root";
   //string out = "sel/test/muDst_test0/conv/sel0/ana_muDst_test0_all_conv_sel0.root";
 
   //selection criteria
