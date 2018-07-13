@@ -20,7 +20,7 @@ class StUPCTrack: public TObject
 public:
 
   StUPCTrack();
-  ~StUPCTrack() {}
+  virtual ~StUPCTrack();
 
   //public types
   //flags for mFlags, up to 8 (uchar)
@@ -56,6 +56,9 @@ public:
   void setTofBeta(Float_t beta) { mTofBeta = beta; }
 
   void setVertexId(UInt_t id) { mVtxId = id; }
+
+  Int_t makeArrayI(Int_t size);
+  Int_t makeArrayF(Int_t size);
 
   void setEvent(StUPCEvent *evt) { mEvt = evt; }
 
@@ -102,6 +105,9 @@ public:
   UInt_t getVertexId() const { return mVtxId; }
   StUPCVertex *getVertex() const;
 
+  TArrayI *getArrayI() const { return mArrayI; }
+  TArrayF *getArrayF() const { return mArrayF; }
+
   StUPCEvent *getEvent() const { return mEvt; }
 
 private:
@@ -139,6 +145,9 @@ private:
   Float_t mTofBeta; // velocity in units of c by TOF
 
   UInt_t mVtxId; // ID of primary vertex associated with track
+
+  TArrayI *mArrayI; // extension for other integer parameters
+  TArrayF *mArrayF; // extension for other floating point parameters
 
   StUPCEvent *mEvt; //! pointer to current event, local use only
 

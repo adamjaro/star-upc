@@ -11,6 +11,8 @@
 //root headers
 #include "TLorentzVector.h"
 #include "TVector3.h"
+#include "TArrayI.h"
+#include "TArrayF.h"
 
 //local headers
 #include "StUPCTrack.h"
@@ -26,7 +28,7 @@ StUPCTrack::StUPCTrack(): TObject(),
   mDcaXY(0), mDcaZ(0), mCharge(0), mNhits(0), mNhitsFit(0), mChi2(0),
   mDEdxSignal(0),
   mBemcPt(-999), mBemcEta(-999), mBemcPhi(-999), mBemcClsId(0), mBemcHitE(-999), mBemcNHits(-999),
-  mTofBeta(0), mVtxId(0),
+  mTofBeta(0), mVtxId(0), mArrayI(0x0), mArrayF(0x0),
   mEvt(0x0)
 {
   //default constructor
@@ -34,6 +36,15 @@ StUPCTrack::StUPCTrack(): TObject(),
   for(Int_t i=0; i<mNpart; i++) mNSigmasTPC[i] = -999;
 
 }//StUPCEvent
+
+//_____________________________________________________________________________
+StUPCTrack::~StUPCTrack() {
+  //destructor
+
+  if(mArrayI) {delete mArrayI; mArrayI = 0x0;}
+  if(mArrayF) {delete mArrayF; mArrayF = 0x0;}
+
+}//~StUPCTrack
 
 //_____________________________________________________________________________
 void StUPCTrack::Clear(Option_t *)
@@ -52,6 +63,9 @@ void StUPCTrack::Clear(Option_t *)
 
   mTofBeta = 0;
 
+  if(mArrayI) mArrayI->Reset();
+  if(mArrayF) mArrayF->Reset();
+
 }//Clear
 
 //_____________________________________________________________________________
@@ -62,6 +76,34 @@ void StUPCTrack::setFlag(Flag flg)
   mFlags |= (1 << flg);
 
 }//set flag
+
+//_____________________________________________________________________________
+Int_t StUPCTrack::makeArrayI(Int_t size) {
+
+  //create the object of TArrayI, skip if it has been already created
+  //the array allows the event to be extended for other integer variables
+
+  if( mArrayI ) return -999; // already initialized
+
+  mArrayI = new TArrayI(size);
+
+  return mArrayI->GetSize();
+
+}//MakeArrayI
+
+//_____________________________________________________________________________
+Int_t StUPCTrack::makeArrayF(Int_t size) {
+
+  //create the object of TArrayF, skip if it has been already created
+  //the array allows the event to be extended for other floating point variables
+
+  if( mArrayF ) return -999; // already initialized
+
+  mArrayF = new TArrayF(size);
+
+  return mArrayF->GetSize();
+
+}//MakeArrayF
 
 //_____________________________________________________________________________
 Bool_t StUPCTrack::getFlag(Flag flg) const

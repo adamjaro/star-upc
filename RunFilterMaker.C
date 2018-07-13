@@ -6,11 +6,10 @@
 
 
 //_____________________________________________________________________________
-void RunFilterMaker(string filelist="txt/starsim_slight14b2.list", Int_t nFiles=200, string outfile="trees/test/StUPC_slight14b2.root") {
+void RunFilterMaker(string filelist="txt/starsim_slight14b2.list", Int_t nFiles=200, string outfile="trees/test/StUPC_slight14b2_test1.root") {
 
   //maker config
   Bool_t isMC = kTRUE; // data or MC
-  Bool_t writeTrgDat = kFALSE; // write trigger details to UPC event
 
   Bool_t useClusterParam = kFALSE; // use BEMC cluster conditions below
   Int_t sizeMax = 4;
@@ -58,7 +57,6 @@ void RunFilterMaker(string filelist="txt/starsim_slight14b2.list", Int_t nFiles=
 
   //configure the analysis maker
   if(isMC) anaMaker->setIsMC();
-  if(writeTrgDat) anaMaker->setWriteTrgData();
 
   //no debug printouts
   StMuDebug::setLevel(0);

@@ -10,7 +10,6 @@ void RunConvElMaker(string filelist="txt/test_low_gpfs.list", Int_t nFiles=1, st
 
   //maker config
   Bool_t isMC = kFALSE; // data or MC
-  Bool_t writeTrgDat = kFALSE; // write trigger details to UPC event
 
   Bool_t useClusterParam = kFALSE; // use BEMC cluster conditions below
   Int_t sizeMax = 4;
@@ -58,7 +57,6 @@ void RunConvElMaker(string filelist="txt/test_low_gpfs.list", Int_t nFiles=1, st
 
   //configure the analysis maker
   if(isMC) anaMaker->setIsMC();
-  if(writeTrgDat) anaMaker->setWriteTrgData();
 
   //no debug printouts
   StMuDebug::setLevel(0);

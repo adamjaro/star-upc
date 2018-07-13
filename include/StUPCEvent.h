@@ -12,6 +12,8 @@ class StUPCBemcCluster;
 class TIterator;
 class StUPCVertex;
 class TParticle;
+class TArrayI;
+class TArrayF;
 
 class StUPCEvent
 {
@@ -36,8 +38,6 @@ public:
   void setMagneticField(Double_t mag) { mMagField = mag; }
   void setLastDSM(UShort_t dsm, UInt_t channel);
 
-  void setWriteTrgData();
-
   void setZDCUnAttEast(UShort_t signal) { mZdcEastUA = signal; }
   void setZDCUnAttWest(UShort_t signal) { mZdcWestUA = signal; }
 
@@ -57,6 +57,9 @@ public:
 
   void setIsMC(Bool_t mc=kTRUE);
   TParticle *addMCParticle();
+
+  Int_t makeArrayI(Int_t size);
+  Int_t makeArrayF(Int_t size);
 
   //getters
   Bool_t getTrigger(UInt_t idx) const;
@@ -96,6 +99,9 @@ public:
   Int_t getNumberOfMCParticles() const { return mNmc; }
   TParticle *getMCParticle(Int_t iMC) const;
 
+  TArrayI *getArrayI() const { return mArrayI; }
+  TArrayF *getArrayF() const { return mArrayF; }
+
 private:
 
   StUPCEvent(const StUPCEvent &o); //not implemented
@@ -123,6 +129,9 @@ private:
 
   UShort_t mTofMult; // TOF multiplicity
   UInt_t mBemcMult; // BEMC multiplicity, number of all BEMC clusters in event
+
+  TArrayI *mArrayI; // extension for other integer parameters
+  TArrayF *mArrayF; // extension for other floating point parameters
 
   static TClonesArray *mgUPCTracks; // array of upc tracks
   TClonesArray *mUPCTracks; //-> array of upc tracks

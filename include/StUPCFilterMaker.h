@@ -22,7 +22,6 @@ public:
   ~StUPCFilterMaker();
 
   void setIsMC(Bool_t mc=kTRUE) { mIsMC = mc; }
-  void setWriteTrgData(Bool_t write = kTRUE) { mWriteTrgData = write; }
 
   Int_t Init();   //called at the beginning of the analysis
   Int_t Make();   //called for each event
@@ -38,7 +37,7 @@ private:
 
   Bool_t runMC();
 
-  StMuDstMaker *mMaker;  //S tMuDstMaker provided to the constructor
+  StMuDstMaker *mMaker;  //StMuDstMaker provided to the constructor
   StMuDst *mMuDst; // input muDst data
 
   Bool_t mIsMC; // MC or data
@@ -62,8 +61,6 @@ private:
   UInt_t mTrgIDs[mMaxTrg]; // trigger IDs
 
   TH2I *mTriggerCounter; // analyzed events per run number for each trigger ID
-
-  Bool_t mWriteTrgData; // flag to write trigger data to output UPC event
 
   StUPCFilterTrgUtil *mTrgUtil;
   StUPCFilterBemcUtil *mBemcUtil; //utility class for BEMC matching

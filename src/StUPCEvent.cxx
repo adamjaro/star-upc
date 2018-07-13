@@ -13,6 +13,8 @@
 #include "TClonesArray.h"
 #include "TIterator.h"
 #include "TParticle.h"
+#include "TArrayI.h"
+#include "TArrayF.h"
 
 //local headers
 #include "StUPCTrack.h"
@@ -33,6 +35,7 @@ StUPCEvent::StUPCEvent():
   mTrg(0), mRunNum(0), mEvtNum(0), mFillNum(0), mbCrossId(0), mbCrossId7bit(0),
   mMagField(0), mZdcEastUA(0), mZdcWestUA(0), mBBCSmallEast(0), mBBCSmallWest(0),
   mBBCLargeEast(0), mBBCLargeWest(0), mTofMult(0), mBemcMult(0),
+  mArrayI(0x0), mArrayF(0x0),
   mUPCTracks(0x0), mNtracks(0),
   mUPCBemcClusters(0x0), mNclusters(0),
   mUPCVertices(0x0), mNvertices(0),
@@ -67,6 +70,8 @@ StUPCEvent::~StUPCEvent()
 {
   //destructor
 
+  if(mArrayI) {delete mArrayI; mArrayI = 0x0;}
+  if(mArrayF) {delete mArrayF; mArrayF = 0x0;}
   if(mUPCTracks) {delete mUPCTracks; mUPCTracks = 0x0;}
   if(mUPCBemcClusters) {delete mUPCBemcClusters; mUPCBemcClusters = 0x0;}
   if(mUPCVertices) {delete mUPCVertices; mUPCVertices = 0x0;}
@@ -96,6 +101,9 @@ void StUPCEvent::clearEvent()
     mMCParticles->Clear("C");
     mNmc = 0;
   }
+
+  if(mArrayI) mArrayI->Reset();
+  if(mArrayF) mArrayF->Reset();
 
 }//clearEvent
 
@@ -170,6 +178,34 @@ TParticle *StUPCEvent::addMCParticle()
   return dynamic_cast<TParticle*>( mMCParticles->ConstructedAt(mNmc++) );
 
 }//addMCParticle
+
+//_____________________________________________________________________________
+Int_t StUPCEvent::makeArrayI(Int_t size) {
+
+  //create the object of TArrayI, skip if it has been already created
+  //the array allows the event to be extended for other integer variables
+
+  if( mArrayI ) return -999; // already initialized
+
+  mArrayI = new TArrayI(size);
+
+  return mArrayI->GetSize();
+
+}//MakeArrayI
+
+//_____________________________________________________________________________
+Int_t StUPCEvent::makeArrayF(Int_t size) {
+
+  //create the object of TArrayF, skip if it has been already created
+  //the array allows the event to be extended for other floating point variables
+
+  if( mArrayF ) return -999; // already initialized
+
+  mArrayF = new TArrayF(size);
+
+  return mArrayF->GetSize();
+
+}//MakeArrayF
 
 //_____________________________________________________________________________
 Bool_t StUPCEvent::getTrigger(UInt_t idx) const

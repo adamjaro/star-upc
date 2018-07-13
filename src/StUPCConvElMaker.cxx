@@ -56,7 +56,7 @@ StUPCConvElMaker::StUPCConvElMaker(StMuDstMaker *maker, string outnam) : StMaker
   mMaker(maker), mMuDst(0x0), mIsMC(0), mOutName(outnam), mOutFile(0x0),
   mHistList(0x0), mCounter(0x0), mErrCounter(0x0), mPairCounter(0x0),
   mHistDca(0x0), mHistDcaPV(0x0), mHistSigEl(0x0), mHistMass(0x0),
-  mUPCEvent(0x0), mUPCTree(0x0), mWriteTrgData(0), mTrgUtil(0x0), mBemcUtil(0x0)
+  mUPCEvent(0x0), mUPCTree(0x0), mTrgUtil(0x0), mBemcUtil(0x0)
 {
   //constructor
 
@@ -132,7 +132,6 @@ Int_t StUPCConvElMaker::Init()
   //output UPC event and tree
   mUPCEvent = new StUPCEvent();
   //configure the UPC event
-  if( mWriteTrgData ) mUPCEvent->setWriteTrgData();
   mUPCEvent->setIsMC( mIsMC );
 
   //create the tree
