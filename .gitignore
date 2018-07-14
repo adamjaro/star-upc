@@ -11,3 +11,4 @@ sched/submit_filelist.xml
 txt/
 trees/
 *.log
+*.sh~
