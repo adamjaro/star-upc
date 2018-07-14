@@ -114,7 +114,7 @@ int main(void) {
   //string in = "trees/StUPC.root";
   //string in = "trees/muDst_run0/StUPC_muDst_run0_all.root";
   //string in = "StUPC_muDst_run3_all.root";
-  string in = "trees/test/StUPC_slight14b2.root";
+  string in = "trees/test/StUPC_slight14b2_test1.root";
   //string in = "trees/starsim/slight14b/StUPC_slight14b2.root";
 
   string out = "build/output.root";
