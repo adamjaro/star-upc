@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE job [
-  <!ENTITY srcdir "/star/u/jaroslav/StUPCLib/ver2">
+  <!ENTITY srcdir "/star/u/jaroslav/star-upc">
 ]>
 
 <job maxFilesPerProcess="30" fileListSyntax="xrootd" simulateSubmission="false">

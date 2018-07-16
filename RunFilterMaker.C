@@ -9,7 +9,7 @@
 void RunFilterMaker(string filelist="txt/starsim_slight14b2.list", Int_t nFiles=200, string outfile="trees/test/StUPC_slight14b2_test1.root") {
 
   //maker config
-  Bool_t isMC = kTRUE; // data or MC
+  Bool_t isMC = kFALSE; // data or MC
 
   Bool_t useClusterParam = kFALSE; // use BEMC cluster conditions below
   Int_t sizeMax = 4;

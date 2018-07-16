@@ -3,7 +3,7 @@ StRoot/
 .sl73_gcc485/
 temp_gccflags.c
 *.session.xml
-sched/filelist.list
+*.list
 *.dataset
 *.zip
 *.package

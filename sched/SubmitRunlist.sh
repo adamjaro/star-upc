@@ -1,13 +1,10 @@
 #!/usr/bin/bash
 
 #top directory for outputs
-top="/gpfs01/star/pwg/jaroslav/star-upc/trees/test/muDst_test1"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst_run0"
 
 #list of runs
 runlist="../txt/runlist_UPC-jpsi-B.txt"
-
-#full path to filelist
-#filelist="/star/u/jaroslav/star-upc/sched/filelist.list"
 
 #macro to run the maker
 macro="RunFilterMaker.C"
@@ -20,10 +17,58 @@ submit="SchedSubmitFilelist.xml"
 
 
 #formulate catalog query for the runlist
+runcond="\""
+irun=0
 for runnum in `cat $runlist`
 do
-    echo $runnum
+    if [ $irun -eq 0 ]
+    then
+        runcond=$runcond$runnum
+    else
+        runcond=$runcond" || "$runnum
+    fi
+    (( irun++ ))
 done
+runcond=$runcond"\""
+
+#catalog query for list of runs in run condition runcond
+tmplist="filelist_tmp.list"
+cat /dev/null > $tmplist
+get_file_list.pl -keys node,path,filename\
+ -cond production=P16id,filetype=daq_reco_MuDst,filename~st_upc,storage=local,runnumber="$runcond"\
+ -limit 0 >> $tmplist
+
+#convert to format for scheduler, section 3.6 The <input> element in submit script, full path ot filelist
+filelist=`pwd`"/filelist.list"
+cat /dev/null > $filelist
+for line in `cat $tmplist`
+do
+  echo "file://"$line | sed "s%::/%/%g" | sed "s%::%/%g" >> $filelist
+done
+rm $tmplist
+
+#create jobs output folder
+basedir=$top"/out"
+mkdir -p $basedir"/logs"
+mkdir -p $basedir"/sched"
+
+#create xml for the filelist
+xml="submit_filelist.xml"
+cat $submit | sed "s%__BASEDIR__%$basedir%g" | sed "s%__FILELIST__%$filelist%g" | sed "s%__MACRO__%$macro%g" > $xml
+
+#submit for the filelist
+star-submit $xml
+
+
+
+
+
+
+
+
+
+
+
 
 
 
