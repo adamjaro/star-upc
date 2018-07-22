@@ -108,17 +108,17 @@ void ShowProggress(Double_t xi, Double_t xall, const string& in, const string& o
 //_____________________________________________________________________________
 int main(void) {
 
-  string basedir = "/home/jaroslav/analyza/star-upc/"; // local
-  //string basedir = "/home/tmp/jaroslav/"; // rcf
+  //string basedir = "/home/jaroslav/analyza/star-upc/"; // local
+  string basedir = "/home/tmp/jaroslav/"; // rcf
 
   //string in = "trees/StUPC.root";
   //string in = "trees/muDst_run0/StUPC_muDst_run0_all.root";
-  //string in = "StUPC_muDst_run3_all.root";
-  string in = "trees/test/StUPC_slight14b2_test1.root";
+  string in = "StUPC_muDst_dev0_all.root";
+  //string in = "trees/test/StUPC_slight14b2_test1.root";
   //string in = "trees/starsim/slight14b/StUPC_slight14b2.root";
 
-  string out = "build/output.root";
-  //string out = "output.root";
+  //string out = "build/output.root";
+  string out = "output.root";
   //string out = "sel/starsim/sel3/ana_slight14b2_sel3.root";
 
   //selection criteria
@@ -139,8 +139,8 @@ int main(void) {
   //sign = 1;
   //maxNsigPID = 9999.;
   //matchTof = 1;
-  matchBemc = 0;
-  useBemcEff = 1;
+  //matchBemc = 0;
+  //useBemcEff = 1;
   //maxAbsEta = 9.e9;
 
   //bemc efficiency
