@@ -16,6 +16,7 @@ submit="SchedSubmitFilelist.xml"
 #end of configuration
 
 
+echo "Creating list of files"
 #formulate catalog query for the runlist
 runcond="\""
 irun=0
@@ -34,9 +35,14 @@ runcond=$runcond"\""
 #catalog query for list of runs in run condition runcond
 tmplist="filelist_tmp.list"
 cat /dev/null > $tmplist
+#get_file_list.pl -keys node,path,filename\
+# -cond production=P16id,filetype=daq_reco_MuDst,filename~st_upc,storage=local,runnumber="$runcond"\
+# -limit 0 >> $tmplist
+
 get_file_list.pl -keys node,path,filename\
- -cond production=P16id,filetype=daq_reco_MuDst,filename~st_upc,storage=local,runnumber="$runcond"\
- -limit 0 >> $tmplist
+ -cond production=P16id,filetype=daq_reco_MuDst,filename~st_upc,storage=local -limit 0 >> $tmplist
+
+exit
 
 #convert to format for scheduler, section 3.6 The <input> element in submit script, full path ot filelist
 filelist=`pwd`"/filelist.list"
@@ -47,6 +53,7 @@ do
 done
 rm $tmplist
 
+echo "Submitting the jobs"
 #create jobs output folder
 basedir=$top"/out"
 mkdir -p $basedir"/logs"
