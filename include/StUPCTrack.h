@@ -46,7 +46,7 @@ public:
   void setChi2(Double_t chi2) { mChi2 = chi2; }
 
   void setDEdxSignal(Double_t de) { mDEdxSignal = de; }
-  void setNSigmasTPC(Part pt, Double_t nsig) { mNSigmasTPC[pt] = nsig; }
+  void setNSigmasTPC(Part pt, Float_t nsig) { mNSigmasTPC[pt] = nsig; }
 
   void setBemcPtEtaPhi(Double_t pt, Double_t eta, Double_t phi) {mBemcPt = pt; mBemcEta = eta; mBemcPhi = phi;}
   void setBemcClusterId(UInt_t id) { mBemcClsId = id; }
@@ -83,11 +83,11 @@ public:
   Double_t getChi2() const { return mChi2; }
 
   Double_t getDEdxSignal() const { return mDEdxSignal; }
-  Double_t getNSigmasTPC(Part pt) const { return mNSigmasTPC[pt]; }
-  Double_t getNSigmasTPCElectron() const { return mNSigmasTPC[kElectron]; }
-  Double_t getNSigmasTPCPion() const { return mNSigmasTPC[kPion]; }
-  Double_t getNSigmasTPCKaon() const { return mNSigmasTPC[kKaon]; }
-  Double_t getNSigmasTPCProton() const { return mNSigmasTPC[kProton]; }
+  Float_t getNSigmasTPC(Part pt) const { return mNSigmasTPC[pt]; }
+  Float_t getNSigmasTPCElectron() const { return mNSigmasTPC[kElectron]; }
+  Float_t getNSigmasTPCPion() const { return mNSigmasTPC[kPion]; }
+  Float_t getNSigmasTPCKaon() const { return mNSigmasTPC[kKaon]; }
+  Float_t getNSigmasTPCProton() const { return mNSigmasTPC[kProton]; }
 
   void getBemcPtEtaPhi(Double_t &pt, Double_t &eta, Double_t &phi) const {pt = mBemcPt; eta = mBemcEta; phi = mBemcPhi;}
   Double_t getBemcPt() const { return mBemcPt; }
@@ -133,7 +133,7 @@ private:
 
   Double32_t mDEdxSignal; // measured dE/dx value
   static const Int_t mNpart = 4; // number of particle species with dE/dx identification
-  Double32_t mNSigmasTPC[mNpart]; // dE/dx n sigmas for particle species
+  Float16_t mNSigmasTPC[mNpart]; // dE/dx n sigmas for particle species
 
   Double32_t mBemcPt; // pT at BEMC radius
   Double32_t mBemcEta; // pseudorapidity at BEMC radius

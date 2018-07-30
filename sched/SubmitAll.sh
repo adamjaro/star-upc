@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #top directory for outputs
-top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst_run0"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/dev/muDst_dev1"
 
 #macro to run the maker
 macro="RunFilterMaker.C"

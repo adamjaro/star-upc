@@ -3,7 +3,7 @@
 #resubmit aborted jobs
 
 #top directory for all outputs
-basedir="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst_run0/out"
+basedir="/gpfs01/star/pwg/jaroslav/star-upc/trees/dev/muDst_dev1/out"
 
 #path to log file
 logpath="/logs/*.out"
