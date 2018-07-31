@@ -30,12 +30,10 @@ StUPCFilterTrgUtil::StUPCFilterTrgUtil() {
 //_____________________________________________________________________________
 void StUPCFilterTrgUtil::processEvent(const StTriggerData *trgdat, StUPCEvent *upcEvt) {
 
-  //last DSM words from DSMs: TOF&RP, BBC&ZDC, EMC;
-  upcEvt->setLastDSM( trgdat->lastDSM(0), 0 );
-  upcEvt->setLastDSM( trgdat->lastDSM(1), 1 );
-  upcEvt->setLastDSM( trgdat->lastDSM(3), 2 );
   //ZDC
   runZDC(trgdat, upcEvt);
+  //VPD
+  runVPD(trgdat, upcEvt);
   //BBC
   runBBC(trgdat, upcEvt);
   //TOF multiplicity
@@ -50,9 +48,25 @@ void StUPCFilterTrgUtil::runZDC(const StTriggerData *trgdat, StUPCEvent *upcEvt)
 
   upcEvt->setZDCUnAttEast( trgdat->zdcUnAttenuated(east) );
   upcEvt->setZDCUnAttWest( trgdat->zdcUnAttenuated(west) );
+  upcEvt->setZdcVertexZ( trgdat->zdcVertexZ() );
 
 }//runZDC
 
+//_____________________________________________________________________________
+void StUPCFilterTrgUtil::runVPD(const StTriggerData *trgdat, StUPCEvent *upcEvt) {
+
+  //function to write VPD data to output UPC event
+
+  UShort_t sum_east=0, sum_west=0;
+  //pmt loop
+  for(Int_t ipmt=1; ipmt<=16; ipmt++) {
+    sum_east += trgdat->vpdADC(east, ipmt);
+    sum_west += trgdat->vpdADC(west, ipmt);
+  }//pmt loop
+  upcEvt->setVPDSumEast( sum_east );
+  upcEvt->setVPDSumWest( sum_west );
+
+}//runVPD
 
 //_____________________________________________________________________________
 void StUPCFilterTrgUtil::runBBC(const StTriggerData *trgdat, StUPCEvent *upcEvt) {

@@ -16,6 +16,7 @@ private:
   StUPCFilterTrgUtil &operator=(const StUPCFilterTrgUtil &o); // not implemented
 
   void runZDC(const StTriggerData *trgdat, StUPCEvent *upcEvt);
+  void runVPD(const StTriggerData *trgdat, StUPCEvent *upcEvt);
   void runBBC(const StTriggerData *trgdat, StUPCEvent *upcEvt);
 
   Bool_t bbcLimits(UShort_t adc, UShort_t tdc) const;

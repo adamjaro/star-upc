@@ -33,8 +33,8 @@ TClonesArray *StUPCEvent::mgMCParticles = 0;
 //_____________________________________________________________________________
 StUPCEvent::StUPCEvent():
   mTrg(0), mRunNum(0), mEvtNum(0), mFillNum(0), mbCrossId(0), mbCrossId7bit(0),
-  mMagField(0), mZdcEastUA(0), mZdcWestUA(0), mBBCSmallEast(0), mBBCSmallWest(0),
-  mBBCLargeEast(0), mBBCLargeWest(0), mTofMult(0), mBemcMult(0),
+  mMagField(0), mZdcEastUA(0), mZdcWestUA(0), mZdcVertexZ(0), mBBCSmallEast(0), mBBCSmallWest(0),
+  mBBCLargeEast(0), mBBCLargeWest(0), mVPDSumEast(0), mVPDSumWest(0), mTofMult(0), mBemcMult(0),
   mArrayI(0x0), mArrayF(0x0),
   mUPCTracks(0x0), mNtracks(0),
   mUPCBemcClusters(0x0), mNclusters(0),
@@ -42,8 +42,6 @@ StUPCEvent::StUPCEvent():
   mMCParticles(0x0), mNmc(0)
 {
   //default constructor
-
-  for(UInt_t i=0; i<mMaxDsm; i++) mLastDSM[i] = 0;
 
   if(!mgUPCTracks) {
     mgUPCTracks = new TClonesArray("StUPCTrack");
@@ -116,15 +114,6 @@ void StUPCEvent::setTrigger(UInt_t idx)
   mTrg |= (1 << idx);
 
 }//setTrigger
-
-//_____________________________________________________________________________
-void StUPCEvent::setLastDSM(UShort_t dsm, UInt_t channel)
-{
-  //set last DSM word
-  if( channel >= mMaxDsm ) return;
-
-  mLastDSM[channel] = dsm;
-}//setLastDSM
 
 //_____________________________________________________________________________
 StUPCTrack *StUPCEvent::addTrack()
@@ -217,15 +206,6 @@ Bool_t StUPCEvent::getTrigger(UInt_t idx) const
   return kFALSE;
 
 }//setTrigger
-
-//_____________________________________________________________________________
-UShort_t StUPCEvent::getLastDSM(UInt_t channel) const
-{
-  //get last DSM word
-  if( channel >= mMaxDsm ) return 0;
-
-  return mLastDSM[channel];
-}//getLastDSM
 
 //_____________________________________________________________________________
 StUPCTrack *StUPCEvent::getTrack(Int_t iTrack) const

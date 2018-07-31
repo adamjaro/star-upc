@@ -36,15 +36,18 @@ public:
   void setBunchCrossId(UInt_t id) { mbCrossId = id; }
   void setBunchCrossId7bit(UInt_t id) { mbCrossId7bit = id; }
   void setMagneticField(Double_t mag) { mMagField = mag; }
-  void setLastDSM(UShort_t dsm, UInt_t channel);
 
   void setZDCUnAttEast(UShort_t signal) { mZdcEastUA = signal; }
   void setZDCUnAttWest(UShort_t signal) { mZdcWestUA = signal; }
+  void setZdcVertexZ(Float_t vtx) { mZdcVertexZ = vtx; }
 
   void setBBCSmallEast(UInt_t sum) { mBBCSmallEast = sum; }
   void setBBCSmallWest(UInt_t sum) { mBBCSmallWest = sum; }
   void setBBCLargeEast(UInt_t sum) { mBBCLargeEast = sum; }
   void setBBCLargeWest(UInt_t sum) { mBBCLargeWest = sum; }
+
+  void setVPDSumEast(UShort_t sum) { mVPDSumEast = sum; }
+  void setVPDSumWest(UShort_t sum) { mVPDSumWest = sum; }
 
   void setTOFMultiplicity(UShort_t tof) { mTofMult = tof; }
   void setBEMCMultiplicity(UInt_t be) { mBemcMult = be; }
@@ -69,15 +72,18 @@ public:
   UInt_t getBunchCrossId() const { return mbCrossId; }
   UInt_t getBunchCrossId7bit() const { return mbCrossId7bit; }
   Double_t getMagneticField() const { return mMagField; }
-  UShort_t getLastDSM(UInt_t channel) const;
 
   UShort_t getZDCUnAttEast() const { return mZdcEastUA; }
   UShort_t getZDCUnAttWest() const { return mZdcWestUA; }
+  Float_t getZdcVertexZ() const { return mZdcVertexZ; }
 
   UInt_t getBBCSmallEast() const { return mBBCSmallEast; }
   UInt_t getBBCSmallWest() const { return mBBCSmallWest; }
   UInt_t getBBCLargeEast() const { return mBBCLargeEast; }
   UInt_t getBBCLargeWest() const { return mBBCLargeWest; }
+
+  UShort_t getVPDSumEast() const { return mVPDSumEast; }
+  UShort_t getVPDSumWest() const { return mVPDSumWest; }
 
   UShort_t getTOFMultiplicity() const { return mTofMult; }
   UInt_t getBEMCMultiplicity() const { return mBemcMult; }
@@ -116,16 +122,17 @@ private:
   UInt_t mbCrossId7bit; // bunch crossing ID 7bit
   Double32_t mMagField; // magnetic field
 
-  static const UInt_t mMaxDsm = 3;
-  UShort_t mLastDSM[mMaxDsm]; // last DSM words
-
   UShort_t mZdcEastUA; // ZDC unattenuated signal, east
   UShort_t mZdcWestUA; // ZDC unattenuated signal, west
+  Float_t mZdcVertexZ; // ZDC vertex z position
 
   UInt_t mBBCSmallEast; // BBC truncated sum, small tiles, east
   UInt_t mBBCSmallWest; // BBC truncated sum, small tiles, west
   UInt_t mBBCLargeEast; // BBC truncated sum, large tiles, east
   UInt_t mBBCLargeWest; // BBC truncated sum, large tiles, west
+
+  UShort_t mVPDSumEast; // VPD ADC sum east
+  UShort_t mVPDSumWest; // VPD ADC sum west
 
   UShort_t mTofMult; // TOF multiplicity
   UInt_t mBemcMult; // BEMC multiplicity, number of all BEMC clusters in event

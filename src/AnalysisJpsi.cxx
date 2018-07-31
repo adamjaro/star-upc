@@ -37,6 +37,8 @@ Double_t jT0Deta, jT0Dphi, jT1Deta, jT1Dphi;
 Int_t jBBCSmallEast, jBBCSmallWest, jBBCLargeEast, jBBCLargeWest;
 Int_t jBbcSEc, jBbcSWc, jBbcLEc, jBbcLWc;
 Int_t jZDCUnAttEast, jZDCUnAttWest, jTOFMult, jBEMCMult;
+Int_t jVPDSumEast, jVPDSumWest;
+Double_t jZDCVtxZ;
 Double_t jT0pT, jT0eta, jT0phi, jT1pT, jT1eta, jT1phi, jT0eng, jT1eng;
 Double_t jT0sigEl, jT1sigEl, jDeltaPhi;
 Double_t jT0dEdxSig, jT1dEdxSig, jT0beta, jT1beta;
@@ -113,7 +115,7 @@ int main(void) {
 
   //string in = "trees/StUPC.root";
   //string in = "trees/muDst_run0/StUPC_muDst_run0_all.root";
-  string in = "StUPC_muDst_dev1_all.root";
+  string in = "StUPC_muDst_dev2_all.root";
   //string in = "trees/test/StUPC_slight14b2_test1.root";
   //string in = "trees/starsim/slight14b/StUPC_slight14b2.root";
 
@@ -137,7 +139,7 @@ int main(void) {
 
   //overrides to the criteria
   //sign = 1;
-  maxNsigPID = 9999.;
+  //maxNsigPID = 9999.;
   //matchTof = 1;
   //matchBemc = 0;
   //useBemcEff = 1;
@@ -150,7 +152,7 @@ int main(void) {
   parEffBemc = epar;
 
   //flag to write all triggers tree
-  //makeAllTree = kTRUE;
+  makeAllTree = kTRUE;
 
 
   //input
@@ -510,9 +512,13 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
 
   jZDCUnAttEast = (Int_t) upcEvt->getZDCUnAttEast();
   jZDCUnAttWest = (Int_t) upcEvt->getZDCUnAttWest();
+  jZDCVtxZ = upcEvt->getZdcVertexZ();
 
   jTOFMult = (Int_t) upcEvt->getTOFMultiplicity();
   jBEMCMult = (Int_t) upcEvt->getBEMCMultiplicity();
+
+  jVPDSumEast = (Int_t) upcEvt->getVPDSumEast();
+  jVPDSumWest = (Int_t) upcEvt->getVPDSumWest();
 
   //tracks kinematics
   jT0pT       = pair[0]->getPt();
@@ -610,6 +616,7 @@ void FillAllTree() {
 
   jZDCUnAttEast = (Int_t) upcEvt->getZDCUnAttEast();
   jZDCUnAttWest = (Int_t) upcEvt->getZDCUnAttWest();
+  jZDCVtxZ = upcEvt->getZdcVertexZ();
 
   jBBCSmallEast = (Int_t) upcEvt->getBBCSmallEast();
   jBBCSmallWest = (Int_t) upcEvt->getBBCSmallWest();
@@ -618,6 +625,9 @@ void FillAllTree() {
 
   jTOFMult = (Int_t) upcEvt->getTOFMultiplicity();
   jBEMCMult = (Int_t) upcEvt->getBEMCMultiplicity();
+
+  jVPDSumEast = (Int_t) upcEvt->getVPDSumEast();
+  jVPDSumWest = (Int_t) upcEvt->getVPDSumWest();
 
   jAllTree->Fill();
 
@@ -653,6 +663,9 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jZDCUnAttWest", &jZDCUnAttWest, "jZDCUnAttWest/I");
   jRecTree ->Branch("jTOFMult", &jTOFMult, "jTOFMult/I");
   jRecTree ->Branch("jBEMCMult", &jBEMCMult, "jBEMCMult/I");
+  jRecTree ->Branch("jVPDSumEast", &jVPDSumEast, "jVPDSumEast/I");
+  jRecTree ->Branch("jVPDSumWest", &jVPDSumWest, "jVPDSumWest/I");
+  jRecTree ->Branch("jZDCVtxZ", &jZDCVtxZ, "jZDCVtxZ/D");
 
   jRecTree ->Branch("jT0pT", &jT0pT, "jT0pT/D");
   jRecTree ->Branch("jT0eta", &jT0eta, "jT0eta/D");
@@ -759,6 +772,10 @@ TFile *CreateOutputTree(const string& out) {
 
     jAllTree ->Branch("jTOFMult", &jTOFMult, "jTOFMult/I");
     jAllTree ->Branch("jBEMCMult", &jBEMCMult, "jBEMCMult/I");
+
+    jAllTree ->Branch("jVPDSumEast", &jVPDSumEast, "jVPDSumEast/I");
+    jAllTree ->Branch("jVPDSumWest", &jVPDSumWest, "jVPDSumWest/I");
+    jAllTree ->Branch("jZDCVtxZ", &jZDCVtxZ, "jZDCVtxZ/D");
   }
 
   return outfile;
