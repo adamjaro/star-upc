@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #top directory for outputs
-top="/gpfs01/star/pwg/jaroslav/star-upc/trees/dev/muDst_dev2"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run0a"
 
 #macro to run the maker
 macro="RunFilterMaker.C"
@@ -23,6 +23,7 @@ trgsetupname="AuAu_200_production_2014 || AuAu_200_production_low_2014 || AuAu_2
  -delim '/' -limit 0 >> $tmplist
 
 #convert to format for scheduler, section 3.6 The <input> element in submit script, full path ot filelist
+echo "Converting the list to format for scheduler"
 filelist=`pwd`"/filelist.list"
 cat /dev/null > $filelist
 for line in `cat $tmplist`

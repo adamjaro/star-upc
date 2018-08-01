@@ -75,7 +75,7 @@ public:
 
   UShort_t getZDCUnAttEast() const { return mZdcEastUA; }
   UShort_t getZDCUnAttWest() const { return mZdcWestUA; }
-  Float_t getZdcVertexZ() const { return mZdcVertexZ; }
+  Float_t getZdcVertexZ() const { return mZdcVertexZ/10.; } // convert from mm to cm
 
   UInt_t getBBCSmallEast() const { return mBBCSmallEast; }
   UInt_t getBBCSmallWest() const { return mBBCSmallWest; }
@@ -124,7 +124,7 @@ private:
 
   UShort_t mZdcEastUA; // ZDC unattenuated signal, east
   UShort_t mZdcWestUA; // ZDC unattenuated signal, west
-  Float_t mZdcVertexZ; // ZDC vertex z position
+  Float_t mZdcVertexZ; // ZDC vertex z position, mm
 
   UInt_t mBBCSmallEast; // BBC truncated sum, small tiles, east
   UInt_t mBBCSmallWest; // BBC truncated sum, small tiles, west
