@@ -13,3 +13,6 @@ trees/
 *.log
 *.sh~
 ana/
+*.mp3
+*.pyc
+*.pdf
