@@ -107,6 +107,19 @@ def prepare_leg(xl, yl, dxl, dyl, tsiz=0.045):
   return leg
 
 #_____________________________________________________________________________
+def add_leg_pt_mass(leg, ptmax, mmin, mmax):
+
+    leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV}", "")
+    add_leg_mass(leg, mmin, mmax)
+
+#_____________________________________________________________________________
+def add_leg_mass(leg, mmin, mmax):
+
+    mmin_fmt = "{0:.1f}".format(mmin)
+    mmax_fmt = "{0:.1f}".format(mmax)
+    leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
+
+#_____________________________________________________________________________
 def col_lin(col, w=4, st=rt.kSolid):
 
   #create line of a given color
@@ -235,12 +248,11 @@ def print_pad(pad):
   print "#####################"
 
 #_____________________________________________________________________________
-def invert_col(pad):
+def invert_col(pad, bgcol=rt.kBlack):
 
    #set foreground and background color
    #fgcol = rt.kGreen
    fgcol = rt.kOrange-3
-   bgcol = rt.kBlack
 
    pad.SetFillColor(bgcol)
    pad.SetFrameLineColor(fgcol)
