@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #top directory for all outputs
-top="/gpfs01/star/pwg/jaroslav/StUPCLib/ver2/trees/muDst_run4"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run1"
 
 #production names for jobs outputs
 plist=("prod" "low" "mid" "high")
@@ -15,8 +15,8 @@ trgsetupname=(
 )
 
 #submit xml
-#submit="SchedSubmit.xml"
-submit="SchedSubmitConv.xml"
+submit="SchedSubmit.xml"
+#submit="SchedSubmitConv.xml"
 
 #loop over productions
 i=0

@@ -3,7 +3,7 @@
 #resubmit aborted jobs
 
 #top directory for all outputs
-top="/gpfs01/star/pwg/jaroslav/StUPCLib/ver2/trees/muDst_run3"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run1"
 
 #production names for jobs outputs
 plist=("prod" "low" "mid" "high")
