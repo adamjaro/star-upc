@@ -14,6 +14,8 @@ from parameter_descriptor import parameter_descriptor as pdesc
 #_____________________________________________________________________________
 def plot_zdc_tpc_vtx_diff():
 
+    #difference between TPC and ZDC vertex
+
     dbin = 2.5
     dmin = -90
     dmax = 130
@@ -93,6 +95,8 @@ def plot_zdc_tpc_vtx_diff():
 #_____________________________________________________________________________
 def plot_zdc_tpc_vtx():
 
+    #2D ZDC and TPC vertices
+
     zbin = 2.
     zmin = -50.
     zmax = 100.
@@ -139,6 +143,8 @@ def plot_zdc_tpc_vtx():
 
 #_____________________________________________________________________________
 def plot_zdc_vtx():
+
+    #ZDC vertex from selected events and from all triggered events
 
     vbin = 0.1
     vmin = -17.

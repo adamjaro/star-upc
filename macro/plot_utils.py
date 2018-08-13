@@ -131,6 +131,27 @@ def col_lin(col, w=4, st=rt.kSolid):
   return lin
 
 #_____________________________________________________________________________
+def cut_line(cut_val, yl, hx, logy=False):
+
+    #vertical line representing a cut value
+
+    if logy == False:
+        tsel_pos = yl*hx.GetMaximum()
+    else:
+        if hx.GetMinimum() > 0.:
+            tsel_pos = TMath.Log10(hx.GetMinimum()) + yl*(TMath.Log10(hx.GetMaximum())-TMath.Log10(hx.GetMinimum()))
+        else:
+            tsel_pos = yl*TMath.Log10(hx.GetMaximum())
+        tsel_pos = TMath.Power(10, tsel_pos)
+
+    lin = TLine(cut_val, 0., cut_val, tsel_pos)
+    lin.SetLineColor(rt.kViolet)
+    lin.SetLineStyle(rt.kDashed)
+    lin.SetLineWidth(4)
+
+    return lin
+
+#_____________________________________________________________________________
 def log_fit_result(r1, lmg=6):
 
   result = ""
