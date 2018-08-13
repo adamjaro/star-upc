@@ -44,6 +44,7 @@ Double_t jT0sigEl, jT1sigEl, jDeltaPhi;
 Double_t jT0dEdxSig, jT1dEdxSig, jT0beta, jT1beta;
 Double_t jT0phiBemc, jT1phiBemc, jDeltaPhiBemc;
 Double_t jVtxX, jVtxY, jVtxZ;
+Double_t jT0dcaXY, jT0dcaZ, jT1dcaXY, jT1dcaZ;
 Double_t jT0chi2, jT1chi2;
 Double_t jT0bemcE, jT1bemcE, jT0bemcP, jT1bemcP;
 Double_t jT0pTBemc, jT1pTBemc, jT0etaBemc, jT1etaBemc;
@@ -58,13 +59,13 @@ Double_t jGenP0pT, jGenP0eta, jGenP0phi, jGenP1pT, jGenP1eta, jGenP1phi;
 const Double_t kUdf=-9.e9;//default for undefined
 
 //selection criteria
-Short_t sign;
-UShort_t minNhits;
+Int_t sign;
+Int_t minNhits;
 Double_t maxAbsEta, maxNsigPID;
 Bool_t matchBemc, matchTof, projBemc;
 Bool_t useBemcEff;
 Double_t minDphiBemc;
-Float_t maxAbsZvtx;
+Double_t maxAbsZvtx;
 Double_t maxAbsY;
 const Int_t npairSel=2;
 enum {kV0=0, kV1};
@@ -111,17 +112,18 @@ void ShowProggress(Double_t xi, Double_t xall, const string& in, const string& o
 int main(void) {
 
   //string basedir = "/home/jaroslav/analyza/star-upc/"; // local
-  string basedir = "/home/tmp/jaroslav/"; // rcf
+  //string basedir = "/home/tmp/jaroslav/"; // rcf
+  string basedir = "/star/u/jaroslav/star-upc/"; // rcf home
 
   //string in = "trees/StUPC.root";
   //string in = "trees/muDst_run0/StUPC_muDst_run0_all.root";
-  string in = "StUPC_muDst_run1_all.root";
-  //string in = "trees/test/StUPC_slight14b2_test1.root";
+  //string in = "StUPC_muDst_run1_all.root";
+  string in = "trees/starsim/StUPC_slight14b2.root";
   //string in = "trees/starsim/slight14b/StUPC_slight14b2.root";
 
   //string out = "build/output.root";
-  string out = "output.root";
-  //string out = "sel/starsim/sel3/ana_slight14b2_sel3.root";
+  //string out = "output.root";
+  string out = "ana/starsim/slight14b2/sel3/ana_slight14b2_sel3.root";
 
   //selection criteria
   sign = -1;            // sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
@@ -134,15 +136,16 @@ int main(void) {
   projBemc = 1;         // projection to BEMC, 1: required, 0: not required, redundant with matchBemc
   useBemcEff = 0;       // use BEMC matching efficiency from file
   minDphiBemc = 2.618;  // minimal tracks opening angle at BEMC
-  maxAbsZvtx = 50.;    // maximal Z position of vertex, absolute value
+  maxAbsZvtx = 50.;     // maximal Z position of vertex, absolute value
   maxAbsY = 1.;         // maximal pair rapidity, absolute value
 
   //overrides to the criteria
   //sign = 1;
   //maxNsigPID = 9999.;
+  //maxAbsZvtx = 9999.;
   //matchTof = 1;
-  //matchBemc = 0;
-  //useBemcEff = 1;
+  matchBemc = 0;
+  useBemcEff = 1;
   //maxAbsEta = 9.e9;
 
   //bemc efficiency
@@ -152,7 +155,7 @@ int main(void) {
   parEffBemc = epar;
 
   //flag to write all triggers tree
-  makeAllTree = kTRUE;
+  //makeAllTree = kTRUE;
 
 
   //input
@@ -552,6 +555,12 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   jVtxY = vtx->getPosY();
   jVtxZ = vtx->getPosZ();
 
+  //DCA to vertex
+  jT0dcaXY = pair[0]->getDcaXY();
+  jT0dcaZ = pair[0]->getDcaZ();
+  jT1dcaXY = pair[1]->getDcaXY();
+  jT1dcaZ = pair[1]->getDcaZ();
+
   //tracks Chi^2
   jT0chi2 = pair[0]->getChi2();
   jT1chi2 = pair[1]->getChi2();
@@ -690,6 +699,11 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jVtxY", &jVtxY, "jVtxY/D");
   jRecTree ->Branch("jVtxZ", &jVtxZ, "jVtxZ/D");
 
+  jRecTree ->Branch("jT0dcaXY", &jT0dcaXY, "jT0dcaXY/D");
+  jRecTree ->Branch("jT0dcaZ", &jT0dcaZ, "jT0dcaZ/D");
+  jRecTree ->Branch("jT1dcaXY", &jT1dcaXY, "jT1dcaXY/D");
+  jRecTree ->Branch("jT1dcaZ", &jT1dcaZ, "jT1dcaZ/D");
+
   jRecTree ->Branch("jT0chi2", &jT0chi2, "jT0chi2/D");
   jRecTree ->Branch("jT1chi2", &jT1chi2, "jT1chi2/D");
   jRecTree ->Branch("jT0bemcE", &jT0bemcE, "jT0bemcE/D");
@@ -731,8 +745,8 @@ TFile *CreateOutputTree(const string& out) {
   }
 
   //selection criteria in output reconstructed tree
-  jRecTree ->Branch("sign", &sign, "sign/S");
-  jRecTree ->Branch("minNhits", &minNhits, "minNhits/s");
+  jRecTree ->Branch("sign", &sign, "sign/I");
+  jRecTree ->Branch("minNhits", &minNhits, "minNhits/I");
   jRecTree ->Branch("maxAbsEta", &maxAbsEta, "maxAbsEta/D");
   jRecTree ->Branch("maxNsigPID", &maxNsigPID, "maxNsigPID/D");
   jRecTree ->Branch("matchBemc", &matchBemc, "matchBemc/O");
@@ -740,7 +754,7 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("projBemc", &projBemc, "projBemc/O");
   jRecTree ->Branch("useBemcEff", &useBemcEff, "useBemcEff/O");
   jRecTree ->Branch("minDphiBemc", &minDphiBemc, "minDphiBemc/D");
-  jRecTree ->Branch("maxAbsZvtx", &maxAbsZvtx, "maxAbsZvtx/F");
+  jRecTree ->Branch("maxAbsZvtx", &maxAbsZvtx, "maxAbsZvtx/D");
   jRecTree ->Branch("maxAbsY", &maxAbsY, "maxAbsY/D");
   jRecTree ->Branch("pairSel", &pairSel, "pairSel/I");
 

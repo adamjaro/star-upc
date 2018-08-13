@@ -96,11 +96,11 @@ Int_t StUPCFilterMaker::Init()
   mTrgRan[ kUPCJpsiB_2 ][0] = 15153036;
   mTrgRan[ kUPCJpsiB_2 ][1] = 15167007;
   //
-  //mTrgIDs[ kUPCmain_1 ] = 450701; // UPC-main, Run14 AuAu, 1st id
+  mTrgIDs[ kUPCmain_1 ] = 450701; // UPC-main, Run14 AuAu, 1st id
   mTrgRan[ kUPCmain_1 ][0] = 15078073;
   mTrgRan[ kUPCmain_1 ][1] = 15167014;
   //
-  //mTrgIDs[ kUPCmain_2 ] = 450711; // UPC-main, Run14 AuAu, 2nd id
+  mTrgIDs[ kUPCmain_2 ] = 450711; // UPC-main, Run14 AuAu, 2nd id
   mTrgRan[ kUPCmain_2 ][0] = 15153036;
   mTrgRan[ kUPCmain_2 ][1] = 15167007;
   //
