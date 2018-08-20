@@ -12,6 +12,7 @@ txt/
 trees/
 *.log
 *.sh~
+*.py~
 ana/
 *.mp3
 *.pyc
