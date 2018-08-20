@@ -188,6 +188,48 @@ def log_fit_result(r1, lmg=6):
   return result
 
 #_____________________________________________________________________________
+def log_tfit_result(r1, lmg=6):
+
+    result = ""
+
+    result += "Minimizer status: " + str(r1.Status()) + ", "
+    result += "cov matrix status: " + str(r1.CovMatrixStatus()) + "\n"
+
+    result += "Chi2 = " + str(r1.Chi2()) + "\n"
+    result += "NDf = " + str(r1.Ndf()) + "\n"
+    result += "Ndm = " + str(r1.Edm()) + "\n"
+    result += "NCalls = " + str(r1.NCalls()) + "\n"
+    for ipar in range(r1.NPar()):
+        result += r1.ParName(ipar) + " = " + str(r1.Parameter(ipar)) + " +/- " +  str(r1.ParError(ipar)) + "\n"
+
+    ss = std.stringstream()
+    r1.PrintCovMatrix(ss);
+    result += convert_stream(ss)
+
+    return insert_left_margin(result, lmg)
+
+#_____________________________________________________________________________
+def insert_left_margin(res, lmg):
+
+    #put left margin
+    rline = res.split("\n")
+    result = ""
+    for line in rline:
+        result += " ".ljust(lmg) + line + "\n"
+
+    return result
+
+#_____________________________________________________________________________
+def convert_stream(ss):
+
+    stream = ""
+    while ss.eof() == False:
+        chnum = ss.get()
+        if chnum < 0: continue
+        stream += chr(chnum)
+    return stream
+
+#_____________________________________________________________________________
 def log_fit_parameters(r1, lmg=6):
 
     #direct access to fit parameters
