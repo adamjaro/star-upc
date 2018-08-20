@@ -118,11 +118,11 @@ int main(void) {
   //string in = "trees/StUPC.root";
   //string in = "trees/muDst_run0/StUPC_muDst_run0_all.root";
   //string in = "StUPC_muDst_run1_all.root";
-  string in = "trees/starsim/StUPC_slight14b2x1.root";
+  string in = "trees/starsim/StUPC_slight14b2x2.root";
 
   //string out = "build/output.root";
   //string out = "output.root";
-  string out = "ana/starsim/slight14b2/sel3/ana_slight14b2x1_sel3_nzvtx.root";
+  string out = "ana/starsim/slight14b2/sel3/ana_slight14b2x2_sel3_nzvtx.root";
 
   //selection criteria
   sign = -1;            // sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
