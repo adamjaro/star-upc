@@ -70,18 +70,25 @@ def prepare_TH2D_n(name, nbinsX, xmin, xmax, nbinsY, ymin, ymax):
   return hx
 
 #_____________________________________________________________________________
-def norm_to_data(hMC, hDat, col=rt.kBlue):
+def norm_to_data(hMC, hDat, col=rt.kBlue, lo=0., hi=-1.):
 
-  #normalize MC hMC to data hDat, suppress errors to draw as line and set color
+    #normalize MC hMC to data hDat, suppress errors to draw as line and set color,
+    #optional range for data to be used to normalize the MC
 
-  hMC.Sumw2()
-  hMC.Scale(hDat.Integral("width")/hMC.Integral("width"))
-  for ibin in range(hMC.GetNbinsX()+1):
-    hMC.SetBinError(ibin, 0)
-  hMC.SetLineColor(col)
-  hMC.SetMarkerColor(col)
+    hMC.Sumw2()
+    #norm in full or restricted range
+    if hi < lo:
+        hMC.Scale(hDat.Integral("width")/hMC.Integral("width"))
+    else:
+        b_lo = hDat.FindBin(lo)
+        b_hi = hDat.FindBin(hi)
+        hMC.Scale(hDat.Integral(b_lo, b_hi, "width")/hMC.Integral("width"))
+    
+    for ibin in range(hMC.GetNbinsX()+1):
+        hMC.SetBinError(ibin, 0)
 
-
+    hMC.SetLineColor(col)
+    hMC.SetMarkerColor(col)
 
 #_____________________________________________________________________________
 def box_canvas():
