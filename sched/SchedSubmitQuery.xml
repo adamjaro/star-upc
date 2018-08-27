@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE job [
+  <!ENTITY basedir "__BASEDIR__">
+  <!ENTITY srcdir "/star/u/jaroslav/star-upc">
+]>
+
+<job maxFilesPerProcess="30" fileListSyntax="xrootd" simulateSubmission="false">
+
+  <command>
+    echo "Starting the job"
+    ls
+    hostname
+    starpro
+    echo $STAR
+    echo $OPTSTAR
+    cons
+    root4star -l -q -b RunFilterMaker.C\(\"$FILELIST\",$INPUTFILECOUNT,\"$SCRATCH/$JOBID.root\"\)
+  </command>
+
+  <input URL="catalog:star.bnl.gov?__QUERY__" nFiles="all" />
+
+  <output fromScratch="*.root" toURL="file:&basedir;/" />
+
+  <stdout URL="file:&basedir;/logs/$JOBID.out"/>
+  <stderr URL="file:&basedir;/logs/$JOBID.err"/>
+
+  <Generator>
+    <Location>&basedir;/sched</Location>
+  </Generator>
+
+  <SandBox installer="ZIP">
+  	<Package>
+  		<File>file:&srcdir;/RunFilterMaker.C</File>
+  		<File>file:&srcdir;/StRoot</File>
+  	</Package>
+  </SandBox>
+
+
+
+
+
+
+
+
+
+
+
+
+</job>

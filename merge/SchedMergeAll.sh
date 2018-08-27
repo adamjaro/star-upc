@@ -1,8 +1,9 @@
 #!/bin/bash
 
-top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run1a"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run2"
 pattern="*/*.root"
-outfile="StUPC_muDst_run1a_all.root"
+#pattern="2010/*.root"
+outfile="StUPC_muDst_run2_all.root"
 
 root -l -b -q 'MergeFiles.C('\"$top'/'$pattern\"','\"$top'/'$outfile\"')'
 stat=$?
