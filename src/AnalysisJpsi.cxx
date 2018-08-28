@@ -27,6 +27,7 @@
 #include "StUPCBemcCluster.h"
 #include "StUPCVertex.h"
 #include "THB1D.h"
+#include "ArgumentParser.h"
 
 using namespace std;
 
@@ -57,19 +58,21 @@ Double_t jGenPt, jGenPt2, jGenM, jGenY;
 Double_t jGenP0pT, jGenP0eta, jGenP0phi, jGenP1pT, jGenP1eta, jGenP1phi;
 
 const Double_t kUdf=-9.e9;//default for undefined
+const Double_t kInf=9.e9; // infinity representation
 
 //selection criteria
-Int_t sign;
-Int_t minNhits;
-Double_t maxAbsEta, maxNsigPID;
-Bool_t matchBemc, matchTof, projBemc;
-Bool_t useBemcEff;
-Double_t minDphiBemc;
-Double_t maxAbsZvtx;
-Double_t maxAbsY;
+Int_t sign=0;
+Int_t minNhits=0;
+Double_t maxAbsEta=kInf, maxNsigPID=kInf;
+Bool_t matchBemc=0, matchTof=0, projBemc=0;
+Bool_t useBemcEff=0;
+Double_t minDphiBemc=-kInf;
+Double_t maxAbsZvtx=kInf;
+Double_t maxAbsY=kInf;
 const Int_t npairSel=2;
 enum {kV0=0, kV1};
-Int_t pairSel;
+Int_t pairSel=kV0;
+Double_t epar0=0., epar1=0., epar2=0., epar3=0.;
 
 //trigger IDs, same as in StUPCFilterMaker.h
 enum {kUPCJpsiB_1=0, kUPCJpsiB_2, kUPCmain_1, kUPCmain_2, kZero_bias};
@@ -109,60 +112,53 @@ void PrintStat(ostream& out, const string& innam, const string& outnam, Int_t lm
 void ShowProggress(Double_t xi, Double_t xall, const string& in, const string& out);
 
 //_____________________________________________________________________________
-int main(void) {
+int main(int argc, char* argv[]) {
 
-  //string basedir = "/home/jaroslav/analyza/star-upc/"; // local
-  //string basedir = "/home/tmp/jaroslav/"; // rcf
-  string basedir = "/star/u/jaroslav/star-upc/"; // rcf home
+  if( argc != 2 ) {
+    cout << "No configuration file specified." << endl;
+    return -1;
+  }
 
-  //string in = "trees/StUPC.root";
-  //string in = "trees/muDst_run0/StUPC_muDst_run0_all.root";
-  //string in = "StUPC_muDst_run1_all.root";
-  string in = "trees/starsim/StUPC_slight14b2x2.root";
+  //register selection criteria for argument parser
+  ArgumentParser parser;
+  parser.AddDouble("maxAbsEta", &maxAbsEta);
+  parser.AddDouble("maxNsigPID", &maxNsigPID);
+  parser.AddDouble("minDphiBemc", &minDphiBemc);
+  parser.AddDouble("maxAbsZvtx", &maxAbsZvtx);
+  parser.AddDouble("maxAbsY", &maxAbsY);
+  parser.AddInt("sign", &sign);
+  parser.AddInt("minNhits", &minNhits);
+  parser.AddInt("pairSel", &pairSel);
+  parser.AddBool("matchBemc", &matchBemc);
+  parser.AddBool("matchTof", &matchTof);
+  parser.AddBool("projBemc", &projBemc);
+  parser.AddBool("useBemcEff", &useBemcEff);
+  parser.AddDouble("epar0", &epar0);
+  parser.AddDouble("epar1", &epar1);
+  parser.AddDouble("epar2", &epar2);
+  parser.AddDouble("epar3", &epar3);
+  parser.AddBool("makeAllTree", &makeAllTree);
 
-  //string out = "build/output.root";
-  //string out = "output.root";
-  string out = "ana/starsim/slight14b2/sel3/ana_slight14b2x2_sel3_nzvtx.root";
+  string basedir_in, in_name, basedir_out, out_name;
+  parser.AddString("basedir_in", &basedir_in);
+  parser.AddString("in_name", &in_name);
+  parser.AddString("basedir_out", &basedir_out);
+  parser.AddString("out_name", &out_name);
 
-  //selection criteria
-  sign = -1;            // sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
-  pairSel = kV0;        // pair selection version, kV0: already same vertex, kV1: pair and then vertex
-  minNhits = 14;        // min number of track hits
-  maxAbsEta = 1.;       // max track pseudorapidity, absolute value
-  maxNsigPID = 3;       // max number of sigmas for TPC dE/dx PID
-  matchBemc = 1;        // track - BEMC matching, 1: required, 0: not required
-  matchTof = 0;         // track - TOF matching, 1: required, 0: not required
-  projBemc = 1;         // projection to BEMC, 1: required, 0: not required, redundant with matchBemc
-  useBemcEff = 0;       // use BEMC matching efficiency from file
-  minDphiBemc = 2.618;  // minimal tracks opening angle at BEMC
-  maxAbsZvtx = 50.;     // maximal Z position of vertex, absolute value
-  maxAbsY = 1.;         // maximal pair rapidity, absolute value
+  //read the configuration file
+  parser.SetConfigDirectory("../config");
+  if( !parser.Parse(argv[1]) ) return -1;
 
-  //overrides to the criteria
-  //sign = 1;
-  //maxNsigPID = 9999.;
-  maxAbsZvtx = 9999.;
-  //matchTof = 1;
-  matchBemc = 0;
-  useBemcEff = 1;
-  //maxAbsEta = 9.e9;
-
-  //bemc efficiency
-  //Double_t epar[] = {0.411, 1.206, 0.241, 0.0009}; // slight14b1_sel2b
-  //Double_t epar[] = {0.455, 1.021, 0.328, -0.041}; // conv_sel0, run1, ptot
-  Double_t epar[] = {0.423, 1.011, 0.275, -0.015}; // conv/sel0, run3, ptot
+  //set bemc efficiency from selection criteria
+  Double_t epar[] = {epar0, epar1, epar2, epar3};
   parEffBemc = epar;
 
-  //flag to write all triggers tree
-  //makeAllTree = kTRUE;
-
-
   //input
-  TTree *upcTree = ConnectInput(basedir+in);
+  TTree *upcTree = ConnectInput(basedir_in + "/" + in_name);
   if(!upcTree) {cout << "No input." << endl; return 1;}
 
   //output
-  TFile *outfile = CreateOutputTree(basedir+out);
+  TFile *outfile = CreateOutputTree(basedir_out + "/" + out_name);
   if(!outfile) {cout << "Can not open output file." << endl; return -1;}
 
   //analysis init
@@ -170,15 +166,15 @@ int main(void) {
 
   Long64_t nev = upcTree->GetEntries();
   cout << "Starting the analysis, events: " << nev << endl;
-  cout<<"Input:   "<<in<<endl;
-  cout<<"Output:  "<<out<<endl;
+  cout<<"Input:   "<<in_name<<endl;
+  cout<<"Output:  "<<out_name<<endl;
 
   clock_t cdelta = CLOCKS_PER_SEC*0.5; //clock ticks per 0.5 sec
   clock_t ctim = clock();
   //event loop
   for(Long64_t iev=0; iev<nev; iev++) {
     if( (clock()-ctim) > cdelta ) {
-      ShowProggress(iev, nev, in, out);
+      ShowProggress(iev, nev, in_name, out_name);
       ctim = clock();
     }
 
@@ -257,10 +253,10 @@ int main(void) {
   }//event loop
 
   hMass->SetTotalHeight( hMass->GetTotalHeight()-1 );
-  ShowProggress(nev, nev, in, out);
+  ShowProggress(nev, nev, in_name, out_name);
   cout << endl;
   ofstream out1("out.txt");
-  PrintStat(out1, in, out, 6);
+  PrintStat(out1, in_name, out_name, 6);
 
   //cout << hMass;
 
@@ -756,6 +752,10 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("maxAbsZvtx", &maxAbsZvtx, "maxAbsZvtx/D");
   jRecTree ->Branch("maxAbsY", &maxAbsY, "maxAbsY/D");
   jRecTree ->Branch("pairSel", &pairSel, "pairSel/I");
+  jRecTree ->Branch("epar0", &epar0, "epar0/D");
+  jRecTree ->Branch("epar1", &epar1, "epar1/D");
+  jRecTree ->Branch("epar2", &epar2, "epar2/D");
+  jRecTree ->Branch("epar3", &epar3, "epar3/D");
 
   //MC generated tree
   jGenTree = new TTree("jGenTree", "jGenTree");

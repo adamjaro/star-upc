@@ -32,7 +32,6 @@ public:
 
 private:
 
-  ClassDef(THB1D, 1);
 };
 
 #endif

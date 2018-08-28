@@ -10,7 +10,6 @@
 #pragma link C++ class StUPCTrack+;
 #pragma link C++ class StUPCBemcCluster+;
 #pragma link C++ class StUPCVertex+;
-#pragma link C++ class THB1D;
 
 #endif
 

@@ -9,12 +9,21 @@ set (SRCS
   src/StUPCBemcCluster.cxx
   src/StUPCVertex.cxx
   src/THB1D.cxx
+  src/ArgumentParser.cxx
   )
 
 #name of shared libarary LIB
 set (LIB star-upc)
 #binary executable files
 set (BIN AnalysisJpsi AnalysisConvEl AnalysisSecVtx AnalysisEmptyEvt)
+
+#sources for ROOT dictionary
+set (SRCS_DICT
+  src/StUPCEvent.cxx
+  src/StUPCTrack.cxx
+  src/StUPCBemcCluster.cxx
+  src/StUPCVertex.cxx
+  )
 
 #LinkDef file for ROOT dictionary
 set (LINKDEF "${LIB}LinkDef.h")
@@ -46,7 +55,7 @@ set (CLING rootcint)
 set (DICT G__${LIB}.cxx)
 
 # Headers from sources
-string(REPLACE ".cxx" ".h" HDRS "${SRCS}")
+string(REPLACE ".cxx" ".h" HDRS "${SRCS_DICT}")
 string(REPLACE "src/" "" HDRS_PLAIN "${HDRS}")
 string(REPLACE "src/" "include/" HDRS_INC "${HDRS}")
 

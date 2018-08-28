@@ -1,0 +1,63 @@
+
+#input and output
+basedir_in      /home/tmp/jaroslav                        #input directory
+#basedir_in      /star/u/jaroslav/star-upc
+in_name         trees/starsim/StUPC_slight14b2x2.root     #input file
+#in_name         StUPC_muDst_run1_all.root
+
+basedir_out     /star/u/jaroslav/star-upc/build           #output directory
+out_name        output.root                               #output file
+#out_name        ana/starsim/slight14b2/sel3/ana_slight14b2x2_sel3_nzvtx.root
+
+#selection criteria
+sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
+pairSel         0       # pair selection version, 0: already same vertex, 1: pair and then vertex
+minNhits        14      # min number of track hits
+maxAbsEta       1.      # max track pseudorapidity, absolute value
+maxNsigPID      3.      # max number of sigmas for TPC dE/dx PID
+matchBemc       1       # track - BEMC matching, 1: required, 0: not required
+matchTof        0       # track - TOF matching, 1: required, 0: not required
+projBemc        1       # projection to BEMC, 1: required, 0: not required, redundant with matchBemc
+useBemcEff      0       # use BEMC matching efficiency from file
+minDphiBemc     2.618   # minimal tracks opening angle at BEMC
+maxAbsZvtx      50.     # maximal Z position of vertex, absolute value
+maxAbsY         1.      # maximal pair rapidity, absolute value
+
+makeAllTree     0       # flag to write all triggers tree
+
+#overrides to the criteria
+#sign        1
+#maxNsigPID  9999.
+#maxAbsZvtx  9999.
+#matchTof    1
+matchBemc   0
+useBemcEff  1
+#maxAbsEta   9.e9
+
+#bemc efficiency
+#conv/sel0, run3, ptot
+epar0   0.423
+epar1   1.011
+epar2   0.275
+epar3   -0.015
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
