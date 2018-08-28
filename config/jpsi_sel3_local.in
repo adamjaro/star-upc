@@ -10,6 +10,7 @@ out_name        output.root                               #output file
 
 #selection criteria
 sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
+trgProfile      0       # trigger profile, 0: Jpsi-B, 1: zero-bias, 2: main 2014, 3: main 2010+11
 pairSel         0       # pair selection version, 0: already same vertex, 1: pair and then vertex
 minNhits        14      # min number of track hits
 maxAbsEta       1.      # max track pseudorapidity, absolute value

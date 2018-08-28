@@ -72,10 +72,11 @@ Double_t maxAbsY=kInf;
 const Int_t npairSel=2;
 enum {kV0=0, kV1};
 Int_t pairSel=kV0;
+Int_t trgProfile=0;
 Double_t epar0=0., epar1=0., epar2=0., epar3=0.;
 
 //trigger IDs, same as in StUPCFilterMaker.h
-enum {kUPCJpsiB_1=0, kUPCJpsiB_2, kUPCmain_1, kUPCmain_2, kZero_bias};
+enum {kUPCJpsiB_1=0, kUPCJpsiB_2, kUPCmain_1, kUPCmain_2, kZero_bias, kMain10_1, kMain10_2, kMain11_1, kMain11_2, kMain11_3};
 
 //analysis variables
 TFile *infile;
@@ -129,6 +130,7 @@ int main(int argc, char* argv[]) {
   parser.AddInt("sign", &sign);
   parser.AddInt("minNhits", &minNhits);
   parser.AddInt("pairSel", &pairSel);
+  parser.AddInt("trgProfile", &trgProfile);
   parser.AddBool("matchBemc", &matchBemc);
   parser.AddBool("matchTof", &matchTof);
   parser.AddBool("projBemc", &projBemc);
@@ -184,9 +186,13 @@ int main(int argc, char* argv[]) {
     if(isMC) RunMC(); // MC
 
     //trigger
-    if( !isMC && !upcEvt->getTrigger(kUPCJpsiB_1) && !upcEvt->getTrigger(kUPCJpsiB_2) ) continue;
-    //if( !isMC && !upcEvt->getTrigger(kZero_bias) ) continue;
-    //if( !isMC && !upcEvt->getTrigger(kUPCmain_1) && !upcEvt->getTrigger(kUPCmain_2) ) continue;
+    if( !isMC && trgProfile==0 && !upcEvt->getTrigger(kUPCJpsiB_1) && !upcEvt->getTrigger(kUPCJpsiB_2) ) continue;
+    if( !isMC && trgProfile==1 && !upcEvt->getTrigger(kZero_bias) ) continue;
+    if( !isMC && trgProfile==2 && !upcEvt->getTrigger(kUPCmain_1) && !upcEvt->getTrigger(kUPCmain_2) ) continue;
+    if( !isMC && trgProfile==3 ) {
+      if( !upcEvt->getTrigger(kMain10_1) && !upcEvt->getTrigger(kMain10_2)
+          && !upcEvt->getTrigger(kMain11_1) && !upcEvt->getTrigger(kMain11_2) && !upcEvt->getTrigger(kMain11_3) ) continue;
+    }
     hEvtCount->Fill( kAnaL );
     if( makeAllTree ) FillAllTree();
 
@@ -752,6 +758,7 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("maxAbsZvtx", &maxAbsZvtx, "maxAbsZvtx/D");
   jRecTree ->Branch("maxAbsY", &maxAbsY, "maxAbsY/D");
   jRecTree ->Branch("pairSel", &pairSel, "pairSel/I");
+  jRecTree ->Branch("trgProfile", &trgProfile, "trgProfile/I");
   jRecTree ->Branch("epar0", &epar0, "epar0/D");
   jRecTree ->Branch("epar1", &epar1, "epar1/D");
   jRecTree ->Branch("epar2", &epar2, "epar2/D");
