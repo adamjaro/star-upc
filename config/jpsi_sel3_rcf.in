@@ -1,9 +1,9 @@
 
 #input and output
-#basedir_in      /home/tmp/jaroslav                        #input directory
-basedir_in      /star/u/jaroslav/star-upc
-in_name         trees/starsim/StUPC_slight14b2x2.root     #input file
-#in_name         StUPC_muDst_run1_all.root
+basedir_in      /home/tmp/jaroslav                        #input directory
+#basedir_in      /star/u/jaroslav/star-upc
+#in_name         trees/starsim/StUPC_slight14b2x2.root     #input file
+in_name         StUPC_muDst_run1_all.root
 
 basedir_out     /star/u/jaroslav/star-upc/build           #output directory
 out_name        output.root                               #output file
@@ -31,8 +31,8 @@ makeAllTree     0       # flag to write all triggers tree
 #maxNsigPID  9999.
 #maxAbsZvtx  9999.
 #matchTof    1
-matchBemc   0
-useBemcEff  1
+#matchBemc   0
+#useBemcEff  1
 #maxAbsEta   9.e9
 
 #bemc efficiency
