@@ -35,7 +35,7 @@ Bool_t ArgumentParser::Parse(std::string configfile) {
 
   char_separator<char> sep(" ");
 
-  ifstream in(configfile);
+  ifstream in(configfile.c_str());
   string line;
   Int_t n_missing = 0;
   //config file loop
@@ -44,7 +44,7 @@ Bool_t ArgumentParser::Parse(std::string configfile) {
     if(line.find("#") == 0) continue;
 
     //split config line to name and value
-    tokenizer<char_separator<char>> cline(line, sep);
+    tokenizer< char_separator<char> > cline(line, sep);
     token_it cline_it = cline.begin();
 
     //double parameters

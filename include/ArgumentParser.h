@@ -35,7 +35,7 @@ public:
 
 private:
 
-  typedef boost::tokenizer<boost::char_separator<char>>::iterator token_it;
+  typedef boost::tokenizer< boost::char_separator<char> >::iterator token_it;
   template<class par_type> Bool_t LoadPar(std::map<std::string, par_type*> cmap, token_it cline_it);
 
 };
