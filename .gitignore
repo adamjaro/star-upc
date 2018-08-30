@@ -21,3 +21,4 @@ ana/
 *.pdf
 fig/
 *.txt
+*.in~
