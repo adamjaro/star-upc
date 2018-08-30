@@ -357,6 +357,8 @@ Int_t StUPCFilterMaker::Make()
     upcVtx->setErrX( vtxPosErr.x() );
     upcVtx->setErrY( vtxPosErr.y() );
     upcVtx->setErrZ( vtxPosErr.z() );
+    upcVtx->setNPrimaryTracks( trkArray->GetEntriesFast() );
+    upcVtx->setNTracksUsed( mMuDst->primaryVertex()->nTracksUsed() );
     upcVtx->setId( ivtx );
 
   }//vertex loop
