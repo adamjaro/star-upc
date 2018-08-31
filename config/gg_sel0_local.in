@@ -1,0 +1,47 @@
+
+#input and output
+basedir_in      /home/jaroslav/analyza/star-upc           #input directory
+in_name         trees/starsim/StUPC_slight14b2x2_v2.root     #input file
+
+basedir_out     /home/jaroslav/analyza/star-upc/build     #output directory
+out_name        output.root                               #output file
+
+#selection criteria
+sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
+maxNPrim        2       # maximal number of primary tracks in vertex
+trgProfile      3       # trigger profile, 0: Jpsi-B, 1: zero-bias, 2: main 2014, 3: main 2010+11
+pairSel         0       # pair selection version, 0: already same vertex, 1: pair and then vertex
+minNhits        15      # min number of track hits
+maxAbsEta       0.8     # max track pseudorapidity, absolute value
+maxNsigPID      4.      # max number of sigmas for TPC dE/dx PID
+matchTof        1       # track - TOF matching, 1: required, 0: not required
+maxAbsZvtx      30.     # maximal Z position of vertex, absolute value
+
+#overrides to the criteria
+#sign        1
+#maxNsigPID  9999.
+#maxAbsZvtx  9999.
+matchTof    0
+#maxAbsEta   9.e9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

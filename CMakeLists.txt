@@ -15,7 +15,7 @@ set (SRCS
 #name of shared libarary LIB
 set (LIB star-upc)
 #binary executable files
-set (BIN AnalysisJpsi AnalysisConvEl AnalysisSecVtx AnalysisEmptyEvt)
+set (BIN AnalysisJpsi AnalysisConvEl AnalysisSecVtx AnalysisEmptyEvt AnalysisGG)
 
 #sources for ROOT dictionary
 set (SRCS_DICT
