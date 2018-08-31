@@ -45,6 +45,7 @@ Double_t jT0sigEl, jT1sigEl, jDeltaPhi;
 Double_t jT0dEdxSig, jT1dEdxSig, jT0beta, jT1beta;
 Double_t jT0phiBemc, jT1phiBemc, jDeltaPhiBemc;
 Double_t jVtxX, jVtxY, jVtxZ;
+Int_t jNPrimInVtx, jNPrimVtxUsed;
 Double_t jT0dcaXY, jT0dcaZ, jT1dcaXY, jT1dcaZ;
 Double_t jT0chi2, jT1chi2;
 Double_t jT0bemcE, jT1bemcE, jT0bemcP, jT1bemcP;
@@ -555,6 +556,8 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   jVtxX = vtx->getPosX();
   jVtxY = vtx->getPosY();
   jVtxZ = vtx->getPosZ();
+  jNPrimInVtx = vtx->getNPrimaryTracks();
+  jNPrimVtxUsed = vtx->getNTracksUsed();
 
   //DCA to vertex
   jT0dcaXY = pair[0]->getDcaXY();
@@ -699,6 +702,8 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jVtxX", &jVtxX, "jVtxX/D");
   jRecTree ->Branch("jVtxY", &jVtxY, "jVtxY/D");
   jRecTree ->Branch("jVtxZ", &jVtxZ, "jVtxZ/D");
+  jRecTree ->Branch("jNPrimInVtx", &jNPrimInVtx, "jNPrimInVtx/I");
+  jRecTree ->Branch("jNPrimVtxUsed", &jNPrimVtxUsed, "jNPrimVtxUsed/I");
 
   jRecTree ->Branch("jT0dcaXY", &jT0dcaXY, "jT0dcaXY/D");
   jRecTree ->Branch("jT0dcaZ", &jT0dcaZ, "jT0dcaZ/D");

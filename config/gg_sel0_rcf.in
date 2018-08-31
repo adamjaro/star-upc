@@ -1,12 +1,10 @@
 
 #input and output
 basedir_in      /home/tmp/jaroslav                        #input directory
-#basedir_in      /star/u/jaroslav/star-upc
-in_name         StUPC_muDst_run2_all.root                  #input file
+in_name         StUPC_muDst_run2a_all.root                  #input file
 
 basedir_out     /star/u/jaroslav/star-upc/build           #output directory
 out_name        output.root                               #output file
-#out_name        ana/starsim/slight14b2/sel3/ana_slight14b2x2_sel3_nzvtx.root
 
 #selection criteria
 sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection

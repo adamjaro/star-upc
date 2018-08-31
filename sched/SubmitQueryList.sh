@@ -3,7 +3,7 @@
 #submit for a given list of catalog queries
 
 #top directory for all outputs
-top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run2"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run2a"
 
 #names for individual query outputs
 qnames=("2010" "2011")

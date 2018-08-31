@@ -6,7 +6,7 @@
 
 
 //_____________________________________________________________________________
-void RunFilterMaker(string filelist="txt/starsim_slight14b2x2.list", Int_t nFiles=1, string outfile="trees/y.root") {
+void RunFilterMaker(string filelist="txt/starsim_slight14b2x2.list", Int_t nFiles=200, string outfile="trees/starsim/StUPC_slight14b2x2_v2.root") {
 
   //maker config
   Bool_t isMC = kFALSE; // data or MC
