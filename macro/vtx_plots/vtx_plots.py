@@ -98,7 +98,7 @@ def plot_vtx_z():
     vmax = 120.
 
     mmin = 1.5
-    mmax = 5.
+    mmax = 5
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 
@@ -130,7 +130,8 @@ def plot_vtx_z():
     leg.SetBorderSize(1)
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hVtx, "Data")
-    leg.AddEntry(hVtxMC, "MC, coherent J/#it{#psi}", "l")
+    #leg.AddEntry(hVtxMC, "MC, coherent J/#it{#psi}", "l")
+    leg.AddEntry(hVtxMC, "MC, #it{#gamma}#it{#gamma} #rightarrow e^{+}e^{-}", "l")
     leg.AddEntry(cut_lo, "Cut at #pm35 cm", "l")
 
     hVtx.Draw()
@@ -153,10 +154,10 @@ if __name__ == "__main__":
     infile = "ana_muDst_run1_all_sel3_nzvtx.root"
 
     #MC
-    basedir_mc = "../../ana/starsim/slight14b2/sel3"
-    #infile_mc = "ana_slight14b2_sel3_nzvtx.root"
-    #infile_mc = "ana_slight14b2x1_sel3_nzvtx.root"
-    infile_mc = "ana_slight14b2x2_sel3_nzvtx.root"
+    #basedir_mc = "../../ana/starsim/slight14b2/sel3"
+    basedir_mc = "../../ana/starsim/slight14b1/sel3"
+    #infile_mc = "ana_slight14b2x2_sel3_nzvtx.root"
+    infile_mc = "ana_slight14b1x2_sel3_nzvtx.root"
 
     interactive = False
 

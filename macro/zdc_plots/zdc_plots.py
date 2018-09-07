@@ -27,6 +27,12 @@ def plot_zdc_tpc_vtx_diff():
 
     fitcol = rt.kBlue
 
+    out = open("out.txt", "w")
+    ut.log_results(out, "in "+infile)
+    strlog = "dbin "+str(dbin)+" dmin "+str(dmin)+" dmax "+str(dmax)
+    strlog += " mmin "+str(mmin)+" mmax "+str(mmax)+"\n"
+    ut.log_results(out, strlog)
+
     can = ut.box_canvas()
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
@@ -42,20 +48,18 @@ def plot_zdc_tpc_vtx_diff():
     f1.SetParameter(1, 25)
     f1.SetParameter(2, 13)
     f1.SetParameter(3, 5)
+    f1.SetParName(0, "norm")
+    f1.SetParName(1, "mean")
+    f1.SetParName(2, "sigma")
+    f1.SetParName(3, "ofs")
 
     r1 = (hDVtx.Fit(f1, "RS")).Get()
-    #r1 = hDVtx.Fit(fOfs, "RS")
-    #print f1.GetParameter(0)
-    #print f1.GetParameter(1)
-    #print f1.GetParameter(2)
-    #print f1.GetParameter(3)
+    out.write(ut.log_tfit_result(r1))
 
     r1.Print()
 
-    #print ut.log_fit_result(r1)
-
     hDVtx.SetYTitle("Events / {0:.1f} cm".format(dbin))
-    hDVtx.SetXTitle("Vertex #it{z}_{TPC} - #it{z}_{ZDC} (cm)")
+    hDVtx.SetXTitle("Vertex #it{z}_{ZDC} - #it{z}_{TPC} (cm)")
 
     hDVtx.SetTitleOffset(1.5, "Y")
     hDVtx.SetTitleOffset(1.3, "X")
@@ -64,12 +68,6 @@ def plot_zdc_tpc_vtx_diff():
     gPad.SetRightMargin(0.04)
     gPad.SetBottomMargin(0.1)
     gPad.SetLeftMargin(0.1)
-
-    leg = ut.prepare_leg(0.14, 0.82, 0.28, 0.12, 0.025)
-    leg.SetMargin(0.17)
-    ut.add_leg_mass(leg, mmin, mmax)
-    leg.AddEntry(hDVtx, "Data")
-    leg.AddEntry(f1, "Gaussian + offset", "l")
 
     #fit parameters on the plot
     desc = pdesc(hDVtx, 0.16, 0.84, 0.057)
@@ -81,11 +79,22 @@ def plot_zdc_tpc_vtx_diff():
     desc.itemRes("#it{#sigma}", r1, 2, fitcol)
     desc.itemRes("ofs", r1, 3, fitcol)
 
-    #gPad.SetLogy()
+    #cut lines at mean +/- 4sigma
+    cut_lo = ut.cut_line(-25, 0.5, hDVtx)
+    cut_hi = ut.cut_line(75, 0.5, hDVtx)
+
+    leg = ut.prepare_leg(0.14, 0.82, 0.28, 0.136, 0.025)
+    leg.SetMargin(0.17)
+    ut.add_leg_mass(leg, mmin, mmax)
+    leg.AddEntry(hDVtx, "Data")
+    leg.AddEntry(f1, "Gaussian + offset", "l")
+    leg.AddEntry(cut_lo, "Cuts at -25 and 75 cm", "l")
 
     hDVtx.Draw()
     leg.Draw("same")
     desc.draw()
+    cut_lo.Draw("same")
+    cut_hi.Draw("same")
 
     ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
@@ -199,6 +208,8 @@ def plot_zdc_vtx():
 #_____________________________________________________________________________
 def plot_zdc_2d():
 
+    #ZDC ADC counts east vs. west 2D
+
     zbin = 18.
     zmin = 0.
     zmax = 700.
@@ -261,6 +272,8 @@ def plot_zdc_2d():
 #_____________________________________________________________________________
 def plot_zdc():
 
+    #ZDC ADC counts east or west 1D
+
     ew = 0
 
     zbin = 10.
@@ -319,9 +332,11 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    basedir = "../../ana/muDst/muDst_run0/sel3"
+    basedir = "../../ana/muDst/muDst_run1/sel3"
+    infile = "ana_muDst_run1_all_sel3z.root"
 
-    infile = "ana_muDst_run0_all_sel3_alltree.root"
+    #basedir = "../../ana/muDst/muDst_run1/sel4"
+    #infile = "ana_muDst_run1_all_sel4z.root"
 
     interactive = False
 
@@ -329,7 +344,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 3
+    iplot = 1
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1
