@@ -69,6 +69,7 @@ Bool_t matchBemc=0, matchTof=0, projBemc=0;
 Bool_t useBemcEff=0;
 Double_t minDphiBemc=-kInf;
 Double_t maxAbsZvtx=kInf;
+Double_t minDVtx=-kInf, maxDVtx=kInf;
 Double_t maxAbsY=kInf;
 const Int_t npairSel=2;
 enum {kV0=0, kV1};
@@ -89,7 +90,7 @@ Bool_t isMC;
 Double_t trackMass;
 Bool_t (*RunTracks[npairSel])(StUPCTrack *pair[]); // pointers to pair selection functions
 TH1I *hEvtCount, *hGenCount, *hTrkCount;
-enum{kAnaL=1, kPair, kVtxId, kDphiBemc, kPID, kZvtx, kRap, kSign, kFin, kUPCJpsiB, kMaxCnt};
+enum{kAnaL=1, kPair, kVtxId, kDphiBemc, kPID, kZvtx, kDvtx, kRap, kSign, kFin, kUPCJpsiB, kMaxCnt};
 enum EvtCount{ kAna=1, kTrg, kDatBEMC, kWritten }; // counter from StUPCFilterMaker.h
 enum GenCount{ kGenAll=1, kGenSel, kMaxCntGen }; // MC generated counter
 enum TrkCount{ kTrkAll=1, kBemc, kTof, kMaxTrkCnt }; // track counter
@@ -127,6 +128,8 @@ int main(int argc, char* argv[]) {
   parser.AddDouble("maxNsigPID", &maxNsigPID);
   parser.AddDouble("minDphiBemc", &minDphiBemc);
   parser.AddDouble("maxAbsZvtx", &maxAbsZvtx);
+  parser.AddDouble("minDVtx", &minDVtx);
+  parser.AddDouble("maxDVtx", &maxDVtx);
   parser.AddDouble("maxAbsY", &maxAbsY);
   parser.AddInt("sign", &sign);
   parser.AddInt("minNhits", &minNhits);
@@ -224,6 +227,11 @@ int main(int argc, char* argv[]) {
     //z_vtx, tracks in pair are already from same vtx, track 0 used to get vtx object
     if( TMath::Abs(pair[0]->getVertex()->getPosZ()) > maxAbsZvtx ) continue;
     hEvtCount->Fill( kZvtx );
+
+    //difference in ZDC and TPC z-vertex
+    Double_t dvtx = upcEvt->getZdcVertexZ() - pair[0]->getVertex()->getPosZ();
+    if( dvtx < minDVtx || dvtx > maxDVtx ) continue;
+    hEvtCount->Fill( kDvtx );
 
     //pair rapidity
     TLorentzVector v0, v1; //4-vectors for tracks
@@ -761,6 +769,8 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("useBemcEff", &useBemcEff, "useBemcEff/O");
   jRecTree ->Branch("minDphiBemc", &minDphiBemc, "minDphiBemc/D");
   jRecTree ->Branch("maxAbsZvtx", &maxAbsZvtx, "maxAbsZvtx/D");
+  jRecTree ->Branch("minDVtx", &minDVtx, "minDVtx/D");
+  jRecTree ->Branch("maxDVtx", &maxDVtx, "maxDVtx/D");
   jRecTree ->Branch("maxAbsY", &maxAbsY, "maxAbsY/D");
   jRecTree ->Branch("pairSel", &pairSel, "pairSel/I");
   jRecTree ->Branch("trgProfile", &trgProfile, "trgProfile/I");
@@ -944,6 +954,7 @@ void PrintStat(ostream& out, const string& innam, const string& outnam, Int_t lm
   st << Form("Dphi BEMC:  %.0f", hEvtCount->GetBinContent( kDphiBemc )) << endl;
   st << Form("PID el:     %.0f", hEvtCount->GetBinContent( kPID )) << endl;
   st << Form("ZVtx:       %.0f", hEvtCount->GetBinContent( kZvtx )) << endl;
+  st << Form("DVtx:       %.0f", hEvtCount->GetBinContent( kDvtx )) << endl;
   st << Form("Rapidity:   %.0f", hEvtCount->GetBinContent( kRap )) << endl;
   st << Form("Sign:       %.0f", hEvtCount->GetBinContent( kSign )) << endl;
   st << Form("Fin:        %.0f", hEvtCount->GetBinContent( kFin )) << endl;

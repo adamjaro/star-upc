@@ -6,6 +6,9 @@
 #include <vector>
 #include <string>
 
+//ROOT headers
+#include "TMath.h"
+
 //local headers
 #include "THB1D.h"
 
@@ -35,6 +38,8 @@ THB1D::THB1D(const char *name, const char *title, Int_t nbins, Double_t xmin, Do
   fTotHeight=0;
 
   fDigLines.reserve(10);
+
+  fLogy = kFALSE;
 
 }//THB1D
 

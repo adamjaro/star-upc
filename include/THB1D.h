@@ -13,6 +13,8 @@ class THB1D: public TH1D {
   std::vector<std::string> fHistLines;
   std::vector<std::string> fDigLines;
 
+  Bool_t fLogy;
+
 public:
 
   THB1D();
@@ -23,14 +25,14 @@ public:
   void SetLeftMargin(Int_t m) { fLeftMarg = m; }
   void SetTotalHeight(Int_t th) { fTotHeight = th; };
 
+  void SetLogy(Bool_t log=kTRUE) { fLogy = log; }
+
   Int_t GetTotalHeight() const { return fTotHeight; };
 
   friend std::ostream& operator<<(std::ostream& os, THB1D& hx);
   friend std::ostream& operator<<(std::ostream& os, THB1D *hx) {
     return operator<<(os, *hx);
   }
-
-private:
 
 };
 

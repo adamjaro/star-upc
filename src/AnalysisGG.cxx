@@ -76,7 +76,7 @@ Bool_t isMC;
 Double_t trackMass;
 Bool_t (*RunTracks[npairSel])(StUPCTrack *pair[]); // pointers to pair selection functions
 TH1I *hEvtCount;
-enum{kAnaL=1, kPair, kVtxId, kDphiBemc, kPID, kZvtx, kRap, kSign, kFin, kUPCJpsiB, kMaxCnt};
+enum{kAnaL=1, kPair, kVtxId, kPID, kZvtx, kSign, kUPCJpsiB, kMaxCnt};
 enum EvtCount{ kAna=1, kTrg, kDatBEMC, kWritten }; // counter from StUPCFilterMaker.h
 THB1D *hMass;
 
@@ -177,8 +177,8 @@ int main(int argc, char* argv[]) {
     pair[0]->getLorentzVector(v0, trackMass);
     pair[1]->getLorentzVector(v1, trackMass);
     TLorentzVector vpair = v0 + v1; //sum of tracks 4-vectors
-    if( TMath::Abs( vpair.Rapidity() ) > maxAbsY ) continue;
-    hEvtCount->Fill( kRap );
+    //if( TMath::Abs( vpair.Rapidity() ) > maxAbsY ) continue;
+    //hEvtCount->Fill( kRap );
 
     //sign selection
     Short_t qTrk0 = pair[0]->getCharge();
@@ -460,7 +460,7 @@ void Init() {
   hEvtCount = new TH1I("hEvtCount", "hEvtCount", kMaxCnt-1, 1, kMaxCnt); // selection statistics
   trackMass = TDatabasePDG::Instance()->GetParticle( 11 )->Mass(); // track electron mass from PDG
   RunTracks[kV0] = RunTracksV0;
-  hMass = new THB1D("hMass", "hMass", 100, 0.2, 4.);
+  hMass = new THB1D("hMass", "hMass", 70, 0.1, 4.);
 
 }//Init
 
@@ -527,12 +527,9 @@ void PrintStat(ostream& out, const string& innam, const string& outnam, Int_t lm
   st << Form("Local ana:  %.0f", hEvtCount->GetBinContent( kAnaL )) << endl;
   st << Form("Pair:       %.0f", hEvtCount->GetBinContent( kPair )) << endl;
   st << Form("Same vtx:   %.0f", hEvtCount->GetBinContent( kVtxId )) << endl;
-  st << Form("Dphi BEMC:  %.0f", hEvtCount->GetBinContent( kDphiBemc )) << endl;
   st << Form("PID el:     %.0f", hEvtCount->GetBinContent( kPID )) << endl;
   st << Form("ZVtx:       %.0f", hEvtCount->GetBinContent( kZvtx )) << endl;
-  st << Form("Rapidity:   %.0f", hEvtCount->GetBinContent( kRap )) << endl;
   st << Form("Sign:       %.0f", hEvtCount->GetBinContent( kSign )) << endl;
-  st << Form("Fin:        %.0f", hEvtCount->GetBinContent( kFin )) << endl;
   st << "---------------------" << endl;
   //mass histogram
   st << hMass;
