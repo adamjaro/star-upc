@@ -18,16 +18,16 @@
   </command>
 
 
-
+  <!--
   <input URL="catalog:star.bnl.gov?
     production=P16id,trgsetupname=__TRG__,filetype=daq_reco_MuDst,filename~st_upc,storage=local,runnumber[]15078073-15167014"
   nFiles="all" />
+  -->
 
-  <!--
   <input URL="catalog:star.bnl.gov?
     production=P18ib,trgsetupname=__TRG__,filetype=daq_reco_muDst,filename~st_zerobias,storage=nfs"
   nFiles="all" />
-  -->
+
   <!--
   <input URL="filelist:__FILELIST__" />
   -->

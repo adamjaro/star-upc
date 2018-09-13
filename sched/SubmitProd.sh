@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #top directory for all outputs
-top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run1a"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run3"
 
 #production names for jobs outputs
 plist=("prod" "low" "mid" "high")

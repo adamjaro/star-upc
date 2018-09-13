@@ -10,16 +10,13 @@ sched/submit_filelist.xml
 *.session.xml
 submit_*.xml
 txt/
-trees/
 *.log
 *.sh~
 *.py~
 *.xml~
-ana/
 *.mp3
 *.pyc
 *.pdf
-fig/
 *.txt
 *.in~
 *.root

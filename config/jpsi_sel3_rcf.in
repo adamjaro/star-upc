@@ -1,14 +1,14 @@
 
 #input and output
 #basedir_in      /home/tmp/jaroslav                        #input directory
-basedir_in      /star/u/jaroslav/star-upc
-in_name         trees/starsim/StUPC_slight14b1x2.root     #input file
+basedir_in      /star/u/jaroslav/star-upc-data
+in_name         trees/starsim/StUPC_slight14c1x5.root     #input file
 #in_name         StUPC_muDst_run1_all.root
 
 basedir_out     /star/u/jaroslav/star-upc/build           #output directory
-#basedir_out     /star/u/jaroslav/star-upc
+#basedir_out     /star/u/jaroslav/star-upc-data
 out_name        output.root                               #output file
-#out_name        ana/starsim/slight14b1/sel3/ana_slight14b1x2_sel3_nzvtx.root
+#out_name        ana/starsim/slight14c1/sel3/ana_slight14c1x5_sel3.root
 #out_name        ana/muDst/muDst_run1/sel3/ana_muDst_run1_all_sel3z.root
 
 #selection criteria
@@ -26,7 +26,7 @@ minDphiBemc     2.618   # minimal tracks opening angle at BEMC
 maxAbsZvtx      50.     # maximal Z position of vertex, absolute value
 maxAbsY         1.      # maximal pair rapidity, absolute value
 
-makeAllTree     0       # flag to write all triggers tree
+makeAllTree     1       # flag to write all triggers tree
 
 #overrides to the criteria
 #sign        1
@@ -34,8 +34,8 @@ makeAllTree     0       # flag to write all triggers tree
 #maxAbsZvtx  9999.
 #maxAbsZvtx  100.
 #matchTof    1
-matchBemc   0
-useBemcEff  1
+#matchBemc   0
+#useBemcEff  1
 #maxAbsEta   9.e9
 
 #bemc efficiency

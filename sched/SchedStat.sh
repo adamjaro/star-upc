@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-basedir="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run2a/*"
+basedir="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run3/*"
 
 nall=$(ls $basedir/sched/*_*.csh | wc -l)
 

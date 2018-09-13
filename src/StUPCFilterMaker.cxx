@@ -105,27 +105,27 @@ Int_t StUPCFilterMaker::Init()
   mTrgRan[ kUPCmain_2 ][0] = 15153036;
   mTrgRan[ kUPCmain_2 ][1] = 15167007;
   //
-  //mTrgIDs[ kZero_bias ] = 9300; // Zero-bias, Run14 AuAu
+  mTrgIDs[ kZero_bias ] = 9300; // Zero-bias, Run14 AuAu
   mTrgRan[ kZero_bias ][0] = 15045068;
   mTrgRan[ kZero_bias ][1] = 15187006;
   //
-  mTrgIDs[ kMain10_1 ] = 1; // UPC-main, Run10 AuAu, pre-PHYSICS id
+  //mTrgIDs[ kMain10_1 ] = 1; // UPC-main, Run10 AuAu, pre-PHYSICS id
   mTrgRan[ kMain10_1 ][0] = 11002120;
   mTrgRan[ kMain10_1 ][1] = 11039045;
   //
-  mTrgIDs[ kMain10_2 ] = 260750; // UPC-main, Run10 AuAu, standard PHYSICS id
+  //mTrgIDs[ kMain10_2 ] = 260750; // UPC-main, Run10 AuAu, standard PHYSICS id
   mTrgRan[ kMain10_2 ][0] = 11039046;
   mTrgRan[ kMain10_2 ][1] = 11077018;
   //
-  mTrgIDs[ kMain11_1 ] = 4; // UPC-main, Run11 AuAu, pre-PHYSICS id
+  //mTrgIDs[ kMain11_1 ] = 4; // UPC-main, Run11 AuAu, pre-PHYSICS id
   mTrgRan[ kMain11_1 ][0] = 11002120;
   mTrgRan[ kMain11_1 ][1] = 12146002;
   //
-  mTrgIDs[ kMain11_2 ] = 350007; // UPC-main, Run11 AuAu, standard PHYSICS 1st id
+  //mTrgIDs[ kMain11_2 ] = 350007; // UPC-main, Run11 AuAu, standard PHYSICS 1st id
   mTrgRan[ kMain11_2 ][0] = 12146003;
   mTrgRan[ kMain11_2 ][1] = 12171017;
   //
-  mTrgIDs[ kMain11_3 ] = 350017; // UPC-main, Run11 AuAu, standard PHYSICS 2nd id
+  //mTrgIDs[ kMain11_3 ] = 350017; // UPC-main, Run11 AuAu, standard PHYSICS 2nd id
   mTrgRan[ kMain11_3 ][0] = 12146003;
   mTrgRan[ kMain11_3 ][1] = 12171017;
 

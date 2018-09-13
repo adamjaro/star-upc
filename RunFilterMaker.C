@@ -6,10 +6,12 @@
 
 
 //_____________________________________________________________________________
-void RunFilterMaker(string filelist="txt/starsim_slight14b1x2.list", Int_t nFiles=2000, string outfile="trees/starsim/StUPC_slight14b1x2.root") {
+void RunFilterMaker(string filelist="txt/sim_slight14c1x5.list",
+                    Int_t nFiles=10,
+                    string outfile="../star-upc-data/trees/starsim/StUPC_slight14c1x5.root") {
 
   //maker config
-  Bool_t isMC = kTRUE; // data or MC
+  Bool_t isMC = kFALSE; // data or MC
 
   Bool_t useClusterParam = kFALSE; // use BEMC cluster conditions below
   Int_t sizeMax = 4;
