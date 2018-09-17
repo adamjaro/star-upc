@@ -2,7 +2,7 @@
 #input and output
 #basedir_in      /home/tmp/jaroslav                        #input directory
 basedir_in      /star/u/jaroslav/star-upc-data
-in_name         trees/starsim/StUPC_slight14c1x5.root     #input file
+in_name         trees/starsim/StUPC_slight14d1.root     #input file
 #in_name         StUPC_muDst_run1_all.root
 
 basedir_out     /star/u/jaroslav/star-upc/build           #output directory
@@ -26,7 +26,7 @@ minDphiBemc     2.618   # minimal tracks opening angle at BEMC
 maxAbsZvtx      50.     # maximal Z position of vertex, absolute value
 maxAbsY         1.      # maximal pair rapidity, absolute value
 
-makeAllTree     1       # flag to write all triggers tree
+makeAllTree     0       # flag to write all triggers tree
 
 #overrides to the criteria
 #sign        1
