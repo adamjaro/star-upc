@@ -1,6 +1,6 @@
 
 import ROOT as rt
-from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2
+from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
 from ROOT import RooHist, TLatex
 from ROOT import std
 
@@ -42,6 +42,14 @@ def set_H1D(hx):
   hx.SetLabelSize(siz)
   hx.SetTitleSize(siz, "Y")
   hx.SetLabelSize(siz, "Y")
+
+#_____________________________________________________________________________
+def set_graph(tx):
+
+    tx.SetMarkerStyle(rt.kFullCircle)
+    tx.SetMarkerColor(rt.kBlack)
+    tx.SetLineColor(rt.kBlack)
+    tx.SetLineWidth(2)
 
 #_____________________________________________________________________________
 def prepare_TH2D(name, xbin, xmin, xmax, ybin, ymin, ymax):
@@ -370,6 +378,20 @@ def invert_col(pad, bgcol=rt.kBlack):
             axes[i].SetAxisColor(fgcol)
             axes[i].SetLabelColor(fgcol)
             axes[i].SetTitleColor(fgcol)
+      #TGraph
+      if obj.InheritsFrom(TGraph.Class()) == True:
+            obj.SetFillColor(bgcol)
+            ax = obj.GetXaxis()
+            ay = obj.GetYaxis()
+            ax.SetAxisColor(fgcol)
+            ay.SetAxisColor(fgcol)
+            ax.SetLabelColor(fgcol)
+            ay.SetLabelColor(fgcol)
+            ax.SetTitleColor(fgcol)
+            ay.SetTitleColor(fgcol)
+            if obj.GetLineColor() == rt.kBlack:
+                obj.SetLineColor(fgcol)
+                obj.SetMarkerColor(fgcol)
       #move to next item
       obj = next()
 

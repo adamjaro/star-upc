@@ -1,6 +1,6 @@
 
 //_____________________________________________________________________________
-void get_bins(vector<Double_t>& bins, list<Double_t>& valAll, list<Double_t>& valSel, Double_t prec, Double_t delt) {
+void get_bins(vector<Double_t>& bins, list<Double_t>& valAll, list<Double_t>& valSel, Double_t prec, Double_t ons, Double_t delt) {
 
   //sort the lists
   valAll.sort();
@@ -42,6 +42,7 @@ void get_bins(vector<Double_t>& bins, list<Double_t>& valAll, list<Double_t>& va
       Double_t xsel = Double_t(nsel);
       Double_t xall = Double_t(nall);
       rel = TMath::Sqrt( (xall-xsel)/(xall*xsel) );
+      if( xsel/xall < ons ) rel = rel/2.;
     }
 
     //test for maximal allowed error
@@ -60,7 +61,8 @@ void get_bins(vector<Double_t>& bins, list<Double_t>& valAll, list<Double_t>& va
     //test for end of momenta interval
     if( cmax > maxval ) {
       //set last found edge to the end of values interval and finish
-      bins[bins.size()-1] = maxval;
+      //bins[bins.size()-1] = maxval;
+      bins.push_back(maxval);
       break;
     }
 

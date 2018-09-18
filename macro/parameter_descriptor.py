@@ -10,8 +10,10 @@ class parameter_descriptor(object):
       #position and separations relative to the frame coordinates
       gxmin = self.frame.GetXaxis().GetXmin()
       gxmax = self.frame.GetXaxis().GetXmax()
-      gymin = self.frame.GetMinimum()
-      gymax = self.frame.GetMaximum()
+      #gymin = self.frame.GetMinimum()
+      #gymax = self.frame.GetMaximum()
+      gymin = self.frame.GetYaxis().GetXmin()
+      gymax = self.frame.GetYaxis().GetXmax()
       self.xpos = gxmin + (gxmax-gxmin)*x # horizontal position of first equal sign
       self.ypos = gymin + (gymax-gymin)*y # vertical position of first equal sign
       self.itsep = (gymax-gymin)*sep # vertical separation of items
