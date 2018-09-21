@@ -2,13 +2,13 @@
 #input and output
 #basedir_in      /home/tmp/jaroslav                        #input directory
 basedir_in      /star/u/jaroslav/star-upc-data
-in_name         trees/starsim/StUPC_slight14d1.root     #input file
+in_name         trees/starsim/StUPC_slight14d2.root     #input file
 #in_name         StUPC_muDst_run1_all.root
 
 basedir_out     /star/u/jaroslav/star-upc/build           #output directory
 #basedir_out     /star/u/jaroslav/star-upc-data
 out_name        output.root                               #output file
-#out_name        ana/starsim/slight14c1/sel3/ana_slight14c1x5_sel3.root
+#out_name        ana/starsim/slight14d/sel3/ana_slight14d2_sel3b.root
 #out_name        ana/muDst/muDst_run1/sel3/ana_muDst_run1_all_sel3z.root
 
 #selection criteria
@@ -34,16 +34,16 @@ makeAllTree     0       # flag to write all triggers tree
 #maxAbsZvtx  9999.
 #maxAbsZvtx  100.
 #matchTof    1
-#matchBemc   0
-#useBemcEff  1
+matchBemc   0
+useBemcEff  1
 #maxAbsEta   9.e9
 
 #bemc efficiency
 #conv/sel0, run3, ptot
-epar0   0.423
-epar1   1.011
-epar2   0.275
-epar3   -0.015
+epar0   0.415
+epar1   1.014
+epar2   0.277
+epar3   0.
 
 
 
