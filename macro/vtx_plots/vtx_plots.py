@@ -6,6 +6,7 @@ from ROOT import TF1
 
 import sys
 sys.path.append('../')
+gROOT.SetMacroPath("../")
 import plot_utils as ut
 from parameter_descriptor import parameter_descriptor as pdesc
 
@@ -13,7 +14,7 @@ from parameter_descriptor import parameter_descriptor as pdesc
 def fit_vtx_z():
 
     #gaussian fit to vertex z-position
-    datamc = False  #true - data, false - mc
+    datamc = True  #true - data, false - mc
 
     if datamc:
         vbin = 4.
@@ -48,8 +49,8 @@ def fit_vtx_z():
     f1.SetNpx(1000)
     f1.SetLineColor(fitcol)
 
+    #make the fit
     r1 = (hVtx.Fit(f1, "RS")).Get()
-    #print r1
     out.write(ut.log_tfit_result(r1))
 
     hVtx.SetYTitle("Counts / {0:.0f} cm".format(vbin));
@@ -122,8 +123,8 @@ def plot_vtx_z():
     gPad.SetBottomMargin(0.1)
     gPad.SetLeftMargin(0.11)
 
-    cut_lo = ut.cut_line(-35, 0.8, hVtx)
-    cut_hi = ut.cut_line(35, 0.8, hVtx)
+    cut_lo = ut.cut_line(-30, 0.8, hVtx)
+    cut_hi = ut.cut_line(30, 0.8, hVtx)
 
     leg = ut.prepare_leg(0.16, 0.82, 0.26, 0.12, 0.025)
     leg.SetMargin(0.15)
@@ -132,7 +133,7 @@ def plot_vtx_z():
     leg.AddEntry(hVtx, "Data")
     #leg.AddEntry(hVtxMC, "MC, coherent J/#it{#psi}", "l")
     leg.AddEntry(hVtxMC, "MC, #it{#gamma}#it{#gamma} #rightarrow e^{+}e^{-}", "l")
-    leg.AddEntry(cut_lo, "Cut at #pm35 cm", "l")
+    leg.AddEntry(cut_lo, "Cut at #pm30 cm", "l")
 
     hVtx.Draw()
     hVtxMC.Draw("same")
@@ -149,13 +150,13 @@ def plot_vtx_z():
 if __name__ == "__main__":
 
     #data
-    basedir = "../../ana/muDst/muDst_run1/sel3"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel3"
     #infile = "ana_muDst_run1_all_sel3.root"
     infile = "ana_muDst_run1_all_sel3_nzvtx.root"
 
     #MC
     #basedir_mc = "../../ana/starsim/slight14b2/sel3"
-    basedir_mc = "../../ana/starsim/slight14b1/sel3"
+    basedir_mc = "../../../star-upc-data/ana/starsim/slight14b1/sel3"
     #infile_mc = "ana_slight14b2x2_sel3_nzvtx.root"
     infile_mc = "ana_slight14b1x2_sel3_nzvtx.root"
 

@@ -10,38 +10,38 @@ sys.path.append('../')
 import plot_utils as ut
 from parameter_descriptor import parameter_descriptor as pdesc
 
-from fit_functions import m, y, pT, cb, m0, sig, alpha, n
+from fit_functions import m, y, pT
+from fit_functions import lam, c1, c2, bkgd
+from fit_functions import lamF, c1f, c2f, bkgd_f
 
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
     basedir = "../../../star-upc-data/ana/starsim"
 
-    infile = "slight14c1/sel3/ana_slight14c1x4_sel3.root"
+    infile = "slight14d/sel3/ana_slight14d2_sel3b.root"
+    #infile = "slight14d/sel3/ana_slight14d2_sel3.root"
 
-    mbin = 0.02
-    mmin = 2.
-    mmax = 3.6
+    mbin = 0.08
+    mmin = 0.9
+    mmax = 5.
 
-    fitran = [2., 3.22]
+    fitran = [1.4, mmax] # 1.4  2
 
     ymin = -1.
     ymax = 1.
 
-    ptmax = 0.17; # 0.17
+    ptmax = 0.17
 
     binned = False
 
-    #ccb = rt.kMagenta;
-    ccb = rt.kBlue
-    lmg = 4; # left margin in text output
-
-    strdat = "MC coherent #it{J}/#it{#psi}#rightarrow e^{+}e^{-}"
+    cbkg = rt.kMagenta
+    #cbkg = rt.kBlue
 
     #-- end of config --
 
 
-    #get input
+    #load the input
     gROOT.SetBatch()
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     out = open("out.txt", "w")
     #log fit parameters
     loglist1 = [(x,eval(x)) for x in ["infile", "mbin", "mmin", "mmax"]]
-    loglist2 = [(x,eval(x)) for x in ["ymin", "ymax", "ptmax", "binned", "fitran[0]", "fitran[1]"]]
+    loglist2 = [(x,eval(x)) for x in ["ymin", "ymax", "ptmax", "fitran", "binned"]]
     strlog = ut.make_log_string(loglist1, loglist2)
     ut.log_results(out, strlog+"\n")
 
@@ -69,16 +69,16 @@ if __name__ == "__main__":
     dataH = RooDataHist("dataH", "dataH", RooArgList(m), hMass)
 
     #make the fit
+    c1.setVal(fitran[0])
     if binned == True:
-        r1 = cb.fitTo(dataH, rf.Range("fitran"), rf.Save())
+        r1 = bkgd.fitTo(dataH, rf.Range("fitran"), rf.Save())
     else:
-        r1 = cb.fitTo(data, rf.Range("fitran"), rf.Save())
+        r1 = bkgd.fitTo(data, rf.Range("fitran"), rf.Save())
 
     #log fit results
     ut.log_results(out, ut.log_fit_result(r1))
-    ut.log_results(out, "Alpha and n in 3-digits:")
-    ut.log_results(out, "{0:6} {1:.3f} +/- {2:.3f}".format("alpha:", alpha.getVal(), alpha.getError()))
-    ut.log_results(out, "{0:6} {1:.3f} +/- {2:.3f}".format("n:", n.getVal(), n.getError()))
+    ut.log_results(out, "Fit parameters in 3-digits:")
+    ut.log_results(out, ut.log_fit_parameters(r1, 0))
 
     #create the plot
     gStyle.SetPadTickX(1)
@@ -95,40 +95,50 @@ if __name__ == "__main__":
     frame.GetXaxis().SetTitleOffset(1.2);
     frame.GetYaxis().SetTitleOffset(1.6);
 
+    #plot the data
     if binned == True:
         dataH.plotOn(frame, rf.Name("data"))
     else:
         data.plotOn(frame, rf.Name("data"))
 
-    cb.plotOn(frame, rf.Precision(1e-6), rf.Name("CrystalBall"), rf.LineColor(ccb))
+    #plot background function as determined from the fit
+    bkgd.plotOn(frame, rf.Range("fitran"), rf.LineColor(cbkg), rf.Name("Background"))
+
+    #background function from the data
+    lamF.setVal(-1.094)
+    c1f.setVal(1.331)
+    c2f.setVal(0.185)
+    bkgd_f.plotOn(frame, rf.Range("fitran"), rf.LineColor(rt.kRed), rf.Name("Background_f"))
+
     frame.Draw()
 
-    frame.SetXTitle("#it{m}_{e^{+}e^{-}} (GeV)")
-    frame.SetYTitle( "Dielectron counts / ({0:.0f} MeV)".format(1000.*mbin) )
+    frame.SetXTitle("#it{m}_{e^{+}e^{-}} (GeV/#it{c}^{2})")
+    frame.SetYTitle( "Dielectron counts / (%.0f MeV/#it{c}^{2})" % (1000.*mbin) )
 
     #fit parameters on the plot
-    desc = pdesc(frame, 0.18, 0.8, 0.057); #x, y, sep
+    desc = pdesc(frame, 0.75, 0.78, 0.045); #x, y, sep
     desc.set_text_size(0.03)
-
-    desc.itemD("#chi^{2}/ndf", frame.chiSquare("CrystalBall", "data", 4), -1, ccb)
-    desc.prec = 4
-    desc.itemR("#it{m}_{0}", m0, ccb)
-    desc.itemR("#sigma", sig, ccb)
-    desc.prec = 3
-    desc.itemR("#alpha", alpha, ccb)
-    desc.itemR("#it{n}", n, ccb)
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("Background", "data", 3), -1, cbkg)
+    desc.itemR("#lambda", lam, cbkg)
+    desc.itemR("#it{c}_{1}", c1, cbkg)
+    desc.itemR("#it{c}_{2}", c2, cbkg)
     desc.draw()
 
-    leg = ut.prepare_leg(0.16, 0.85, 0.35, 0.08, 0.029) # x, y, dx, dy, tsiz
-    leg.SetMargin(0.14)
+    #legend for data and fit function
+    bkgfunc = "(#it{m}-#it{c}_{1})#it{e}^{#lambda(#it{m}-#it{c}_{1})^{2}+#it{c}_{2}(#it{m}-#it{c}_{1})^{3}}"
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
-    leg.AddEntry(hx, strdat)
+    lx = ut.col_lin(cbkg)
+    leg = ut.prepare_leg(0.58, 0.82, 0.39, 0.1, 0.029) # x, y, dx, dy, tsiz
+    leg.SetMargin(0.1)
+    leg.AddEntry(hx, "MC #gamma#gamma#rightarrow e^{+}e^{-}") # , "lp"
+    leg.AddEntry(lx, "#it{f}_{bkg}(#it{m}) = "+bkgfunc, "l")
     leg.Draw("same")
 
-    leg2 = ut.prepare_leg(0.75, 0.8, 0.21, 0.12, 0.03) # x, y, dx, dy, tsiz
-    leg2.SetMargin(0.05)
-    leg2.AddEntry(0, "#bf{%2.1f < #it{y} < %2.1f}" % (ymin, ymax), "")
-    leg2.AddEntry(0, "#bf{#it{p}_{T} < %.3f GeV}" % ptmax, "")
+    #legend for shape from the data
+    leg2 = ut.prepare_leg(0.7, 0.55, 0.25, 0.04, 0.029)
+    leg2.SetMargin(0.17)
+    lx2 = ut.col_lin(rt.kRed)
+    leg2.AddEntry(lx2, "Shape from data", "l")
     leg2.Draw("same")
 
     ut.invert_col(gPad)
@@ -139,6 +149,14 @@ if __name__ == "__main__":
 
     #beep when finished
     gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
+
+
+
+
+
+
+
+
 
 
 

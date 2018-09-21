@@ -156,8 +156,8 @@ def plot_zdc_vtx():
     #ZDC vertex from selected events and from all triggered events
 
     vbin = 0.1
-    vmin = -17.
-    vmax = 20.
+    vmin = -5.
+    vmax = 7.
 
     mmin = 1.5
     mmax = 5.
@@ -332,8 +332,8 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    basedir = "../../ana/muDst/muDst_run1/sel3"
-    infile = "ana_muDst_run1_all_sel3z.root"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel3"
+    infile = "ana_muDst_run1_all_sel3.root"
 
     #basedir = "../../ana/muDst/muDst_run1/sel4"
     #infile = "ana_muDst_run1_all_sel4z.root"
@@ -344,7 +344,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 1
+    iplot = 2
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1

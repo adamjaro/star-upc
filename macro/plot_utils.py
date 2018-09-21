@@ -1,7 +1,7 @@
 
 import ROOT as rt
 from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
-from ROOT import RooHist, TLatex
+from ROOT import RooHist, TLatex, gROOT, TIter
 from ROOT import std
 
 #_____________________________________________________________________________
@@ -122,6 +122,12 @@ def prepare_leg(xl, yl, dxl, dyl, tsiz=0.045):
   return leg
 
 #_____________________________________________________________________________
+def add_leg_y_pt(leg, ymin, ymax, ptmax):
+
+    leg.AddEntry(None, "#bf{%2.1f < #it{y} < %2.1f}" % (ymin, ymax), "")
+    leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV}", "")
+
+#_____________________________________________________________________________
 def add_leg_pt_mass(leg, ptmax, mmin, mmax):
 
     leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV}", "")
@@ -173,55 +179,37 @@ def log_fit_result(r1, lmg=6):
 
   ss = std.stringstream()
   r1.printMultiline(ss, 0, rt.kTRUE)
-  stream = ""
-  while ss.eof() == False:
-    chnum = ss.get()
-    if chnum < 0: continue
-    stream += chr(chnum)
+  stream = convert_stream(ss)
   #put parameter numbers
   line_stream = stream.split("\n")
-  pnum = -1
+  pnum = -2
   for i in range(len(line_stream)):
     if pnum >= 0 and line_stream[i] != "":
       numlin = "  " + str(pnum) + line_stream[i][2+len(str(pnum)):]
       line_stream[i] = numlin
       pnum += 1
-    if line_stream[i].find("--------") > -1:
+    if pnum == -1:
+      pnum += 1
+    if line_stream[i].find("InitialValue") > -1:
       pnum += 1
     result += line_stream[i] + "\n"
 
   cor = r1.correlationMatrix()
   result += print_matrix(cor)
 
-  #put left margin
-  rline = result.split("\n")
-  result = ""
-  for line in rline:
-    result += " ".ljust(lmg)
-    result += line + "\n"
+  return insert_left_margin(result, lmg)
 
-  return result
+#--------
 
 #_____________________________________________________________________________
 def log_tfit_result(r1, lmg=6):
 
-    result = ""
-
-    result += "Minimizer status: " + str(r1.Status()) + ", "
-    result += "cov matrix status: " + str(r1.CovMatrixStatus()) + "\n"
-
-    result += "Chi2 = " + str(r1.Chi2()) + "\n"
-    result += "NDf = " + str(r1.Ndf()) + "\n"
-    result += "Ndm = " + str(r1.Edm()) + "\n"
-    result += "NCalls = " + str(r1.NCalls()) + "\n"
-    for ipar in range(r1.NPar()):
-        result += r1.ParName(ipar) + " = " + str(r1.Parameter(ipar)) + " +/- " +  str(r1.ParError(ipar)) + "\n"
-
     ss = std.stringstream()
-    r1.PrintCovMatrix(ss);
-    result += convert_stream(ss)
+    gROOT.LoadMacro("plot_utils.h")
+    rt.FitResultPrint(ss, r1)
+    stream = convert_stream(ss)
 
-    return insert_left_margin(result, lmg)
+    return insert_left_margin(stream, lmg)
 
 #_____________________________________________________________________________
 def insert_left_margin(res, lmg):
@@ -285,7 +273,8 @@ def table_fit_parameters(r1):
 #_____________________________________________________________________________
 def log_results(out, msg, lmg=6):
 
-    out.write(" ".ljust(lmg) + msg + "\n")
+    for line in msg.split("\n"):
+        out.write(" ".ljust(lmg) + line + "\n")
 
 #_____________________________________________________________________________
 def print_matrix(mat):
@@ -312,6 +301,20 @@ def print_matrix(mat):
   result += delim
 
   return result
+
+#_____________________________________________________________________________
+def make_log_string(*names):
+
+    #prepare string to log parameter names and values
+
+    strlog=""
+    for iset in xrange(len(names)):
+        for nam, val in names[iset]:
+            strlog += nam + " " + str(val) + " "
+        if iset < len(names)-1:
+            strlog += "\n"
+
+    return strlog
 
 #_____________________________________________________________________________
 def print_pad(pad):
@@ -355,6 +358,19 @@ def invert_col(pad, bgcol=rt.kBlack):
          obj.SetFillStyle(1000)
          obj.SetFillColor(fgcol)
          obj.SetTextColor(bgcol)
+         ln = TIter(obj.GetListOfPrimitives())
+         lo = ln.Next()
+         while lo != None:
+           if lo.GetObject() == None:
+             lo = ln.Next()
+             continue
+           if lo.GetObject().InheritsFrom(TH1.Class()) == True:
+             hx = lo.GetObject()
+             hx.SetFillColor(bgcol)
+             if hx.GetMarkerColor() == rt.kBlack:
+               hx.SetMarkerColor(fgcol)
+               hx.SetLineColor(fgcol)
+           lo = ln.Next()
       #RooHist
       if obj.InheritsFrom(RooHist.Class()) == True:
          if obj.GetMarkerColor() == rt.kBlack:
