@@ -199,17 +199,22 @@ def log_fit_result(r1, lmg=6):
 
   return insert_left_margin(result, lmg)
 
-#--------
-
 #_____________________________________________________________________________
 def log_tfit_result(r1, lmg=6):
 
-    ss = std.stringstream()
-    gROOT.LoadMacro("plot_utils.h")
-    rt.FitResultPrint(ss, r1)
-    stream = convert_stream(ss)
+    result = "Minimizer status: " + str(r1.Status()) + ", "
+    result += "cov matrix status: " + str(r1.CovMatrixStatus()) + "\n"
 
-    return insert_left_margin(stream, lmg)
+    ss = std.stringstream()
+    gROOT.ProcessLine("\
+        void FitResultPrint(stringstream& str, const TFitResult& r1) {\
+            r1.FitResult::Print(str, kTRUE);\
+        }\
+    ")
+    rt.FitResultPrint(ss, r1)
+    result += convert_stream(ss)
+
+    return insert_left_margin(result, lmg)
 
 #_____________________________________________________________________________
 def insert_left_margin(res, lmg):

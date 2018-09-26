@@ -6,7 +6,7 @@ from time import time
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TH1D
 from ROOT import TGraphAsymmErrors, TMath, TF1
-from ROOT import vector, double
+from ROOT import vector, double, AddressOf
 
 import sys
 sys.path.append('../')
@@ -24,20 +24,26 @@ def get_bins(tree, bnam, bmatch, prec, ons, delt):
     tree.SetBranchStatus(bmatch[0], 1)
     tree.SetBranchStatus(bmatch[1], 1)
 
+    #C++ structure for tree entry
+    gROOT.ProcessLine("struct Entry {Double_t p0, p1; Bool_t match0, match1;};")
+    entry = rt.Entry()
+    tree.SetBranchAddress(bnam[0], AddressOf(entry, "p0"))
+    tree.SetBranchAddress(bnam[1], AddressOf(entry, "p1"))
+    tree.SetBranchAddress(bmatch[0], AddressOf(entry, "match0"))
+    tree.SetBranchAddress(bmatch[1], AddressOf(entry, "match1"))
+
     #momenta values for all and matched tracks
     valAll = rt.list(double)()
     valSel = rt.list(double)()
 
-    for i in range(tree.GetEntriesFast()):
+    for i in xrange(tree.GetEntriesFast()):
         tree.GetEntry(i)
-        exec("p0 = tree."+bnam[0])
-        exec("p1 = tree."+bnam[1])
-        exec("match0 = tree."+bmatch[0])
-        exec("match1 = tree."+bmatch[1])
-        valAll.push_back(p0)
-        valAll.push_back(p1)
-        if match0 == True: valSel.push_back(p0)
-        if match1 == True: valSel.push_back(p1)
+        valAll.push_back(entry.p0)
+        valAll.push_back(entry.p1)
+        if entry.match0 == 1: valSel.push_back(entry.p0)
+        if entry.match1 == 1: valSel.push_back(entry.p1)
+
+    tree.ResetBranchAddresses()
 
     #bin edges
     bins = vector(rt.double)()
@@ -63,10 +69,12 @@ def fitFuncErf(xVal, par):
 if __name__ == "__main__":
 
     basedir = "../../../star-upc-data/ana/muDst"
+    #basedir = "../../../star-upc-data/ana/starsim"
 
     infile = "muDst_run1a/conv0/ana_muDst_run1a_all_conv0.root"
+    #infile = "slight14d/sel3/ana_slight14d2_sel3a.root"
 
-    precision = 0.06   # 0.06
+    precision = 0.06   # 0.06  0.01
     onset = -0.03
     delta = 1.e-7
 

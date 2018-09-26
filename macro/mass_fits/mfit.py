@@ -38,8 +38,8 @@ if __name__ == "__main__":
 
     ptmax = 0.17
 
-    alphafix = 0.697 # 0.813
-    nfix = 3.382 # 2.332
+    alphafix = 0.693
+    nfix = 3.595
 
     fitran = [1.45, mmax]
 
