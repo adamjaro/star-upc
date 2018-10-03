@@ -53,6 +53,7 @@ Double_t jT0pTBemc, jT1pTBemc, jT0etaBemc, jT1etaBemc;
 Bool_t jT0matchBemc, jT1matchBemc, jT0matchTof, jT1matchTof;
 Double_t jT0bemcHitE, jT1bemcHitE, jT0EnAtBemc, jT1EnAtBemc;
 Int_t jT0charge, jT1charge, jT0nHits, jT1nHits, jT0nHitsFit, jT1nHitsFit;
+Int_t jTrgIdx;
 
 TTree *jGenTree;
 Double_t jGenPt, jGenPt2, jGenM, jGenY;
@@ -256,7 +257,7 @@ int main(int argc, char* argv[]) {
     FillRecTree(pair, vpair, v0, v1);
 
     //J/psi mass
-    if( vpair.M() > 2.9 && vpair.M() < 3.2 ) {
+    if( vpair.M() > 2.8 && vpair.M() < 3.2 ) {
       hEvtCount->Fill( kFin );
     }
 
@@ -626,6 +627,12 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   jT0nHitsFit = pair[0]->getNhitsFit();
   jT1nHitsFit = pair[1]->getNhitsFit();
 
+  //trigger index, introduced for trigger efficiency using UPC-main
+  jTrgIdx = 0;
+  if( upcEvt->getTrigger(kUPCJpsiB_1) || upcEvt->getTrigger(kUPCJpsiB_2) ) {
+    jTrgIdx = 1;
+  }
+
   jRecTree->Fill();
 
 }//FillRecTree
@@ -743,6 +750,8 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jT1nHits", &jT1nHits, "jT1nHits/I");
   jRecTree ->Branch("jT0nHitsFit", &jT0nHitsFit, "jT0nHitsFit/I");
   jRecTree ->Branch("jT1nHitsFit", &jT1nHitsFit, "jT1nHitsFit/I");
+
+  jRecTree ->Branch("jTrgIdx", &jTrgIdx, "jTrgIdx/I");
 
   //MC in reconstructed tree
   if( isMC ) {
