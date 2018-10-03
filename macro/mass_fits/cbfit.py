@@ -18,7 +18,7 @@ if __name__ == "__main__":
     basedir = "../../../star-upc-data/ana/starsim"
 
     #infile = "slight14c1/sel3/ana_slight14c1x4_sel3.root"
-    infile = "slight14d/sel3/ana_slight14d1_sel3b.root"
+    infile = "slight14d/sel5/ana_slight14d1_sel5a.root"
 
     mbin = 0.002
     mmin = 2.
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     leg2.AddEntry(0, "#bf{#it{p}_{T} < %.3f GeV}" % ptmax, "")
     leg2.Draw("same")
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

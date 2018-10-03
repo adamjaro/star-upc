@@ -5,6 +5,7 @@ from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TF1
 from ROOT import TArrow, TLatex, TLine
 from ROOT import TEveManager, gEve, TEveArrow, TGMainFrame
 import code
+import math as ma
 
 import sys
 sys.path.append('../')
@@ -17,10 +18,10 @@ def plot_zdc_tpc_vtx_diff():
     #difference between TPC and ZDC vertex
 
     dbin = 2.5
-    dmin = -90
-    dmax = 130
-    #dmin = -1500
-    #dmax = 2000
+    #dmin = -90
+    #dmax = 130
+    dmin = -1500
+    dmax = 2000
 
     mmin = 1.5
     mmax = 5.
@@ -41,6 +42,7 @@ def plot_zdc_tpc_vtx_diff():
 
     tree.Draw("jZDCVtxZ-jVtxZ >> hDVtx", strsel)
 
+    #fit function
     f1 = TF1("f1", "gaus+[3]", -50, 105)
     f1.SetNpx(1000)
     f1.SetLineColor(fitcol)
@@ -53,10 +55,30 @@ def plot_zdc_tpc_vtx_diff():
     f1.SetParName(2, "sigma")
     f1.SetParName(3, "ofs")
 
-    r1 = (hDVtx.Fit(f1, "RS")).Get()
-    out.write(ut.log_tfit_result(r1))
+    #make the fit
+    #r1 = (hDVtx.Fit(f1, "RS")).Get()
+    #out.write(ut.log_tfit_result(r1))
 
-    r1.Print()
+    #r1.Print()
+
+    #fraction of events within +/- 4 sigma
+    t1 = tree.CopyTree(strsel)
+    nall = t1.GetEntries()
+    lo = f1.GetParameter(1) - 4.*f1.GetParameter(2)
+    hi = f1.GetParameter(1) + 4.*f1.GetParameter(2)
+    nsel = t1.Draw("", "(jZDCVtxZ-jVtxZ)>{0:.3f} && (jZDCVtxZ-jVtxZ)<{1:.3f}".format(lo, hi))
+    fraction = float(nsel)/float(nall)
+    err = fraction*ma.sqrt(float(nall-nsel)/(nall*nsel))
+    ut.log_results(out, "Fraction of events within +/- 4 sigma")
+    ut.log_results(out, "4sigma interval: "+str(lo)+" "+str(hi))
+    ut.log_results(out, "nall: "+str(nall))
+    ut.log_results(out, "nsel: "+str(nsel))
+    ut.log_results(out, "f_4s: {0:.3f} +/- {1:.3f}".format(fraction, err))
+    print "4sigma interval:", lo, hi
+    print "nall:", nall
+    print "nsel:", nsel
+    print "f_4s: {0:.3f} +/- {1:.3f}".format(fraction, err)
+
 
     hDVtx.SetYTitle("Events / {0:.1f} cm".format(dbin))
     hDVtx.SetXTitle("Vertex #it{z}_{ZDC} - #it{z}_{TPC} (cm)")
@@ -72,31 +94,31 @@ def plot_zdc_tpc_vtx_diff():
     #fit parameters on the plot
     desc = pdesc(hDVtx, 0.16, 0.84, 0.057)
     desc.set_text_size(0.03)
-    desc.itemD("#chi^{2}/ndf", r1.Chi2()/r1.Ndf(), -1, fitcol)
+    #desc.itemD("#chi^{2}/ndf", r1.Chi2()/r1.Ndf(), -1, fitcol)
     desc.prec = 2
-    desc.itemRes("norm", r1, 0, fitcol)
-    desc.itemRes("mean", r1, 1, fitcol)
-    desc.itemRes("#it{#sigma}", r1, 2, fitcol)
-    desc.itemRes("ofs", r1, 3, fitcol)
+    #desc.itemRes("norm", r1, 0, fitcol)
+    #desc.itemRes("mean", r1, 1, fitcol)
+    #desc.itemRes("#it{#sigma}", r1, 2, fitcol)
+    #desc.itemRes("ofs", r1, 3, fitcol)
 
     #cut lines at mean +/- 4sigma
-    cut_lo = ut.cut_line(-25, 0.5, hDVtx)
-    cut_hi = ut.cut_line(75, 0.5, hDVtx)
+    cut_lo = ut.cut_line(-20, 0.5, hDVtx)
+    cut_hi = ut.cut_line(70, 0.5, hDVtx)
 
     leg = ut.prepare_leg(0.14, 0.82, 0.28, 0.136, 0.025)
     leg.SetMargin(0.17)
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hDVtx, "Data")
     leg.AddEntry(f1, "Gaussian + offset", "l")
-    leg.AddEntry(cut_lo, "Cuts at -25 and 75 cm", "l")
+    leg.AddEntry(cut_lo, "4#it{#sigma} at -20 and 70 cm", "l")
 
     hDVtx.Draw()
-    leg.Draw("same")
-    desc.draw()
-    cut_lo.Draw("same")
-    cut_hi.Draw("same")
+    #leg.Draw("same")
+    #desc.draw()
+    #cut_lo.Draw("same")
+    #cut_hi.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_zdc_tpc_vtx_diff
@@ -194,7 +216,7 @@ def plot_zdc_vtx():
     leg.AddEntry(hZdcVtx, "Selected events")
     leg.AddEntry(hZdcVtxAll, "All UPC-JpsiB triggers", "l")
 
-    gPad.SetLogy()
+    #gPad.SetLogy()
 
     hZdcVtx.Draw()
     hZdcVtxAll.Draw("same")
@@ -332,8 +354,8 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel3"
-    infile = "ana_muDst_run1_all_sel3.root"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    infile = "ana_muDst_run1_all_sel5.root"
 
     #basedir = "../../ana/muDst/muDst_run1/sel4"
     #infile = "ana_muDst_run1_all_sel4z.root"
@@ -344,7 +366,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 2
+    iplot = 4
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1

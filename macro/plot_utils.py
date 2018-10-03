@@ -363,19 +363,20 @@ def invert_col(pad, bgcol=rt.kBlack):
          obj.SetFillStyle(1000)
          obj.SetFillColor(fgcol)
          obj.SetTextColor(bgcol)
-         ln = TIter(obj.GetListOfPrimitives())
-         lo = ln.Next()
-         while lo != None:
-           if lo.GetObject() == None:
-             lo = ln.Next()
-             continue
-           if lo.GetObject().InheritsFrom(TH1.Class()) == True:
-             hx = lo.GetObject()
-             hx.SetFillColor(bgcol)
-             if hx.GetMarkerColor() == rt.kBlack:
-               hx.SetMarkerColor(fgcol)
-               hx.SetLineColor(fgcol)
-           lo = ln.Next()
+         #ln = TIter(obj.GetListOfPrimitives())
+         #lo = ln.Next()
+         #while lo != None:
+           #if lo.GetObject() == None:
+             #lo = ln.Next()
+             #continue
+           #if lo.GetObject().InheritsFrom(TH1.Class()) == True:
+             #hx = lo.GetObject()
+             #hx.SetFillColor(bgcol)
+             #if hx.GetMarkerColor() == rt.kBlack:
+               #hx.SetMarkerColor(fgcol)
+               #hx.SetLineColor(fgcol)
+               #pass
+           #lo = ln.Next()
       #RooHist
       if obj.InheritsFrom(RooHist.Class()) == True:
          if obj.GetMarkerColor() == rt.kBlack:

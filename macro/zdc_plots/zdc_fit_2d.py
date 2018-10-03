@@ -58,11 +58,11 @@ def make_fit():
     adc_max = 700.
 
     ptmax = 0.17
-    mmin = 1.5
-    mmax = 5.
+    mmin = 2.8
+    mmax = 3.2
 
     #east/west projections and 2D plot
-    ew = 1
+    ew = 0
     p2d = 1
 
     #plot colors
@@ -164,8 +164,8 @@ if __name__ == "__main__":
     #basedir = "../../ana/muDst/muDst_run1/sel3"
     #infile = "ana_muDst_run1_all_sel3z.root"
 
-    basedir = "../../ana/muDst/muDst_run1/sel4"
-    infile = "ana_muDst_run1_all_sel4z.root"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    infile = "ana_muDst_run1_all_sel5z.root"
 
     interactive = False
 

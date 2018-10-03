@@ -4,6 +4,7 @@ import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TH1D
 from ROOT import RooDataSet, RooArgSet, RooDataHist, RooArgList
 from ROOT import RooAddPdf, RooRealVar
+from ROOT import RooAbsReal
 from ROOT import RooFit as rf
 
 import sys
@@ -26,8 +27,8 @@ if __name__ == "__main__":
 
     basedir = "../../../star-upc-data/ana/muDst"
 
-    infile = "muDst_run1/sel3/ana_muDst_run1_all_sel3.root"
-    inLS = "muDst_run1/sel3/ana_muDst_run1_all_sel3_ls.root"
+    infile = "muDst_run1/sel5/ana_muDst_run1_all_sel5.root"
+    inLS = "muDst_run1/sel5/ana_muDst_run1_all_sel5_ls.root"
 
     mbin = 0.055
     mmin = 1.13
@@ -38,16 +39,21 @@ if __name__ == "__main__":
 
     ptmax = 0.17
 
-    alphafix = 0.693
-    nfix = 3.595
+    alphafix = 0.705
+    nfix = 3.649
 
     fitran = [1.45, mmax]
 
     binned = False
 
-    cmodel = rt.kMagenta
+    #integration range
+    intran = [1.6, 2.6]
+
+    #cmodel = rt.kMagenta
+    cmodel = rt.kBlue
     cbkg = rt.kRed
-    ccb = rt.kYellow
+    #ccb = rt.kYellow
+    ccb = rt.kGreen+1
 
     #-- end of config --
 
@@ -62,7 +68,7 @@ if __name__ == "__main__":
     #log fit parameters
     loglist1 = [(x,eval(x)) for x in ["infile", "inLS"]]
     loglist2 = [(x,eval(x)) for x in ["mbin", "mmin", "mmax", "ymin", "ymax", "ptmax", "binned"]]
-    loglist3 = [(x,eval(x)) for x in ["alphafix", "nfix", "fitran"]]
+    loglist3 = [(x,eval(x)) for x in ["alphafix", "nfix", "fitran", "intran"]]
     strlog = ut.make_log_string(loglist1, loglist2, loglist3)
     ut.log_results(out, strlog+"\n")
 
@@ -73,6 +79,7 @@ if __name__ == "__main__":
     m.setMin(mmin)
     m.setMax(mmax)
     m.setRange("fitran", fitran[0], fitran[1])
+    m.setRange("intran", intran[0], intran[1])
     dataIN = RooDataSet("data", "data", tree, RooArgSet(m,y,pT));
     data = dataIN.reduce(strsel);
     #binned data
@@ -109,6 +116,20 @@ if __name__ == "__main__":
 
     #log fit results
     ut.log_results(out, ut.log_fit_result(r1))
+
+    #integrate fit functions
+    mset = RooArgSet(m)
+    icb = cb.createIntegral(mset, rf.NormSet(mset), rf.Range("intran"))
+    ibkg = bkgd.createIntegral(mset, rf.NormSet(mset), rf.Range("intran"))
+    intCB = RooRealVar("intCB", "intCB", 0, nevt)
+    intBkg = RooRealVar("intBkg", "intBkg", 0, nevt)
+    intCB.setVal(icb.getVal()*ncb.getVal())
+    intCB.setError(icb.getVal()*ncb.getError())
+    intBkg.setVal(ibkg.getVal()*nbkg.getVal())
+    intBkg.setError(ibkg.getVal()*nbkg.getError())
+
+    ut.log_results(out, "CrystalBall integral: {0:.0f} +/- {1:.0f}".format(intCB.getVal(), intCB.getError()))
+    ut.log_results(out, "Background integral: {0:.0f} +/- {1:.0f}".format(intBkg.getVal(), intBkg.getError()))
 
     #create the plot
     gStyle.SetPadTickX(1)
@@ -164,7 +185,7 @@ if __name__ == "__main__":
     hxLS.SetMarkerColor(rt.kRed)
     hxLS.SetMarkerStyle(21)
     leg2.AddEntry(hx, "unlike sign")
-    leg2.AddEntry(hxLS, "like sign")
+    leg2.AddEntry(hxLS, "like sign", "p")
     leg2.Draw("same")
 
     #show fit parameters
