@@ -53,7 +53,7 @@ Double_t jT0pTBemc, jT1pTBemc, jT0etaBemc, jT1etaBemc;
 Bool_t jT0matchBemc, jT1matchBemc, jT0matchTof, jT1matchTof;
 Double_t jT0bemcHitE, jT1bemcHitE, jT0EnAtBemc, jT1EnAtBemc;
 Int_t jT0charge, jT1charge, jT0nHits, jT1nHits, jT0nHitsFit, jT1nHitsFit;
-Int_t jTrgIdx;
+Int_t jTrgIdx, jRunNum;
 
 TTree *jGenTree;
 Double_t jGenPt, jGenPt2, jGenM, jGenY;
@@ -633,6 +633,9 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
     jTrgIdx = 1;
   }
 
+  //run number
+  jRunNum = upcEvt->getRunNumber();
+
   jRecTree->Fill();
 
 }//FillRecTree
@@ -752,6 +755,7 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jT1nHitsFit", &jT1nHitsFit, "jT1nHitsFit/I");
 
   jRecTree ->Branch("jTrgIdx", &jTrgIdx, "jTrgIdx/I");
+  jRecTree ->Branch("jRunNum", &jRunNum, "jRunNum/I");
 
   //MC in reconstructed tree
   if( isMC ) {
