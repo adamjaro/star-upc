@@ -58,8 +58,8 @@ def make_fit():
     adc_max = 700.
 
     ptmax = 0.17
-    mmin = 2.8
-    mmax = 3.2
+    mmin = 3.4
+    mmax = 4.6
 
     #east/west projections and 2D plot
     ew = 0

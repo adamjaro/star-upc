@@ -26,7 +26,8 @@ if __name__ == "__main__":
     binned = True
 
     #fraction of events with valid ZDC vertex
-    f_4s = 0.575
+    #f_4s = 0.575
+    f_4s = 1.
 
     #colM = rt.kMagenta
     colM = rt.kBlue
