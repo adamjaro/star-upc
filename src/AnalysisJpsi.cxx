@@ -58,6 +58,7 @@ Int_t jTrgIdx, jRunNum;
 TTree *jGenTree;
 Double_t jGenPt, jGenPt2, jGenM, jGenY;
 Double_t jGenP0pT, jGenP0eta, jGenP0phi, jGenP1pT, jGenP1eta, jGenP1phi;
+Double_t jGenVtxX, jGenVtxY, jGenVtxZ;
 
 const Double_t kUdf=-9.e9;//default for undefined
 const Double_t kInf=9.e9; // infinity representation
@@ -442,20 +443,18 @@ Bool_t RunMC() {
   jGenP0pT=kUdf; jGenP0eta=kUdf; jGenP0phi=kUdf;
   jGenP1pT=kUdf; jGenP1eta=kUdf; jGenP1phi=kUdf;
   jGenPt=kUdf; jGenPt2=kUdf; jGenM=kUdf; jGenY=kUdf;
+  jGenVtxX=kUdf; jGenVtxY=kUdf; jGenVtxZ=kUdf;
 
   //generated dilepton
   TLorentzVector vgen;
 
-  //if( upcEvt->getNumberOfMCParticles() != 2 ) return kTRUE;
-
-  //cout << "#########" << endl;
+  //particle vertex IDs
+  Int_t v0id=-1, v1id=-2;
 
   //mc loop
   for(Int_t imc=0; imc<upcEvt->getNumberOfMCParticles(); imc++) {
     TParticle *mcp = upcEvt->getMCParticle(imc);
     if(!mcp) continue;
-
-    //cout << mcp->GetPdgCode() << endl;
 
     //consider only first two MC particles to prevent GEANT-created
     //electrons
@@ -466,11 +465,13 @@ Bool_t RunMC() {
       jGenP0pT = mcp->Pt();
       jGenP0eta = mcp->Eta();
       jGenP0phi = mcp->Phi();
+      v0id = mcp->GetFirstMother();
     } else {
       //negative particle
       jGenP1pT = mcp->Pt();
       jGenP1eta = mcp->Eta();
       jGenP1phi = mcp->Phi();
+      v1id = mcp->GetFirstMother();
     }
 
     //generated dilepton
@@ -485,6 +486,14 @@ Bool_t RunMC() {
   jGenPt2 = jGenPt*jGenPt;
   jGenM = vgen.M();
   jGenY = vgen.Rapidity();
+
+  //MC generated vertex, assuming both particles come from the same vertex
+  if( v0id == v1id ) {
+    TParticle *mcp = upcEvt->getMCParticle(0);
+    jGenVtxX = mcp->Vx();
+    jGenVtxY = mcp->Vy();
+    jGenVtxZ = mcp->Vz();
+  }
 
   //rapidity selection for MC
   if( TMath::Abs(jGenY) > maxAbsY ) return kFALSE;
@@ -769,6 +778,9 @@ TFile *CreateOutputTree(const string& out) {
     jRecTree ->Branch("jGenP1pT", &jGenP1pT, "jGenP1pT/D");
     jRecTree ->Branch("jGenP1eta", &jGenP1eta, "jGenP1eta/D");
     jRecTree ->Branch("jGenP1phi", &jGenP1phi, "jGenP1phi/D");
+    jRecTree ->Branch("jGenVtxX", &jGenVtxX, "jGenVtxX/D");
+    jRecTree ->Branch("jGenVtxY", &jGenVtxY, "jGenVtxY/D");
+    jRecTree ->Branch("jGenVtxZ", &jGenVtxZ, "jGenVtxZ/D");
   }
 
   //selection criteria in output reconstructed tree
@@ -805,6 +817,9 @@ TFile *CreateOutputTree(const string& out) {
     jGenTree ->Branch("jGenP1pT", &jGenP1pT, "jGenP1pT/D");
     jGenTree ->Branch("jGenP1eta", &jGenP1eta, "jGenP1eta/D");
     jGenTree ->Branch("jGenP1phi", &jGenP1phi, "jGenP1phi/D");
+    jGenTree ->Branch("jGenVtxX", &jGenVtxX, "jGenVtxX/D");
+    jGenTree ->Branch("jGenVtxY", &jGenVtxY, "jGenVtxY/D");
+    jGenTree ->Branch("jGenVtxZ", &jGenVtxZ, "jGenVtxZ/D");
   }
 
   //all triggers tree

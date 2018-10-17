@@ -9,6 +9,7 @@
 //c++ headers
 #include "string.h"
 #include <vector>
+#include <map>
 
 //root headers
 #include "TObjArray.h"
@@ -28,6 +29,7 @@
 #include "StMuDSTMaker/COMMON/StMuPrimaryVertex.h"
 #include "StMuDSTMaker/COMMON/StMuTrack.h"
 #include "StMuDSTMaker/COMMON/StMuMcTrack.h"
+#include "StMuDSTMaker/COMMON/StMuMcVertex.h"
 #include "StEvent/StTriggerData.h"
 
 //local headers
@@ -378,10 +380,20 @@ Int_t StUPCFilterMaker::Make()
 //_____________________________________________________________________________
 Bool_t StUPCFilterMaker::runMC() {
 
+  TClonesArray *muMcVtx = mMuDst->mcArray(0);
   TClonesArray *muMcTracks = mMuDst->mcArray(1);
   if( !muMcTracks ) return kFALSE;
+  if( !muMcVtx ) return kFALSE;
 
   TDatabasePDG *pdgdat = TDatabasePDG::Instance();
+
+  //vertex map from id to position in clones array
+  map<Int_t, Int_t> vmap;
+  //MC vertex loop
+  for(Int_t ivtx=0; ivtx<muMcVtx->GetEntries(); ivtx++) {
+    StMuMcVertex *vtx = dynamic_cast<StMuMcVertex*>(muMcVtx->At(ivtx));
+    vmap[vtx->Id()] = ivtx;
+  }//MC vertex loop
 
   //mc tracks loop
   for(Int_t i=0; i<muMcTracks->GetEntries(); i++) {
@@ -399,6 +411,14 @@ Bool_t StUPCFilterMaker::runMC() {
 
     part->SetMomentum(px, py, pz, energy);
     part->SetPdgCode( pdgdat->ConvertGeant3ToPdg( mcTrk->GePid() ) );
+
+    //MC vertex
+    StMuMcVertex *vtx = dynamic_cast<StMuMcVertex*>(muMcVtx->At( vmap[mcTrk->IdVx()] ));
+    const StThreeVectorF vxyz = vtx->XyzV();
+
+    part->SetProductionVertex(vxyz.x(), vxyz.y(), vxyz.z(), 0.);
+    //set original vertex id
+    part->SetFirstMother(mcTrk->IdVx());
 
   }//mc tracks loop
 

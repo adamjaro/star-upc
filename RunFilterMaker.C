@@ -6,9 +6,9 @@
 
 
 //_____________________________________________________________________________
-void RunFilterMaker(string filelist="txt/sim_slight14d2.list",
-                    Int_t nFiles=2000,
-                    string outfile="../star-upc-data/trees/starsim/StUPC_slight14d2.root") {
+void RunFilterMaker(string filelist="txt/sim_slight14e1.list",
+                    Int_t nFiles=301,
+                    string outfile="../star-upc-data/trees/starsim/StUPC_slight14e1.root") {
 
   //maker config
   Bool_t isMC = kTRUE; // data or MC
