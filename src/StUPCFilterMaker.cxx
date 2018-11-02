@@ -144,7 +144,7 @@ Int_t StUPCFilterMaker::Init()
   //output UPC event and tree
   mUPCEvent = new StUPCEvent();
   //configure the UPC event
-  mUPCEvent->setIsMC( mIsMC );
+  if( mIsMC > 0 ) mUPCEvent->setIsMC( kTRUE );
 
   //create the tree
   mUPCTree = new TTree("mUPCTree", "mUPCTree");
@@ -200,7 +200,7 @@ Int_t StUPCFilterMaker::Make()
   mCounter->Fill( kAna ); // analyzed events
 
   //mc
-  if(mIsMC) {
+  if( mIsMC > 0 ) {
     if( !runMC() ) {
       LOG_INFO << "StUPCFilterMaker::Make() no MC" << endm;
       mErrCounter->Fill( kNoMC );
@@ -224,7 +224,7 @@ Int_t StUPCFilterMaker::Make()
 
     mTriggerCounter->Fill(runnum, i);
   }
-  if( mIsMC ) isTrg = kTRUE; //override for MC
+  if( mIsMC > 0 ) isTrg = kTRUE; //override for MC
   if( !isTrg ) return kStOk;
   //event passed the trigger
 
@@ -256,7 +256,7 @@ Int_t StUPCFilterMaker::Make()
 
   //trigger data for DSM, ZDC, BBC and TOF
   const StTriggerData *trgdat = evt->triggerData();
-  if( !trgdat && !mIsMC ) {
+  if( !trgdat && mIsMC==0 ) {
     mErrCounter->Fill( kNoTrgDat ); // no trigger data
     LOG_INFO << "StUPCFilterMaker::Make() no trigger data" << endm;
     return kStErr;
@@ -307,8 +307,8 @@ Int_t StUPCFilterMaker::Make()
       const StMuBTofPidTraits &tofPid = track->btofPidTraits();
       Bool_t matchTof = tofPid.matchFlag() != 0 ? kTRUE : kFALSE;
 
-      //require at least one match, only in data
-      if( !mIsMC && !matchBemc && !matchTof ) continue;
+      //require at least one match, only in data or embedding MC
+      if( mIsMC!=1 && !matchBemc && !matchTof ) continue;
 
       //track matched to BEMC or TOF and selected to write to output UPC event
       nSelTracks++;

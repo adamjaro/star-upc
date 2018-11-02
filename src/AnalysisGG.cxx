@@ -79,11 +79,13 @@ TH1I *hEvtCount;
 enum{kAnaL=1, kPair, kVtxId, kPID, kZvtx, kSign, kUPCJpsiB, kMaxCnt};
 enum EvtCount{ kAna=1, kTrg, kDatBEMC, kWritten }; // counter from StUPCFilterMaker.h
 THB1D *hMass;
+Bool_t makeAllTree=0;
 
 //functions
 Bool_t RunTracksV0(StUPCTrack *pair[]);
 inline Bool_t selectTrack(const StUPCTrack *trk);
 void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentzVector &v0, const TLorentzVector &v1);
+void FillAllTree();
 void SortTracks(StUPCTrack *pair[]);
 void Init();
 TTree *ConnectInput(const string& in);
@@ -111,6 +113,7 @@ int main(int argc, char* argv[]) {
   parser.AddInt("pairSel", &pairSel);
   parser.AddInt("trgProfile", &trgProfile);
   parser.AddBool("matchTof", &matchTof);
+  parser.AddBool("makeAllTree", &makeAllTree);
 
   string basedir_in, in_name, basedir_out, out_name;
   parser.AddString("basedir_in", &basedir_in);
@@ -155,6 +158,7 @@ int main(int argc, char* argv[]) {
           && !upcEvt->getTrigger(kMain11_1) && !upcEvt->getTrigger(kMain11_2) && !upcEvt->getTrigger(kMain11_3) ) continue;
     }
     hEvtCount->Fill( kAnaL );
+    if( makeAllTree ) FillAllTree();
 
     //tracks
     StUPCTrack *pair[2] = {0,0};
@@ -201,6 +205,7 @@ int main(int argc, char* argv[]) {
 
   //write the outputs
   jRecTree->Write();
+  jAllTree->Write();
   hEvtCount->Write();
   outfile->Close();
   if(infile) infile->Close();
@@ -363,6 +368,29 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
 }//FillRecTree
 
 //_____________________________________________________________________________
+void FillAllTree() {
+
+  //fills all trigger tree
+
+  jZDCUnAttEast = (Int_t) upcEvt->getZDCUnAttEast();
+  jZDCUnAttWest = (Int_t) upcEvt->getZDCUnAttWest();
+  jZDCVtxZ = upcEvt->getZdcVertexZ();
+
+  jBBCSmallEast = (Int_t) upcEvt->getBBCSmallEast();
+  jBBCSmallWest = (Int_t) upcEvt->getBBCSmallWest();
+  jBBCLargeEast = (Int_t) upcEvt->getBBCLargeEast();
+  jBBCLargeWest = (Int_t) upcEvt->getBBCLargeWest();
+
+  jTOFMult = (Int_t) upcEvt->getTOFMultiplicity();
+
+  jVPDSumEast = (Int_t) upcEvt->getVPDSumEast();
+  jVPDSumWest = (Int_t) upcEvt->getVPDSumWest();
+
+  jAllTree->Fill();
+
+}//FillAllTree
+
+//_____________________________________________________________________________
 void SortTracks(StUPCTrack *pair[]) {
 
   //sort tracks in pair according to charge, first track positive,
@@ -449,6 +477,24 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("maxAbsZvtx", &maxAbsZvtx, "maxAbsZvtx/D");
   jRecTree ->Branch("pairSel", &pairSel, "pairSel/I");
   jRecTree ->Branch("maxNPrim", &maxNPrim, "maxNPrim/I");
+
+  //all triggers tree
+  jAllTree = new TTree("jAllTree", "jAllTree");
+  if( makeAllTree ) {
+    jAllTree ->Branch("jZDCUnAttEast", &jZDCUnAttEast, "jZDCUnAttEast/I");
+    jAllTree ->Branch("jZDCUnAttWest", &jZDCUnAttWest, "jZDCUnAttWest/I");
+
+    jAllTree ->Branch("jBBCSmallEast", &jBBCSmallEast, "jBBCSmallEast/I");
+    jAllTree ->Branch("jBBCSmallWest", &jBBCSmallWest, "jBBCSmallWest/I");
+    jAllTree ->Branch("jBBCLargeEast", &jBBCLargeEast, "jBBCLargeEast/I");
+    jAllTree ->Branch("jBBCLargeWest", &jBBCLargeWest, "jBBCLargeWest/I");
+
+    jAllTree ->Branch("jTOFMult", &jTOFMult, "jTOFMult/I");
+
+    jAllTree ->Branch("jVPDSumEast", &jVPDSumEast, "jVPDSumEast/I");
+    jAllTree ->Branch("jVPDSumWest", &jVPDSumWest, "jVPDSumWest/I");
+    jAllTree ->Branch("jZDCVtxZ", &jZDCVtxZ, "jZDCVtxZ/D");
+  }
 
   return outfile;
 

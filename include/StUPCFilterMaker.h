@@ -21,7 +21,7 @@ public:
   StUPCFilterMaker(StMuDstMaker *maker, string outnam="StUPC.root");
   ~StUPCFilterMaker();
 
-  void setIsMC(Bool_t mc=kTRUE) { mIsMC = mc; }
+  void setIsMC(Int_t mc) { mIsMC = mc; }
 
   Int_t Init();   //called at the beginning of the analysis
   Int_t Make();   //called for each event
@@ -40,7 +40,7 @@ private:
   StMuDstMaker *mMaker;  //StMuDstMaker provided to the constructor
   StMuDst *mMuDst; // input muDst data
 
-  Bool_t mIsMC; // MC or data
+  Int_t mIsMC; // MC or data
 
   string mOutName;  // name of the output file
   TFile *mOutFile;  // output file

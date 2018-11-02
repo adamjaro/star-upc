@@ -11,7 +11,7 @@ void RunFilterMaker(string filelist="txt/sim_slight14e2x1.list",
                     string outfile="../star-upc-data/trees/starsim/StUPC_slight14e2x1.root") {
 
   //maker config
-  Bool_t isMC = kTRUE; // data or MC
+  Int_t isMC = 2; // 0 - data,  1 - starsim MC,  2 - embedding MC
 
   Bool_t useClusterParam = kFALSE; // use BEMC cluster conditions below
   Int_t sizeMax = 4;
@@ -58,7 +58,7 @@ void RunFilterMaker(string filelist="txt/sim_slight14e2x1.list",
   StUPCFilterMaker *anaMaker = new StUPCFilterMaker(maker, outfile); //maker for muDst passed to the constructor
 
   //configure the analysis maker
-  if(isMC) anaMaker->setIsMC();
+  anaMaker->setIsMC(isMC);
 
   //no debug printouts
   StMuDebug::setLevel(0);

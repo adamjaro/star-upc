@@ -3,10 +3,10 @@
 basedir_in      /home/tmp/jaroslav                        #input directory
 in_name         StUPC_muDst_run2a_all.root                  #input file
 
-#basedir_out     /star/u/jaroslav/star-upc/build           #output directory
-basedir_out     /star/u/jaroslav/star-upc
-#out_name        output.root                               #output file
-out_name        ana/muDst/muDst_run2a/gg0/ana_muDst_run2a_all_gg0_ls.root
+basedir_out     /star/u/jaroslav/star-upc/build           #output directory
+#basedir_out     /star/u/jaroslav/star-upc-data
+out_name        output.root                               #output file
+#out_name        ana/muDst/muDst_run2a/gg0/ana_muDst_run2a_all_gg0_v2.root
 
 #selection criteria
 sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
@@ -19,8 +19,10 @@ maxNsigPID      2.      # max number of sigmas for TPC dE/dx PID
 matchTof        1       # track - TOF matching, 1: required, 0: not required
 maxAbsZvtx      30.     # maximal Z position of vertex, absolute value
 
+makeAllTree     1       # flag to write all triggers tree
+
 #overrides to the criteria
-sign        1
+#sign        1
 #maxNsigPID  9999.
 #maxAbsZvtx  9999.
 #matchTof    1
