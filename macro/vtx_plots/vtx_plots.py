@@ -14,12 +14,12 @@ from parameter_descriptor import parameter_descriptor as pdesc
 def fit_vtx_z():
 
     #gaussian fit to vertex z-position
-    datamc = True  #true - data, false - mc
+    datamc = False  #true - data, false - mc
 
     if datamc:
         vbin = 4.
     else:
-        vbin = 1.
+        vbin = 2
     vmax = 120.
 
     mmin = 1.5
@@ -70,7 +70,7 @@ def fit_vtx_z():
     if datamc:
         leg.AddEntry(hVtx, "Data")
     else:
-        leg.AddEntry(hVtx, "MC")
+        leg.AddEntry(hVtx, "Embedding MC #gamma#gamma")
     leg.AddEntry(f1, "Gaussian fit", "l")
 
     #fit parameters on the plot
@@ -86,7 +86,7 @@ def fit_vtx_z():
     leg.Draw("same")
     desc.draw()
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of fit_vtx_z
@@ -127,8 +127,8 @@ def plot_vtx_z():
     cut_hi = ut.cut_line(30, 0.8, hVtx)
 
     leg = ut.prepare_leg(0.16, 0.82, 0.26, 0.12, 0.025)
-    leg.SetMargin(0.15)
-    leg.SetBorderSize(1)
+    #leg.SetMargin(0.15)
+    #leg.SetBorderSize(1)
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hVtx, "Data")
     #leg.AddEntry(hVtxMC, "MC, coherent J/#it{#psi}", "l")
@@ -141,7 +141,7 @@ def plot_vtx_z():
     cut_lo.Draw("same")
     cut_hi.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_vtx_z
@@ -156,9 +156,9 @@ if __name__ == "__main__":
 
     #MC
     #basedir_mc = "../../ana/starsim/slight14b2/sel3"
-    basedir_mc = "../../../star-upc-data/ana/starsim/slight14b1/sel3"
+    basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
     #infile_mc = "ana_slight14b2x2_sel3_nzvtx.root"
-    infile_mc = "ana_slight14b1x2_sel3_nzvtx.root"
+    infile_mc = "ana_slight14e2x1_sel5_nzvtx.root"
 
     interactive = False
 

@@ -90,7 +90,8 @@ if __name__ == "__main__":
     ut.log_results(out, ut.log_fit_result(r1))
 
     #fraction of all events in the middle Gaussian
-    nall = float(tree.GetEntries())*f_4s
+    #nall = float(tree.GetEntries())*f_4s
+    nall = float(tree.GetEntries())
     ut.log_results(out, "Fraction of all events in the middle Gaussian:")
     ut.log_results(out, "nall, uncorrected: "+str(tree.GetEntries()))
     ut.log_results(out, "nall: "+str(nall))
@@ -99,6 +100,10 @@ if __name__ == "__main__":
     print "nall:", nall
     print "n0:", n0.getVal()
     print "n0/nall", n0.getVal()/nall
+    #range 26 +/- 30
+    n_range = tree.Draw("", "jZDCVtxZ>-4. && jZDCVtxZ<56")
+    print "n_range: ", n_range
+    print "n_range/nall: ", n_range/nall
 
     #make the plot
     gStyle.SetPadTickX(1)
@@ -133,17 +138,29 @@ if __name__ == "__main__":
     frame.Draw()
 
     #put fit parameters
-    desc = pdesc(frame, 0.15, 0.85, 0.045)
+    desc = pdesc(frame, 0.15, 0.9, 0.045)
     desc.set_text_size(0.03)
     desc.itemD("#chi^{2}/ndf", frame.chiSquare("Model", "data", 9), -1, colM)
     desc.prec = 0
     desc.itemR("norm", n0, col0)
-    desc.prec = 3
-    desc.itemR("#it{#mu}", m0, col0)
-    desc.itemR("#it{#sigma}", sig0, col0)
+    desc.prec = 2
+    desc.itemR("#mu", m0, col0)
+    desc.itemR("#sigma", sig0, col0)
     desc.draw()
 
-    ut.invert_col(gPad)
+    #side gaussians
+    desc2 = pdesc(frame, 0.7, 0.92, 0.045)
+    desc2.prec = 0
+    desc2.itemR("norm_{lo}", nL, colLR)
+    desc2.itemR("norm_{hi}", nR, colLR)
+    desc2.prec = 2
+    desc2.itemR("#mu_{lo}", mL, colLR)
+    desc2.itemR("#mu_{hi}", mR, colLR)
+    desc2.itemR("#sigma_{lo}", sigL, colLR)
+    desc2.itemR("#sigma_{hi}", sigR, colLR)
+    desc2.draw()
+
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

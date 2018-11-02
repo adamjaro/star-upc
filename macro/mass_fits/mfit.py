@@ -39,15 +39,16 @@ if __name__ == "__main__":
 
     ptmax = 0.17
 
-    alphafix = 0.705
-    nfix = 3.649
+    alphafix = 0.689
+    nfix = 3.877
 
     fitran = [1.45, mmax]
 
     binned = False
 
     #integration range
-    intran = [1.6, 2.6]
+    #intran = [1.6, 2.6]
+    intran = [3.4, 4.6]
 
     #cmodel = rt.kMagenta
     cmodel = rt.kBlue
@@ -128,6 +129,7 @@ if __name__ == "__main__":
     intBkg.setVal(ibkg.getVal()*nbkg.getVal())
     intBkg.setError(ibkg.getVal()*nbkg.getError())
 
+    ut.log_results(out, "Integration range: ["+str(intran[0])+", "+str(intran[1])+"]")
     ut.log_results(out, "CrystalBall integral: {0:.0f} +/- {1:.0f}".format(intCB.getVal(), intCB.getError()))
     ut.log_results(out, "Background integral: {0:.0f} +/- {1:.0f}".format(intBkg.getVal(), intBkg.getError()))
 
@@ -211,7 +213,19 @@ if __name__ == "__main__":
     desc.itemR("#it{c}_{2}", c2, cbkg)
     desc.draw()
 
-    ut.invert_col(gPad)
+    #integration range
+    lin_lo = ut.cut_line(intran[0], 0.33, frame)
+    lin_hi = ut.cut_line(intran[1], 0.33, frame)
+    lin_lo.Draw("same")
+    lin_hi.Draw("same")
+
+    #integration result
+    desc2 = pdesc(frame, 0.77, 0.6, 0.045)
+    desc2.prec = 0
+    desc2.itemD("#int_{%.1f}^{%.1f}#it{#gamma#gamma}" % (intran[0], intran[1]), intBkg.getVal(), intBkg.getError(), cbkg)
+    desc2.draw()
+
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

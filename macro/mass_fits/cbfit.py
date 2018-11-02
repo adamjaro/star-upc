@@ -17,10 +17,10 @@ if __name__ == "__main__":
 
     basedir = "../../../star-upc-data/ana/starsim"
 
-    #infile = "slight14c1/sel3/ana_slight14c1x4_sel3.root"
-    infile = "slight14d/sel5/ana_slight14d1_sel5a.root"
+    #infile = "slight14d/sel5/ana_slight14d1_sel5a.root"
+    infile = "slight14e/sel5/ana_slight14e1x1_sel5.root"
 
-    mbin = 0.002
+    mbin = 0.004
     mmin = 2.
     mmax = 3.6
 
@@ -37,7 +37,8 @@ if __name__ == "__main__":
     ccb = rt.kBlue
     lmg = 4; # left margin in text output
 
-    strdat = "MC coherent #it{J}/#it{#psi}#rightarrow e^{+}e^{-}"
+    #strdat = "MC coherent #it{J}/#it{#psi}#rightarrow e^{+}e^{-}"
+    strdat = "Embedding MC coherent #it{J}/#it{#psi}"
 
     #-- end of config --
 

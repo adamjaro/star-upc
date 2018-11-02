@@ -20,8 +20,8 @@ if __name__ == "__main__":
     basedir = "../../../star-upc-data/ana/starsim"
 
     #infile = "slight14d/sel3/ana_slight14d2_sel3.root"
-    infile = "slight14d/sel3/ana_slight14d2_sel3b.root"
-    #infile = "slight14d/sel3/ana_slight14d2_sel3c.root"
+    #infile = "slight14d/sel3/ana_slight14d2_sel3b.root"
+    infile = "slight14e/sel5/ana_slight14e2x1_sel5.root"
 
     mbin = 0.08
     mmin = 0.9
@@ -36,8 +36,8 @@ if __name__ == "__main__":
 
     binned = False
 
-    cbkg = rt.kMagenta
-    #cbkg = rt.kBlue
+    #cbkg = rt.kMagenta
+    cbkg = rt.kBlue
 
     #-- end of config --
 
@@ -106,9 +106,9 @@ if __name__ == "__main__":
     bkgd.plotOn(frame, rf.Range("fitran"), rf.LineColor(cbkg), rf.Name("Background"))
 
     #background function from the data
-    lamF.setVal(-1.095)
-    c1f.setVal(1.332)
-    c2f.setVal(0.185)
+    lamF.setVal(-1.113)
+    c1f.setVal(1.341)
+    c2f.setVal(0.192)
     #lamF.setVal(-0.827)
     #c1f.setVal(1.881)
     #c2f.setVal(0.121)
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     lx = ut.col_lin(cbkg)
     leg = ut.prepare_leg(0.58, 0.82, 0.39, 0.1, 0.029) # x, y, dx, dy, tsiz
     leg.SetMargin(0.1)
-    leg.AddEntry(hx, "MC #gamma#gamma#rightarrow e^{+}e^{-}") # , "lp"
+    leg.AddEntry(hx, "Embedding MC #gamma#gamma#rightarrow e^{+}e^{-}") # , "lp"
     leg.AddEntry(lx, "#it{f}_{bkg}(#it{m}) = "+bkgfunc, "l")
     leg.Draw("same")
 
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     leg2.AddEntry(lx2, "Shape from data", "l")
     leg2.Draw("same")
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

@@ -85,10 +85,27 @@ class AnalyzeTree(object):
         #use a given precision for the ratio
         return self.ApplyPrec(nsel/nall, prec)
 
-
-
-
-
+#_____________________________________________________________________________
+    def AnalyzeData(self, inp, prec=4):
+        #data input
+        infile = TFile.Open(inp, "read")
+        #data tree
+        datatree = infile.Get("jRecTree")
+        datatree.SetBranchStatus("*", 0)
+        datatree.SetBranchStatus("jRecM", 1)
+        datatree.SetBranchStatus("jRecY", 1)
+        datatree.SetBranchStatus("jRecPt", 1)
+        datatree.SetBranchStatus("jZDCUnAttEast", 1)
+        datatree.SetBranchStatus("jZDCUnAttWest", 1)
+        #selection formula
+        strsel = "jRecM>"+str(self.mmin) + " && jRecM<"+str(self.mmax)
+        strsel += " && jRecY>"+str(self.ymin) + " && jRecY<"+str(self.ymax)
+        strsel += " && jRecPt<"+str(self.ptmax)
+        strsel += " && jZDCUnAttEast < 130"
+        strsel += " && jZDCUnAttWest < 160"
+        #apply the selection
+        ndat = float(datatree.Draw("", strsel))
+        return ndat
 
 
 

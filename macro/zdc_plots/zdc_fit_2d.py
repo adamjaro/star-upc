@@ -58,8 +58,8 @@ def make_fit():
     adc_max = 700.
 
     ptmax = 0.17
-    mmin = 3.4
-    mmax = 4.6
+    mmin = 1.6
+    mmax = 2.6
 
     #east/west projections and 2D plot
     ew = 0
@@ -145,7 +145,20 @@ def make_fit():
     #gPad.GetViewer3D().OpenComposite(b3d)
     #print b3d
 
-    ut.invert_col(gPad)
+    #print "All input: ", data.numEntries()
+    #print "All input: 858"
+    #all input data
+    nall = float(tree.Draw("", strsel))
+    print "All input: ", nall
+    print "1n1n events: ", model.num_1n1n.getVal()
+    ratio_1n1n = float(model.num_1n1n.getVal())/nall
+    print "Ratio 1n1n / all: ", ratio_1n1n
+    ut.log_results(out, "Fraction of 1n1n events:\n", lmg)
+    ut.log_results(out, "All input: "+str(nall), lmg)
+    ut.log_results(out, "1n1n events: "+str(model.num_1n1n.getVal()), lmg)
+    ut.log_results(out, "Ratio 1n1n / all: "+str(ratio_1n1n), lmg)
+
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     if interactive == True: start_interactive()
@@ -166,6 +179,7 @@ if __name__ == "__main__":
 
     basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
     infile = "ana_muDst_run1_all_sel5z.root"
+    #infile = "ana_muDst_run1_all_sel5.root"
 
     interactive = False
 
