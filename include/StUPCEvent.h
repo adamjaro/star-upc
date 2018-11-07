@@ -88,21 +88,21 @@ public:
   UShort_t getTOFMultiplicity() const { return mTofMult; }
   UInt_t getBEMCMultiplicity() const { return mBemcMult; }
 
-  Int_t getNumberOfTracks() const { return mNtracks; }
+  Int_t getNumberOfTracks() const;
   StUPCTrack *getTrack(Int_t iTrack) const;
 
-  Int_t getNumberOfClusters() const { return mNclusters; }
+  Int_t getNumberOfClusters() const;
   StUPCBemcCluster *getCluster(Int_t iCls) const;
   StUPCBemcCluster *getClusterId(UInt_t clsId) const;
   TIterator *makeClustersIter() const;
 
-  Int_t getNumberOfVertices() const { return mNvertices; }
+  Int_t getNumberOfVertices() const;
   StUPCVertex *getVertex(Int_t iVtx) const;
   StUPCVertex *getVertexId(UInt_t vtxId) const;
   TIterator *makeVerticesIter() const;
 
   Bool_t getIsMC() const { return mMCParticles != NULL ? kTRUE : kFALSE; }
-  Int_t getNumberOfMCParticles() const { return mNmc; }
+  Int_t getNumberOfMCParticles() const;
   TParticle *getMCParticle(Int_t iMC) const;
 
   TArrayI *getArrayI() const { return mArrayI; }
@@ -142,21 +142,21 @@ private:
 
   static TClonesArray *mgUPCTracks; // array of upc tracks
   TClonesArray *mUPCTracks; //-> array of upc tracks
-  Int_t mNtracks; // number of upc tracks in event
+  Int_t mNtracks; //! number of upc tracks in event, local use when filling
 
   static TClonesArray *mgUPCBemcClusters; // array of BEMC clusters
   TClonesArray *mUPCBemcClusters; //-> array of BEMC clusters
-  Int_t mNclusters; // number of BEMC clusters written in event
+  Int_t mNclusters; //! number of BEMC clusters written in event, local use when filling
 
   static TClonesArray *mgUPCVertices; // array of UPC vertices
   TClonesArray *mUPCVertices; //-> array of UPC vertices
-  Int_t mNvertices; // number of vertices written in event
+  Int_t mNvertices; //! number of vertices written in event, local use when filling
 
   static TClonesArray *mgMCParticles; // array of MC particles
   TClonesArray *mMCParticles; // array of MC particles
-  Int_t mNmc; // number of mc particles in event
+  Int_t mNmc; //! number of mc particles in event, local use when filling
 
-  ClassDef(StUPCEvent, 1);
+  ClassDef(StUPCEvent, 2);
 };
 
 #endif

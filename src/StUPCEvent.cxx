@@ -208,6 +208,17 @@ Bool_t StUPCEvent::getTrigger(UInt_t idx) const
 }//setTrigger
 
 //_____________________________________________________________________________
+Int_t StUPCEvent::getNumberOfTracks() const {
+
+  //number of tracks in event
+
+  if( !mUPCTracks ) return 0;
+
+  return mUPCTracks->GetEntriesFast();
+
+}//getNumberOfTracks
+
+//_____________________________________________________________________________
 StUPCTrack *StUPCEvent::getTrack(Int_t iTrack) const
 {
   // get upc track
@@ -218,6 +229,17 @@ StUPCTrack *StUPCEvent::getTrack(Int_t iTrack) const
   return track;
 
 }//getTrack
+
+//_____________________________________________________________________________
+Int_t StUPCEvent::getNumberOfClusters() const {
+
+  //number of BEMC clusters in event
+
+  if( !mUPCBemcClusters ) return 0;
+
+  return mUPCBemcClusters->GetEntriesFast();
+
+}//getNumberOfClusters
 
 //_____________________________________________________________________________
 StUPCBemcCluster *StUPCEvent::getCluster(Int_t iCls) const
@@ -257,6 +279,17 @@ TIterator *StUPCEvent::makeClustersIter() const
 }//getClustersIter
 
 //_____________________________________________________________________________
+Int_t StUPCEvent::getNumberOfVertices() const {
+
+  //number of primary vertices in event
+
+  if( !mUPCVertices ) return 0;
+
+  return mUPCVertices->GetEntriesFast();
+
+}//getNumberOfVertices
+
+//_____________________________________________________________________________
 StUPCVertex *StUPCEvent::getVertex(Int_t iVtx) const
 {
   //get UPC vertex from clones array
@@ -292,6 +325,17 @@ TIterator *StUPCEvent::makeVerticesIter() const
   return mUPCVertices->MakeIterator();
 
 }//makeVerticesIter
+
+//_____________________________________________________________________________
+Int_t StUPCEvent::getNumberOfMCParticles() const {
+
+  //number of MC particles in event
+
+  if( !mMCParticles ) return 0;
+
+  return mMCParticles->GetEntriesFast();
+
+}//getNumberOfMCParticles
 
 //_____________________________________________________________________________
 TParticle *StUPCEvent::getMCParticle(Int_t iMC) const
