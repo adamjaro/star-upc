@@ -1,15 +1,15 @@
 
 #input and output
-#basedir_in      /home/tmp/jaroslav                        #input directory
-basedir_in      /star/u/jaroslav/star-upc-data
-in_name         trees/starsim/StUPC_slight14e1x1_v3.root     #input file
-#in_name         StUPC_muDst_run1_all.root
+basedir_in      /home/tmp/jaroslav                        #input directory
+#basedir_in      /star/u/jaroslav/star-upc-data
+#in_name         trees/starsim/StUPC_slight14e1x1_v3.root     #input file
+in_name         StUPC_muDst_run1_all.root
 
-basedir_out     /star/u/jaroslav/star-upc/build           #output directory
-#basedir_out     /star/u/jaroslav/star-upc-data
-out_name        output.root                               #output file
+#basedir_out     /star/u/jaroslav/star-upc/build           #output directory
+basedir_out     /star/u/jaroslav/star-upc-data
+#out_name        output.root                               #output file
 #out_name        ana/starsim/slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root
-#out_name        ana/muDst/muDst_run1/sel5/ana_muDst_run1_all_sel5_v2.root
+out_name        ana/muDst/muDst_run1/sel5/ana_muDst_run1_all_sel5z_v2.root
 
 #selection criteria
 sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
@@ -32,10 +32,10 @@ makeAllTree     0       # flag to write all triggers tree
 #sign        1
 #maxNsigPID  9999.
 #trgProfile   2
-#maxAbsZvtx  100.
-matchTof    1
-matchBemc   0
-useBemcEff  1
+maxAbsZvtx  100.
+#matchTof    1
+#matchBemc   0
+#useBemcEff  1
 #maxAbsEta   9.e9
 
 #bemc efficiency

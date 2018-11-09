@@ -44,6 +44,7 @@ Double_t jT0pT, jT0eta, jT0phi, jT1pT, jT1eta, jT1phi, jT0eng, jT1eng;
 Double_t jT0sigEl, jT1sigEl, jDeltaPhi;
 Double_t jT0dEdxSig, jT1dEdxSig, jT0beta, jT1beta;
 Double_t jT0phiBemc, jT1phiBemc, jDeltaPhiBemc;
+Int_t jT0BemcNHits, jT1BemcNHits;
 Double_t jVtxX, jVtxY, jVtxZ;
 Int_t jNPrimInVtx, jNPrimVtxUsed;
 Double_t jT0dcaXY, jT0dcaZ, jT1dcaXY, jT1dcaZ;
@@ -559,6 +560,10 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   pair[1]->getBemcPtEtaPhi(jT1pTBemc, jT1etaBemc, jT1phiBemc);
   //tracks opening angle at BEMC position
   jDeltaPhiBemc = GetDeltaPhi(jT0phiBemc, jT1phiBemc);
+  //number of BEMC hits to which the track is matched to
+  jT0BemcNHits = pair[0]->getBemcNHits();
+  jT1BemcNHits = pair[1]->getBemcNHits();
+
   //tracks energy
   jT0eng = v0.Energy();
   jT1eng = v1.Energy();
@@ -719,6 +724,9 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jT0phiBemc", &jT0phiBemc, "jT0phiBemc/D");
   jRecTree ->Branch("jT1phiBemc", &jT1phiBemc, "jT1phiBemc/D");
   jRecTree ->Branch("jDeltaPhiBemc", &jDeltaPhiBemc, "jDeltaPhiBemc/D");
+  jRecTree ->Branch("jT0BemcNHits", &jT0BemcNHits, "jT0BemcNHits/I");
+  jRecTree ->Branch("jT1BemcNHits", &jT1BemcNHits, "jT1BemcNHits/I");
+
   jRecTree ->Branch("jT0sigEl", &jT0sigEl, "jT0sigEl/D");
   jRecTree ->Branch("jT1sigEl", &jT1sigEl, "jT1sigEl/D");
   jRecTree ->Branch("jT0dEdxSig", &jT0dEdxSig, "jT0dEdxSig/D");
