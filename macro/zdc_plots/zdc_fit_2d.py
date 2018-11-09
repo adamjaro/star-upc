@@ -95,6 +95,7 @@ def make_fit():
     ut.log_results(out, ut.log_fit_result(r1), lmg)
     ut.log_results(out, "Fit parameters:\n", lmg)
     out.write(ut.log_fit_parameters(r1, lmg+2)+"\n")
+    #out.write(ut.table_fit_parameters(r1))
 
     #print ut.table_fit_parameters(r1)
 

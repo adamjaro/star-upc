@@ -90,8 +90,8 @@ if __name__ == "__main__":
     #strsel += " && "+bnam[0]+">0.4 && "+bnam[1]+">0.4"
 
     #line color for fit
-    clin = rt.kMagenta
-    #clin = rt.kBlue
+    #clin = rt.kMagenta
+    clin = rt.kBlue
 
     #-- end of config --
 
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     desc.draw()
     leg.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
