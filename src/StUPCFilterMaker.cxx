@@ -266,6 +266,9 @@ Int_t StUPCFilterMaker::Make()
     mCounter->Fill( kTrgDat ); // events having trigger data
   }
 
+  //TOF number of hits from StMuDst
+  mUPCEvent->setNTofHit( mMuDst->numberOfTofHit() );
+
 /*
   //BEMC high tower and jet patches
   for(Int_t ipatch=0; ipatch<300; ipatch++) {

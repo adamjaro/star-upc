@@ -37,6 +37,10 @@ public:
   void setBunchCrossId7bit(UInt_t id) { mbCrossId7bit = id; }
   void setMagneticField(Double_t mag) { mMagField = mag; }
 
+  void setLastDSM0(UShort_t dsm) { mLastDSM0 = dsm; }
+  void setLastDSM1(UShort_t dsm) { mLastDSM1 = dsm; }
+  void setLastDSM3(UShort_t dsm) { mLastDSM3 = dsm; }
+
   void setZDCUnAttEast(UShort_t signal) { mZdcEastUA = signal; }
   void setZDCUnAttWest(UShort_t signal) { mZdcWestUA = signal; }
   void setZdcVertexZ(Float_t vtx) { mZdcVertexZ = vtx; }
@@ -50,6 +54,7 @@ public:
   void setVPDSumWest(UShort_t sum) { mVPDSumWest = sum; }
 
   void setTOFMultiplicity(UShort_t tof) { mTofMult = tof; }
+  void setNTofHit(UInt_t tof) { mNTofHit = tof; }
   void setBEMCMultiplicity(UInt_t be) { mBemcMult = be; }
 
   StUPCTrack *addTrack();
@@ -73,6 +78,10 @@ public:
   UInt_t getBunchCrossId7bit() const { return mbCrossId7bit; }
   Double_t getMagneticField() const { return mMagField; }
 
+  UShort_t getLastDSM0() const { return mLastDSM0; }
+  UShort_t getLastDSM1() const { return mLastDSM1; }
+  UShort_t getLastDSM3() const { return mLastDSM3; }
+
   UShort_t getZDCUnAttEast() const { return mZdcEastUA; }
   UShort_t getZDCUnAttWest() const { return mZdcWestUA; }
   Float_t getZdcVertexZ() const { return mZdcVertexZ/10.; } // convert from mm to cm
@@ -86,6 +95,7 @@ public:
   UShort_t getVPDSumWest() const { return mVPDSumWest; }
 
   UShort_t getTOFMultiplicity() const { return mTofMult; }
+  UInt_t getNTofHit() const { return mNTofHit; }
   UInt_t getBEMCMultiplicity() const { return mBemcMult; }
 
   Int_t getNumberOfTracks() const;
@@ -122,6 +132,10 @@ private:
   UInt_t mbCrossId7bit; // bunch crossing ID 7bit
   Double32_t mMagField; // magnetic field
 
+  UShort_t mLastDSM0; // TCU bits 0-15 from StTriggerData::lastDSM(0)
+  UShort_t mLastDSM1; // TCU bits 16-31
+  UShort_t mLastDSM3; // TCU bits 58-62
+
   UShort_t mZdcEastUA; // ZDC unattenuated signal, east
   UShort_t mZdcWestUA; // ZDC unattenuated signal, west
   Float_t mZdcVertexZ; // ZDC vertex z position, mm
@@ -134,7 +148,8 @@ private:
   UShort_t mVPDSumEast; // VPD ADC sum east
   UShort_t mVPDSumWest; // VPD ADC sum west
 
-  UShort_t mTofMult; // TOF multiplicity
+  UShort_t mTofMult; // TOF multiplicity from StTriggerData
+  UInt_t mNTofHit; // number of TOF hits from StMuDst::numberOfTofHit
   UInt_t mBemcMult; // BEMC multiplicity, number of all BEMC clusters in event
 
   TArrayI *mArrayI; // extension for other integer parameters
@@ -156,7 +171,7 @@ private:
   TClonesArray *mMCParticles; // array of MC particles
   Int_t mNmc; //! number of mc particles in event, local use when filling
 
-  ClassDef(StUPCEvent, 2);
+  ClassDef(StUPCEvent, 3);
 };
 
 #endif

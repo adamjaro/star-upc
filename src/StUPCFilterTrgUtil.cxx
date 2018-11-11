@@ -30,6 +30,11 @@ StUPCFilterTrgUtil::StUPCFilterTrgUtil() {
 //_____________________________________________________________________________
 void StUPCFilterTrgUtil::processEvent(const StTriggerData *trgdat, StUPCEvent *upcEvt) {
 
+  //TCU bits
+  upcEvt->setLastDSM0( trgdat->lastDSM(0) );
+  upcEvt->setLastDSM1( trgdat->lastDSM(1) );
+  upcEvt->setLastDSM3( trgdat->lastDSM(3) );
+
   //ZDC
   runZDC(trgdat, upcEvt);
   //VPD
