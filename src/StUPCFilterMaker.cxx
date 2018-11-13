@@ -340,7 +340,6 @@ Int_t StUPCFilterMaker::Make()
         upcTrack->setBemcPtEtaPhi(emcPt, emcEta, emcPhi);
         upcTrack->setBemcClusterId(clsId);
         upcTrack->setBemcHitE(hitE);
-        upcTrack->setBemcNHits(nhitsBemc);
       }
       if( matchTof ) {
         upcTrack->setFlag( StUPCTrack::kTof );

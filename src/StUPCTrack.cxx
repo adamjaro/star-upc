@@ -27,7 +27,7 @@ StUPCTrack::StUPCTrack(): TObject(),
   mFlags(0), mPt(0), mEta(0), mPhi(0),
   mDcaXY(0), mDcaZ(0), mCharge(0), mNhits(0), mNhitsFit(0), mChi2(0),
   mDEdxSignal(0),
-  mBemcPt(-999), mBemcEta(-999), mBemcPhi(-999), mBemcClsId(0), mBemcHitE(-999), mBemcNHits(-999),
+  mBemcPt(-999), mBemcEta(-999), mBemcPhi(-999), mBemcClsId(0), mBemcHitE(-999),
   mTofBeta(0), mVtxId(0), mArrayI(0x0), mArrayF(0x0),
   mEvt(0x0)
 {
@@ -59,7 +59,6 @@ void StUPCTrack::Clear(Option_t *)
   mBemcPhi = -999.;
   mBemcClsId = 0;
   mBemcHitE = -999.;
-  mBemcNHits = -999;
 
   mTofBeta = 0;
 

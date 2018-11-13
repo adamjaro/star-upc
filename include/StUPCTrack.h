@@ -51,7 +51,6 @@ public:
   void setBemcPtEtaPhi(Double_t pt, Double_t eta, Double_t phi) {mBemcPt = pt; mBemcEta = eta; mBemcPhi = phi;}
   void setBemcClusterId(UInt_t id) { mBemcClsId = id; }
   void setBemcHitE(Float_t he) { mBemcHitE = he; }
-  void setBemcNHits(Short_t nh) { mBemcNHits = nh; }
 
   void setTofBeta(Float_t beta) { mTofBeta = beta; }
 
@@ -96,7 +95,6 @@ public:
   Double_t getBemcPmag() const;
   UInt_t getBemcClusterId() const { return mBemcClsId; }
   Float_t getBemcHitE() const { return mBemcHitE; }
-  Short_t getBemcNHits() const { return mBemcNHits; }
   StUPCBemcCluster *getBemcCluster() const;
   void getBemcLorentzVector(TLorentzVector &blvec, Double_t mass) const;
 
@@ -140,7 +138,6 @@ private:
   Double32_t mBemcPhi; // phi at BEMC radius
   UInt_t mBemcClsId; // id of BEMC cluster which track is matched to
   Float_t mBemcHitE; // energy of matched BEMC cluster
-  Short_t mBemcNHits; // number of BEMC hits matched to the track
 
   Float_t mTofBeta; // velocity in units of c by TOF
 
@@ -151,7 +148,7 @@ private:
 
   StUPCEvent *mEvt; //! pointer to current event, local use only
 
-  ClassDef(StUPCTrack, 2)
+  ClassDef(StUPCTrack, 3)
 
 };
 

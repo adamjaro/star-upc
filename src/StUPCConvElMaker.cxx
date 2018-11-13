@@ -563,7 +563,6 @@ void StUPCConvElMaker::setUPCTrack(StUPCTrack *ut, StMuTrack *t, KFParticle *kf)
     ut->setBemcPtEtaPhi(emcPt, emcEta, emcPhi);
     ut->setBemcClusterId(clsId);
     ut->setBemcHitE(hitE);
-    ut->setBemcNHits(nhitsBemc);
   }
 
   //TOF matching

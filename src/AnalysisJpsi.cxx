@@ -560,9 +560,6 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   pair[1]->getBemcPtEtaPhi(jT1pTBemc, jT1etaBemc, jT1phiBemc);
   //tracks opening angle at BEMC position
   jDeltaPhiBemc = GetDeltaPhi(jT0phiBemc, jT1phiBemc);
-  //number of BEMC hits to which the track is matched to
-  jT0BemcNHits = pair[0]->getBemcNHits();
-  jT1BemcNHits = pair[1]->getBemcNHits();
 
   //tracks energy
   jT0eng = v0.Energy();
