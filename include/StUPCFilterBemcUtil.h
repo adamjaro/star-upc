@@ -50,6 +50,7 @@ private:
     Float_t clsSigmaPhi;
     Float_t clsE;
     Bool_t isMatched;
+    Float_t clsHT;
   };
   emcCluster mEmcCluster; // object of cluster structure
 

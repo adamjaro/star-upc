@@ -44,12 +44,11 @@ Double_t jT0pT, jT0eta, jT0phi, jT1pT, jT1eta, jT1phi, jT0eng, jT1eng;
 Double_t jT0sigEl, jT1sigEl, jDeltaPhi;
 Double_t jT0dEdxSig, jT1dEdxSig, jT0beta, jT1beta;
 Double_t jT0phiBemc, jT1phiBemc, jDeltaPhiBemc;
-Int_t jT0BemcNHits, jT1BemcNHits;
 Double_t jVtxX, jVtxY, jVtxZ;
 Int_t jNPrimInVtx, jNPrimVtxUsed;
 Double_t jT0dcaXY, jT0dcaZ, jT1dcaXY, jT1dcaZ;
 Double_t jT0chi2, jT1chi2;
-Double_t jT0bemcE, jT1bemcE, jT0bemcP, jT1bemcP;
+Double_t jT0bemcE, jT1bemcE, jT0bemcP, jT1bemcP, jT0bemcHT, jT1bemcHT;
 Double_t jT0pTBemc, jT1pTBemc, jT0etaBemc, jT1etaBemc;
 Bool_t jT0matchBemc, jT1matchBemc, jT0matchTof, jT1matchTof;
 Double_t jT0bemcHitE, jT1bemcHitE, jT0EnAtBemc, jT1EnAtBemc;
@@ -592,9 +591,14 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   //tracks BEMC energy and momentum at BEMC
   // reset tree vars for case of no clusters
   jT0bemcE=kUdf; jT1bemcE=kUdf;
-  if( cls0 && cls1 ) {
+  jT0bemcHT=kUdf; jT1bemcHT=kUdf;
+  if( cls0 ) {
     jT0bemcE = cls0->getEnergy();
+    jT0bemcHT = cls0->getHTEnergy();
+  }
+  if( cls1 ) {
     jT1bemcE = cls1->getEnergy();
+    jT1bemcHT = cls1->getHTEnergy();
   }
   TVector3 v0b, v1b;
   v0b.SetPtEtaPhi(pair[0]->getBemcPt(), pair[0]->getBemcEta(), pair[0]->getBemcPhi());
@@ -721,8 +725,6 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jT0phiBemc", &jT0phiBemc, "jT0phiBemc/D");
   jRecTree ->Branch("jT1phiBemc", &jT1phiBemc, "jT1phiBemc/D");
   jRecTree ->Branch("jDeltaPhiBemc", &jDeltaPhiBemc, "jDeltaPhiBemc/D");
-  jRecTree ->Branch("jT0BemcNHits", &jT0BemcNHits, "jT0BemcNHits/I");
-  jRecTree ->Branch("jT1BemcNHits", &jT1BemcNHits, "jT1BemcNHits/I");
 
   jRecTree ->Branch("jT0sigEl", &jT0sigEl, "jT0sigEl/D");
   jRecTree ->Branch("jT1sigEl", &jT1sigEl, "jT1sigEl/D");
@@ -748,6 +750,8 @@ TFile *CreateOutputTree(const string& out) {
   jRecTree ->Branch("jT1bemcE", &jT1bemcE, "jT1bemcE/D");
   jRecTree ->Branch("jT0bemcP", &jT0bemcP, "jT0bemcP/D");
   jRecTree ->Branch("jT1bemcP", &jT1bemcP, "jT1bemcP/D");
+  jRecTree ->Branch("jT0bemcHT", &jT0bemcHT, "jT0bemcHT/D");
+  jRecTree ->Branch("jT1bemcHT", &jT1bemcHT, "jT1bemcHT/D");
   jRecTree ->Branch("jT0pTBemc", &jT0pTBemc, "jT0pTBemc/D");
   jRecTree ->Branch("jT1pTBemc", &jT1pTBemc, "jT1pTBemc/D");
   jRecTree ->Branch("jT0etaBemc", &jT0etaBemc, "jT0etaBemc/D");

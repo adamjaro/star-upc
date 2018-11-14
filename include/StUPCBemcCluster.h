@@ -24,6 +24,8 @@ public:
   void setEnergy(Float_t en) { mEnergy = en; }
   void setId(UInt_t id) { mId = id; }
 
+  void setHTEnergy(Float_t en) { mHTEnergy = en; }
+
   //getters
   Float_t getEta() const { return mEta; }
   Float_t getPhi() const { return mPhi; }
@@ -31,6 +33,8 @@ public:
   Float_t getSigmaPhi() const { return mSigmaPhi; }
   Float_t getEnergy() const { return mEnergy; }
   UInt_t getId() const { return mId; }
+
+  Float_t getHTEnergy() const { return mHTEnergy; }
 
 private:
 
@@ -43,6 +47,7 @@ private:
   Float_t mSigmaPhi; // sigma of phi
   Float_t mEnergy; // energy of cluster;
   UInt_t mId; // original ID
+  Float_t mHTEnergy; // high tower energy in cluster
 
 
 
@@ -50,8 +55,7 @@ private:
 
 
 
-
-  ClassDef(StUPCBemcCluster, 1)
+  ClassDef(StUPCBemcCluster, 2)
 
 };
 
