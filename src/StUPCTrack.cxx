@@ -28,7 +28,7 @@ StUPCTrack::StUPCTrack(): TObject(),
   mDcaXY(0), mDcaZ(0), mCharge(0), mNhits(0), mNhitsFit(0), mChi2(0),
   mDEdxSignal(0),
   mBemcPt(-999), mBemcEta(-999), mBemcPhi(-999), mBemcClsId(0), mBemcHitE(-999),
-  mTofBeta(0), mVtxId(0), mArrayI(0x0), mArrayF(0x0),
+  mTofTime(0), mTofPathLength(0), mVtxId(0), mArrayI(0x0), mArrayF(0x0),
   mEvt(0x0)
 {
   //default constructor
@@ -54,13 +54,16 @@ void StUPCTrack::Clear(Option_t *)
 
   mFlags = 0;
 
+  //nullify BEMC and TOF members because not every
+  //track is matched to them
   mBemcPt = -999.;
   mBemcEta = -999.;
   mBemcPhi = -999.;
   mBemcClsId = 0;
   mBemcHitE = -999.;
 
-  mTofBeta = 0;
+  mTofTime = 0;
+  mTofPathLength = 0;
 
   if(mArrayI) mArrayI->Reset();
   if(mArrayF) mArrayF->Reset();

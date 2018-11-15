@@ -343,7 +343,8 @@ Int_t StUPCFilterMaker::Make()
       }
       if( matchTof ) {
         upcTrack->setFlag( StUPCTrack::kTof );
-        upcTrack->setTofBeta( tofPid.beta() );
+        upcTrack->setTofTime( tofPid.timeOfFlight() );
+        upcTrack->setTofPathLength( tofPid.pathLength() );
       }
 
     }//tracks loop

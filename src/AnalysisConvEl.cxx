@@ -333,8 +333,8 @@ void FillRecTree(const StUPCTrack *trk0, const StUPCTrack *trk1) {
   jT1dEdxSig  = trk1->getDEdxSignal();
 
   //TOF beta
-  jT0beta = trk0->getTofBeta();
-  jT1beta = trk1->getTofBeta();
+  //jT0beta = trk0->getTofBeta();
+  //jT1beta = trk1->getTofBeta();
 
   //DCA to vertex
   jT0dcaXY = trk0->getDcaXY();

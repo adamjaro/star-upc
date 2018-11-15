@@ -328,8 +328,8 @@ void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentz
   //tracks dE/dx signal and TOF beta
   jT0dEdxSig  = pair[0]->getDEdxSignal();
   jT1dEdxSig  = pair[1]->getDEdxSignal();
-  jT0beta     = pair[0]->getTofBeta();
-  jT1beta     = pair[1]->getTofBeta();
+  //jT0beta     = pair[0]->getTofBeta();
+  //jT1beta     = pair[1]->getTofBeta();
 
   //primary vertex
   StUPCVertex *vtx = pair[0]->getVertex();

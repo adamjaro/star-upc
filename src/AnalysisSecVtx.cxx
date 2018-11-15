@@ -362,7 +362,8 @@ Double_t getTOFmass(const StUPCTrack *trk) {
   trk->getMomentum(ptot);
 
   Double_t pmag = ptot.Mag();
-  Double_t beta = trk->getTofBeta();
+  //Double_t beta = trk->getTofBeta();
+  Double_t beta = 0;
 
   return pmag*pmag*((1./beta)*(1./beta)-1.);
 
@@ -407,8 +408,8 @@ void FillRecTree(const StUPCTrack *gam, const StUPCTrack *trk0, const StUPCTrack
   jT1dEdxSig  = trk1->getDEdxSignal();
 
   //TOF beta
-  jT0beta = trk0->getTofBeta();
-  jT1beta = trk1->getTofBeta();
+  //jT0beta = trk0->getTofBeta();
+  //jT1beta = trk1->getTofBeta();
 
   //DCA to secondary vertex
   jT0dcaXY = trk0->getDcaXY();

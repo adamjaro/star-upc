@@ -570,7 +570,8 @@ void StUPCConvElMaker::setUPCTrack(StUPCTrack *ut, StMuTrack *t, KFParticle *kf)
   Bool_t matchTof = tofPid.matchFlag() != 0 ? kTRUE : kFALSE;
   if( matchTof ) {
     ut->setFlag( StUPCTrack::kTof );
-    ut->setTofBeta( tofPid.beta() );
+    ut->setTofTime( tofPid.timeOfFlight() );
+    ut->setTofPathLength( tofPid.pathLength() );
   }
 
 }//setUPCTrack

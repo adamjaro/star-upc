@@ -52,7 +52,8 @@ public:
   void setBemcClusterId(UInt_t id) { mBemcClsId = id; }
   void setBemcHitE(Float_t he) { mBemcHitE = he; }
 
-  void setTofBeta(Float_t beta) { mTofBeta = beta; }
+  void setTofTime(Float_t time) { mTofTime = time; }
+  void setTofPathLength(Float_t len) { mTofPathLength = len; }
 
   void setVertexId(UInt_t id) { mVtxId = id; }
 
@@ -98,7 +99,8 @@ public:
   StUPCBemcCluster *getBemcCluster() const;
   void getBemcLorentzVector(TLorentzVector &blvec, Double_t mass) const;
 
-  Float_t getTofBeta() const { return mTofBeta; }
+  Float_t getTofTime() const { return mTofTime; }
+  Float_t getTofPathLength() const { return mTofPathLength; }
 
   UInt_t getVertexId() const { return mVtxId; }
   StUPCVertex *getVertex() const;
@@ -139,7 +141,8 @@ private:
   UInt_t mBemcClsId; // id of BEMC cluster which track is matched to
   Float_t mBemcHitE; // energy of matched BEMC cluster
 
-  Float_t mTofBeta; // velocity in units of c by TOF
+  Float_t mTofTime; // time of flight by TOF
+  Float_t mTofPathLength; // path lenght from TOF
 
   UInt_t mVtxId; // ID of primary vertex associated with track
 
@@ -148,7 +151,7 @@ private:
 
   StUPCEvent *mEvt; //! pointer to current event, local use only
 
-  ClassDef(StUPCTrack, 3)
+  ClassDef(StUPCTrack, 4)
 
 };
 
