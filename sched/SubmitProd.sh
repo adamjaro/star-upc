@@ -1,10 +1,11 @@
 #!/usr/bin/bash
 
 #top directory for all outputs
-top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run3"
+top="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_VPDZDCmon1"
 
 #production names for jobs outputs
-plist=("prod" "low" "mid" "high")
+#plist=("prod" "low" "mid" "high")
+plist=("prod" "low" "mid")
 
 #catalog query for each production
 trgsetupname=(

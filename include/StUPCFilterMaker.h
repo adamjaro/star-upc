@@ -28,7 +28,7 @@ public:
   Int_t Finish(); //called at the end
 
   //public types
-  enum {kUPCJpsiB_1=0, kUPCJpsiB_2, kUPCmain_1, kUPCmain_2, kZero_bias, kMain10_1, kMain10_2, kMain11_1, kMain11_2, kMain11_3};
+  enum {kUPCJpsiB_1=0, kUPCJpsiB_2, kUPCmain_1, kUPCmain_2, kZero_bias, kMain10_1, kMain10_2, kMain11_1, kMain11_2, kMain11_3, kMon_1, kMon_2};
 
 private:
 

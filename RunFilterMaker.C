@@ -1,4 +1,5 @@
 
+
 //run with stderr to stdout redirection in c shell:
 //
 //  rm run.log
@@ -11,7 +12,7 @@ void RunFilterMaker(string filelist="txt/sim_slight14e1x1.list",
                     string outfile="../star-upc-data/trees/starsim/StUPC_slight14e1x1_v4.root") {
 
   //maker config
-  Int_t isMC = 2; // 0 - data,  1 - starsim MC,  2 - embedding MC
+  Int_t isMC = 0; // 0 - data,  1 - starsim MC,  2 - embedding MC
 
   Bool_t useClusterParam = kFALSE; // use BEMC cluster conditions below
   Int_t sizeMax = 4;

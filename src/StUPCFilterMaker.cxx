@@ -107,7 +107,7 @@ Int_t StUPCFilterMaker::Init()
   mTrgRan[ kUPCmain_2 ][0] = 15153036;
   mTrgRan[ kUPCmain_2 ][1] = 15167007;
   //
-  mTrgIDs[ kZero_bias ] = 9300; // Zero-bias, Run14 AuAu
+  //mTrgIDs[ kZero_bias ] = 9300; // Zero-bias, Run14 AuAu
   mTrgRan[ kZero_bias ][0] = 15045068;
   mTrgRan[ kZero_bias ][1] = 15187006;
   //
@@ -130,6 +130,14 @@ Int_t StUPCFilterMaker::Init()
   //mTrgIDs[ kMain11_3 ] = 350017; // UPC-main, Run11 AuAu, standard PHYSICS 2nd id
   mTrgRan[ kMain11_3 ][0] = 12146003;
   mTrgRan[ kMain11_3 ][1] = 12171017;
+  //
+  mTrgIDs[ kMon_1 ] = 450013; // VPD-ZDC-novtx-mon, 1st physics id
+  mTrgRan[ kMon_1 ][0] = 15076101;
+  mTrgRan[ kMon_1 ][1] = 15167014;
+  //
+  mTrgIDs[ kMon_2 ] = 450023; // VPD-ZDC-novtx-mon, 2nd physics id
+  mTrgRan[ kMon_2 ][0] = 15153036;
+  mTrgRan[ kMon_2 ][1] = 15167007;
 
 
   //utility for trigger data, BBC and ZDC
