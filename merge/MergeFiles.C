@@ -7,8 +7,10 @@ void MergeFiles(const string pattern, const string outfile) {
 
   //list the output files to a temporary file
   string tmpnam = "files.tmp";
-  string command = "ls " + pattern + " > " + tmpnam + " 2>/dev/null";
-  gSystem->Exec(command.c_str());
+  if( pattern.compare(tmpnam) != 0 ) {
+    string command = "ls " + pattern + " > " + tmpnam + " 2>/dev/null";
+    gSystem->Exec(command.c_str());
+  }
 
   //load files to the merger
   TFileMerger *merg = new TFileMerger();
