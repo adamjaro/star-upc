@@ -18,8 +18,10 @@ def plot_zdc_vtx_alltrg():
     #ZDC vertex from all triggered events
 
     vbin = 0.01
-    vmin = -20.
-    vmax = 20.
+    #vmin = -20.
+    #vmax = 20.
+    vmin = -800
+    vmax = 800
 
     can = ut.box_canvas()
 
@@ -44,8 +46,11 @@ def plot_zdc_vtx_alltrg():
 
     leg = ut.prepare_leg(0.67, 0.8, 0.28, 0.14, 0.025)
     leg.SetMargin(0.17)
-    leg.AddEntry(None, "UPC-JpsiB 2014", "")
+    #leg.AddEntry(None, "UPC-JpsiB 2014", "")
     #leg.AddEntry(None, "UPC-main 2010+2011", "")
+    #leg.AddEntry(None, "UPC-main 2014", "")
+    #leg.AddEntry(None, "Zero bias 2014", "")
+    leg.AddEntry(None, "VPD-ZDC-novtx-mon", "")
 
     #gPad.SetLogy()
 
@@ -174,14 +179,16 @@ def plot_zdc_tpc_vtx():
     #2D ZDC and TPC vertices
 
     zbin = 2.
-    zmin = -50.
-    zmax = 100.
-    #zmin = -1000
-    #zmax = 1000
+    #zmin = -50.
+    #zmax = 100.
+    zmin = -100
+    zmax = 150
 
     tbin = 2.
-    tmin = -55.
-    tmax = 55.
+    #tmin = -55.
+    #tmax = 55.
+    tmin = -110
+    tmax = 110
 
     mmin = 1.5
     mmax = 5.
@@ -212,7 +219,7 @@ def plot_zdc_tpc_vtx():
     hVtx.Draw()
     leg.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_zdc_tpc_vtx
@@ -400,12 +407,19 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
-    infile = "ana_muDst_run1_all_sel5.root"
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    #infile = "ana_muDst_run1_all_sel5.root"
     #infile = "ana_muDst_run1_all_sel5z.root"
+    #infile = "ana_muDst_run1a_all_sel5_tof.root"
 
     #basedir = "../../../star-upc-data/ana/muDst/muDst_run2a/gg0"
     #infile = "ana_muDst_run2a_all_gg0_v2.root"
+
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_run3/sel5"
+    #infile = "ana_muDst_run3_all_sel5z.root"
+
+    basedir = "../../../star-upc-data/ana/muDst/muDst_VPDZDCmon1/sel5"
+    infile = "ana_VPDZDCmon1_mer0_sel5z.root"
 
     interactive = False
 
@@ -413,7 +427,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 4
+    iplot = 5
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1

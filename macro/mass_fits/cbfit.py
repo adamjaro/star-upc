@@ -18,7 +18,7 @@ if __name__ == "__main__":
     basedir = "../../../star-upc-data/ana/starsim"
 
     #infile = "slight14d/sel5/ana_slight14d1_sel5a.root"
-    infile = "slight14e/sel5/ana_slight14e1x1_sel5.root"
+    infile = "slight14e/sel5/ana_slight14e1x1_sel5z.root"
 
     mbin = 0.004
     mmin = 2.

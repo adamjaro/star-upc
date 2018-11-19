@@ -27,11 +27,11 @@ if __name__ == "__main__":
 
     basedir = "../../../star-upc-data/ana/muDst"
 
-    infile = "muDst_run1/sel5/ana_muDst_run1_all_sel5.root"
-    inLS = "muDst_run1/sel5/ana_muDst_run1_all_sel5_ls.root"
+    infile = "muDst_run1/sel5/ana_muDst_run1_all_sel5z.root"
+    inLS = "muDst_run1/sel5/ana_muDst_run1_all_sel5z_ls.root"
 
-    mbin = 0.055
-    mmin = 1.13
+    mbin = 0.045
+    mmin = 1.12
     mmax = 5.
 
     ymin = -1.
@@ -39,16 +39,16 @@ if __name__ == "__main__":
 
     ptmax = 0.17
 
-    alphafix = 0.689
-    nfix = 3.877
+    alphafix = 0.694
+    nfix = 3.743
 
     fitran = [1.45, mmax]
 
     binned = False
 
     #integration range
-    #intran = [1.6, 2.6]
-    intran = [3.4, 4.6]
+    intran = [2.1, 2.6]
+    #intran = [3.4, 4.6]
 
     #cmodel = rt.kMagenta
     cmodel = rt.kBlue

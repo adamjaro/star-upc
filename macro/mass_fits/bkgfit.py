@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     #infile = "slight14d/sel3/ana_slight14d2_sel3.root"
     #infile = "slight14d/sel3/ana_slight14d2_sel3b.root"
-    infile = "slight14e/sel5/ana_slight14e2x1_sel5.root"
+    infile = "slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root"
 
     mbin = 0.08
     mmin = 0.9
@@ -106,9 +106,9 @@ if __name__ == "__main__":
     bkgd.plotOn(frame, rf.Range("fitran"), rf.LineColor(cbkg), rf.Name("Background"))
 
     #background function from the data
-    lamF.setVal(-1.113)
-    c1f.setVal(1.341)
-    c2f.setVal(0.192)
+    lamF.setVal(-1.055)
+    c1f.setVal(1.338)
+    c2f.setVal(0.172)
     #lamF.setVal(-0.827)
     #c1f.setVal(1.881)
     #c2f.setVal(0.121)

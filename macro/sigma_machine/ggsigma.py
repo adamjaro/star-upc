@@ -12,15 +12,15 @@ if __name__ == "__main__":
     ymax = 1.
 
     #mass
-    mmin = 3.4
-    mmax = 4.6
+    mmin = 2.1
+    mmax = 2.6
 
     #pT
     ptmax = 0.17
 
     #number of gamma-gamma from mass fit
-    Ngg = 54
-    nggerr = 2
+    Ngg = 324
+    nggerr = 11
 
     #fraction of 1n1n events
     ratio_1n1n = 0.136
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     ratio_ana = 3420950./3694000
 
     #scale the lumi for |z| around nominal bunch crossing
-    ratio_zdc_vtx = 0.211
+    ratio_zdc_vtx = 0.502
 
     #tof correction to efficiency
     ratio_tof = 1.433
@@ -42,11 +42,11 @@ if __name__ == "__main__":
 
     #data
     basedir_data = "../../../star-upc-data/ana/muDst/muDst_run1/sel5/"
-    datatree = basedir_data + "ana_muDst_run1_all_sel5.root"
+    datatree = basedir_data + "ana_muDst_run1_all_sel5z.root"
 
     #gamma-gamma mc
     basedir = "../../../star-upc-data/ana/starsim/"
-    mctree = basedir + "slight14e/sel5/ana_slight14e2x1_sel5.root"
+    mctree = basedir + "slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root"
 
     #starlight total cross section of gamma-gamma -> e+e- and corresponding file
     sigma_starlight = 2.063

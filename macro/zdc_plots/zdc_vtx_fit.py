@@ -100,8 +100,9 @@ if __name__ == "__main__":
     print "nall:", nall
     print "n0:", n0.getVal()
     print "n0/nall", n0.getVal()/nall
-    #range 26 +/- 30
-    n_range = tree.Draw("", "jZDCVtxZ>-4. && jZDCVtxZ<56")
+    #range 26 +/- 30: jZDCVtxZ>-4. && jZDCVtxZ<56
+    #range 26 +/- 100:  -74., 126.
+    n_range = tree.Draw("", "jZDCVtxZ>-74. && jZDCVtxZ<126")
     print "n_range: ", n_range
     print "n_range/nall: ", n_range/nall
 
