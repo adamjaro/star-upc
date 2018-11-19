@@ -228,6 +228,7 @@ int main(int argc, char* argv[]) {
 
     //z_vtx, tracks in pair are already from same vtx, track 0 used to get vtx object
     if( TMath::Abs(pair[0]->getVertex()->getPosZ()) > maxAbsZvtx ) continue;
+    //if( TMath::Abs(upcEvt->getZdcVertexZ()-26.) < maxAbsZvtx ) continue;
     hEvtCount->Fill( kZvtx );
 
     //difference in ZDC and TPC z-vertex
