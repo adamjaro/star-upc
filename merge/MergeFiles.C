@@ -5,6 +5,8 @@ void MergeFiles(const string pattern, const string outfile) {
 
   gSystem->Load("../build/libstar-upc.so");
 
+  cout << "MergeFiles.C: " << pattern << " " << outfile << endl;
+
   //list the output files to a temporary file
   string tmpnam = "files.tmp";
   if( pattern.compare(tmpnam) != 0 ) {
