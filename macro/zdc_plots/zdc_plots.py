@@ -20,6 +20,8 @@ def plot_zdc_vtx_alltrg():
     vbin = 0.01
     #vmin = -20.
     #vmax = 20.
+    #vmin = -26
+    #vmax = -12
     vmin = -800
     vmax = 800
 
@@ -31,6 +33,7 @@ def plot_zdc_vtx_alltrg():
 
     #convert to meters for plot
     treeAll = inp.Get("jAllTree")
+    print "Number of all trg events:", treeAll.GetEntries()
     treeAll.Draw("jZDCVtxZ/100. >> hZdcVtxAll")
 
     hZdcVtx.SetYTitle("Events / {0:.0f} cm".format(vbin*100.))
@@ -49,8 +52,8 @@ def plot_zdc_vtx_alltrg():
     #leg.AddEntry(None, "UPC-JpsiB 2014", "")
     #leg.AddEntry(None, "UPC-main 2010+2011", "")
     #leg.AddEntry(None, "UPC-main 2014", "")
-    #leg.AddEntry(None, "Zero bias 2014", "")
-    leg.AddEntry(None, "VPD-ZDC-novtx-mon", "")
+    leg.AddEntry(None, "Zero bias 2014", "")
+    #leg.AddEntry(None, "VPD-ZDC-novtx-mon", "")
 
     #gPad.SetLogy()
 
@@ -415,11 +418,11 @@ if __name__ == "__main__":
     #basedir = "../../../star-upc-data/ana/muDst/muDst_run2a/gg0"
     #infile = "ana_muDst_run2a_all_gg0_v2.root"
 
-    #basedir = "../../../star-upc-data/ana/muDst/muDst_run3/sel5"
-    #infile = "ana_muDst_run3_all_sel5z.root"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run3/sel5"
+    infile = "ana_muDst_run3_all_sel5z.root"
 
-    basedir = "../../../star-upc-data/ana/muDst/muDst_VPDZDCmon1/sel5"
-    infile = "ana_VPDZDCmon1_mer0_sel5z.root"
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_VPDZDCmon1/sel5"
+    #infile = "ana_VPDZDCmon1_sel5z.root"
 
     interactive = False
 
