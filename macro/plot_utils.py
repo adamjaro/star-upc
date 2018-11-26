@@ -78,6 +78,15 @@ def prepare_TH2D_n(name, nbinsX, xmin, xmax, nbinsY, ymin, ymax):
   return hx
 
 #_____________________________________________________________________________
+def put_yx_tit(hx, ytit, xtit, yofs=1.5, xofs=1.1):
+
+    hx.SetYTitle(ytit)
+    hx.SetXTitle(xtit)
+
+    hx.SetTitleOffset(yofs, "Y")
+    hx.SetTitleOffset(xofs, "X")
+
+#_____________________________________________________________________________
 def norm_to_data(hMC, hDat, col=rt.kBlue, lo=0., hi=-1.):
 
     #normalize MC hMC to data hDat, suppress errors to draw as line and set color,
@@ -112,6 +121,14 @@ def box_canvas():
     return can
 
 #_____________________________________________________________________________
+def set_margin_lbtr(gPad, lm, bm, tm, rm):
+
+    gPad.SetLeftMargin(lm)
+    gPad.SetBottomMargin(bm)
+    gPad.SetTopMargin(tm)
+    gPad.SetRightMargin(rm)
+
+#_____________________________________________________________________________
 def prepare_leg(xl, yl, dxl, dyl, tsiz=0.045):
 
   leg = TLegend(xl, yl, xl+dxl, yl+dyl)
@@ -139,6 +156,16 @@ def add_leg_mass(leg, mmin, mmax):
     mmin_fmt = "{0:.1f}".format(mmin)
     mmax_fmt = "{0:.1f}".format(mmax)
     leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
+
+#_____________________________________________________________________________
+def make_uo_leg(hx, xl, yl, dxl, dyl, tsiz=0.03):
+
+    leg = prepare_leg(xl, yl, dxl, dyl, tsiz)
+
+    uolin = "Underflow: {0:.0f}, overflow: {1:.0f}".format(hx.GetBinContent(0), hx.GetBinContent(hx.GetNbinsX()+1))
+    leg.AddEntry(None, uolin, "")
+
+    return leg
 
 #_____________________________________________________________________________
 def col_lin(col, w=4, st=rt.kSolid):
@@ -360,9 +387,10 @@ def invert_col(pad, bgcol=rt.kBlack):
          obj.GetYaxis().SetTitleColor(fgcol)
       #Legend
       if obj.InheritsFrom(TLegend.Class()) == True:
-         obj.SetFillStyle(1000)
-         obj.SetFillColor(fgcol)
-         obj.SetTextColor(bgcol)
+         obj.SetTextColor(fgcol)
+         #obj.SetFillStyle(1000)
+         #obj.SetFillColor(fgcol)
+         #obj.SetTextColor(bgcol)
          #ln = TIter(obj.GetListOfPrimitives())
          #lo = ln.Next()
          #while lo != None:
