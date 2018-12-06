@@ -9,6 +9,243 @@ import plot_utils as ut
 
 
 #_____________________________________________________________________________
+def plot_rec_gen_pt2():
+
+    #reconstructed pT^2 vs. generated pT^2 for resolution
+
+    ptbin = 0.005
+    #ptbin = 0.002
+    ptmin = 0.
+    ptmax = 1.
+    #ptmax = 0.16
+    #ptmin = 0.
+    #ptmax = 0.2
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt2 = ut.prepare_TH2D("hPt2", ptbin, ptmin, ptmax, ptbin, ptmin, ptmax)
+
+    tit_str = "#it{p}_{T}"+" / ({0:.3f}".format(ptbin)+" GeV)"
+    ut.put_yx_tit(hPt2, "Reconstructed " + tit_str, "Generated " + tit_str, 1.5, 1.2)
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.015, 0.09)
+
+    draw = "jRecPt:jGenPt"
+    #draw = "jRecPt*jRecPt:jGenPt*jGenPt"
+
+    mctree.Draw(draw + " >> hPt2", strsel)
+
+    #hPt2.SetYTitle("rec")
+    #hPt2.SetXTitle("gen")
+
+    #ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_rec_gen_pt2
+
+#_____________________________________________________________________________
+def plot_jpsi_logPt2():
+
+    #J/psi log_10(pT^2)
+
+    ptbin = 0.12
+    ptmin = -5.
+    ptmax = 1.
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+    hPtMC = ut.prepare_TH1D("hPtMC", ptbin/3., ptmin, ptmax)
+
+    ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV^{2})", "#it{p}_{T}^{2} (GeV^{2})")
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.01)
+
+    draw = "TMath::Log10(jRecPt*jRecPt)"
+
+    tree.Draw(draw + " >> hPt", strsel)
+    mctree.Draw(draw + " >> hPtMC", strsel)
+    ut.norm_to_data(hPtMC, hPt, rt.kBlue, -5., -1.8) # norm for coh
+    #ut.norm_to_data(hPtMC, hPt, rt.kBlue, -1.1, 1.) # for incoh
+    #ut.norm_to_data(hPtMC, hPt, rt.kBlue, -5., -2.4) # for ggel
+
+    hPt.Draw()
+    hPtMC.Draw("same")
+
+    leg = ut.prepare_leg(0.67, 0.8, 0.14, 0.16, 0.03)
+    ut.add_leg_mass(leg, mmin, mmax)
+    leg.AddEntry(hPt, "Data")
+    leg.AddEntry(hPtMC, "Coherent MC", "l")
+    leg.Draw("same")
+
+    uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    #gPad.SetLogy()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_jpsi_logPt2
+
+#_____________________________________________________________________________
+def plot_jpsi_pt2():
+
+    #J/psi pT^2
+
+    ptbin = 0.002
+    ptmin = 0.
+    ptmax = 0.15
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+    hPtMC = ut.prepare_TH1D("hPtMC", ptbin/3., ptmin, ptmax)
+
+    ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV^{2})", "#it{p}_{T}^{2} (GeV^{2})")
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
+
+    draw = "jRecPt*jRecPt"
+
+    tree.Draw(draw + " >> hPt", strsel)
+    mctree.Draw(draw + " >> hPtMC", strsel)
+    ut.norm_to_data(hPtMC, hPt, rt.kBlue, 0., 0.015)
+
+    hPt.Draw()
+    hPtMC.Draw("same")
+
+    leg = ut.prepare_leg(0.67, 0.8, 0.14, 0.16, 0.03)
+    ut.add_leg_mass(leg, mmin, mmax)
+    leg.AddEntry(hPt, "Data")
+    leg.AddEntry(hPtMC, "Coherent MC", "l")
+    leg.Draw("same")
+
+    uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    gPad.SetLogy()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_jpsi_pt2
+
+#_____________________________________________________________________________
+def plot_jpsi_pt():
+
+    #J/psi transverse momentum
+    ptbin = 0.015
+    ptmin = 0.
+    ptmax = 1.
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+    hPtMC = ut.prepare_TH1D("hPtMC", ptbin/3., ptmin, ptmax)
+
+    ut.put_yx_tit(hPt, "Events / ({0:.3f} GeV)".format(ptbin), "#it{p}_{T} (GeV)")
+
+    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.01, 0.01)
+
+    draw = "jRecPt"
+
+    tree.Draw(draw + " >> hPt", strsel)
+    mctree.Draw(draw + " >> hPtMC", strsel)
+    ut.norm_to_data(hPtMC, hPt, rt.kBlue, 0., 0.14)
+
+    hPt.Draw()
+    hPtMC.Draw("same")
+
+    leg = ut.prepare_leg(0.67, 0.8, 0.14, 0.16, 0.03)
+    ut.add_leg_mass(leg, mmin, mmax)
+    leg.AddEntry(hPt, "Data")
+    leg.AddEntry(hPtMC, "Coherent MC", "l")
+    leg.Draw("same")
+
+    uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_jpsi_pt
+
+#_____________________________________________________________________________
+def plot_dphi_bemc():
+
+    #tracks opening angle at BEMC
+    phibin = 0.01
+    phimin = 2.4
+    phimax = 3.1
+
+    mmin = 1.5
+    mmax = 5
+    #mmin = 2.8
+    #mmax = 3.2
+
+    ptmax = 0.17
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f} && jRecPt<{2:.3f}".format(mmin, mmax, ptmax)
+
+    can = ut.box_canvas()
+
+    hDphi = ut.prepare_TH1D("hDphi", phibin, phimin, phimax)
+    hDphiMC = ut.prepare_TH1D("hDphiMC", phibin, phimin, phimax)
+
+    ut.put_yx_tit(hDphi, "Events / {0:.2f}".format(phibin), "Tracks #Delta#phi at BEMC")
+    ut.put_yx_tit(hDphiMC, "Events / {0:.2f}".format(phibin), "Tracks #Delta#phi at BEMC")
+
+    ut.set_margin_lbtr(gPad, 0.1, 0.08, 0.014, 0.01)
+
+    tree.Draw("jDeltaPhiBemc >> hDphi", strsel)
+    mctree.Draw("jDeltaPhiBemc >> hDphiMC", strsel)
+    ut.norm_to_data(hDphiMC, hDphi, rt.kBlue)
+
+    hDphiMC.Draw()
+    hDphi.Draw("e1same")
+    #hDphi.Draw()
+    hDphiMC.Draw("same")
+
+    lin = ut.cut_line(2.618, 0.5, hDphi)
+    lin.Draw("same")
+
+    leg = ut.prepare_leg(0.14, 0.71, 0.14, 0.21, 0.03)
+    ut.add_leg_pt_mass(leg, ptmax, mmin, mmax)
+    leg.AddEntry(hDphi, "Data")
+    leg.AddEntry(hDphiMC, "MC", "l")
+    leg.AddEntry(lin, "Cut at 2.618", "l")
+    leg.Draw("same")
+
+    uoleg = ut.make_uo_leg(hDphi, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_dphi_bemc
+
+#_____________________________________________________________________________
 def plot_dvtx_mc():
 
     #difference between reconstructed and generated vertex in MC
@@ -339,10 +576,13 @@ if __name__ == "__main__":
     #data
     basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
     infile = "ana_muDst_run1_all_sel5z.root"
+    #infile = "ana_muDst_run1_all_sel5z_nDphi.root"
 
     #MC
     basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
-    infile_mc = "ana_slight14e1x1_sel5z.root"
+    #infile_mc = "ana_slight14e1x1_sel5z.root"
+    infile_mc = "ana_slight14e3_sel5z.root"
+    #infile_mc = "ana_slight14e1x1_sel5z_nDphi.root"
     #infile_mc = "ana_slight14e2x1_sel5_nzvtx.root"
 
     interactive = False
@@ -351,7 +591,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 6
+    iplot = 11
     funclist = []
     funclist.append(plot_y) # 0
     funclist.append(plot_tracks_eta) # 1
@@ -360,6 +600,11 @@ if __name__ == "__main__":
     funclist.append(plot_tracks_chi2) # 4
     funclist.append(plot_tracks_nhits) # 5
     funclist.append(plot_dvtx_mc) # 6
+    funclist.append(plot_dphi_bemc) # 7
+    funclist.append(plot_jpsi_pt) # 8
+    funclist.append(plot_jpsi_pt2) # 9
+    funclist.append(plot_jpsi_logPt2) # 10
+    funclist.append(plot_rec_gen_pt2) # 11
 
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")
