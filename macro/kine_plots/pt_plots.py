@@ -4,12 +4,400 @@ import math
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TF1
+from ROOT import TF1, TH1D, TGraphAsymmErrors
+from ROOT import RooRealVar, RooDataSet, RooArgSet, RooDataHist, RooArgList, RooGenericPdf
+from ROOT import RooFormulaVar
+from ROOT import RooFit as rf
 
 import sys
 sys.path.append('../')
 import plot_utils as ut
 from parameter_descriptor import parameter_descriptor as pdesc
+
+#_____________________________________________________________________________
+def make_eff_pt2():
+
+    #efficiency vs. pT^2
+
+    ptbin = 0.005
+    ptmin = 0.
+    ptmax = 0.12   # 0.3
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
+    hPtRec = TH1D("hPtRec", "hPtRec", nbins, ptmin, ptmax)
+    hPtGen = TH1D("hPtGen", "hPtGen", nbins, ptmin, ptmax)
+    #hPtRec = ut.prepare_TH1D("hPtRec", ptbin, ptmin, ptmax)
+    #hPtGen = ut.prepare_TH1D("hPtGen", ptbin, ptmin, ptmax)
+
+    hPtRec.Sumw2()
+    hPtGen.Sumw2()
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
+
+    #generated trees
+    tree_coh_gen = inp_coh.Get("jGenTree")
+    tree_incoh_gen = inp_incoh.Get("jGenTree")
+
+    tree_coh.Draw("jGenPt*jGenPt >> hPtRec", strsel)
+    tree_coh_gen.Draw("jGenPt*jGenPt >> hPtGen")
+
+    #tree_incoh.Draw("jGenPt*jGenPt >>+ hPtRec", strsel)
+    #tree_incoh_gen.Draw("jGenPt*jGenPt >>+ hPtGen")
+
+    #tree_incoh.Draw("jGenPt*jGenPt >> hPtRec", strsel)
+    #tree_incoh_gen.Draw("jGenPt*jGenPt >> hPtGen")
+
+    #calculate the efficiency
+    hEff = TGraphAsymmErrors(hPtRec, hPtGen)
+
+    #hPtRec.Divide(hPtGen)
+
+    #hPtRec.Draw()
+    #hPtGen.Draw("same")
+    hEff.Draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+# end of make_eff_pt2
+
+#_____________________________________________________________________________
+def subtract_pt2():
+
+    #pT^2 with subtracted incoherent and gamma-gamma components
+
+    ptbin = 0.005
+    ptmin = 0.
+    ptmax = 0.12   # 0.3
+
+    mmin = 2.8
+    mmax = 3.2
+
+    ngg = 131  # number of gamma-gamma from mass fit
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
+    hPtIncoh = ut.prepare_TH1D("hPtIncoh", ptbin, ptmin, ptmax)
+    hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
+
+    ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV^{2})", "#it{p}_{T}^{2} (GeV^{2})")
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
+
+    draw = "jRecPt*jRecPt"
+
+    tree.Draw(draw + " >> hPt", strsel)
+    tree_coh.Draw(draw + " >> hPtCoh", strsel)
+    tree_gg.Draw(draw + " >> hPtGG", strsel)
+
+    #incoherent functional shape
+    func_incoh_pt2 = TF1("func_incoh", "[0]*exp(-[1]*x)", 0., 10.)
+    func_incoh_pt2.SetParameters(873.04, 3.28)
+
+    #fill incoherent histogram from functional shape
+    ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
+
+    #normalize gamma-gamma component
+    ut.norm_to_num(hPtGG, ngg, rt.kGreen)
+
+    #subtract gamma-gamma and incoherent components
+    hPt.Sumw2()
+    hPt.Add(hPtGG, -1)
+    hPt.Add(hPtIncoh, -1)
+
+    #normalize coherent MC to a custom range
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, 0., 0.015)
+
+    hPt.SetMinimum(1)
+
+    hPt.Draw()
+    hPtCoh.Draw("same")
+    #hPtIncoh.Draw("same")
+    #hPtGG.Draw("same")
+
+    leg = ut.prepare_leg(0.67, 0.78, 0.14, 0.18, 0.03)
+    ut.add_leg_mass(leg, mmin, mmax)
+    leg.AddEntry(hPt, "Data")
+    leg.AddEntry(hPtCoh, "Coherent MC", "l")
+    #leg.AddEntry(hPtIncoh, "Incoherent MC", "l")
+    #leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
+    leg.Draw("same")
+
+    uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    gPad.SetLogy()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of subtract_pt2
+
+#_____________________________________________________________________________
+def plot_pt2_real():
+
+    #pT^2 with realistic normalization for incoherent and gamma-gamma components
+
+    ptbin = 0.002
+    ptmin = 0.
+    ptmax = 0.2   # 0.3
+
+    mmin = 2.8
+    mmax = 3.2
+
+    ngg = 131  # number of gamma-gamma from mass fit
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
+    hPtIncoh = ut.prepare_TH1D("hPtIncoh", ptbin, ptmin, ptmax)
+    hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
+
+    ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV^{2})", "#it{p}_{T}^{2} (GeV^{2})")
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
+
+    draw = "jRecPt*jRecPt"
+
+    tree.Draw(draw + " >> hPt", strsel)
+    tree_coh.Draw(draw + " >> hPtCoh", strsel)
+    tree_gg.Draw(draw + " >> hPtGG", strsel)
+
+    #incoherent functional shape
+    func_incoh_pt2 = TF1("func_incoh", "[0]*exp(-[1]*x)", 0., 10.)
+    func_incoh_pt2.SetParameters(873.04, 3.28)
+
+    #fill incoherent histogram from functional shape
+    ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
+
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, 0., 0.015)
+    ut.norm_to_num(hPtGG, ngg, rt.kGreen)
+
+    hPt.Draw()
+    hPtCoh.Draw("same")
+    hPtIncoh.Draw("same")
+    hPtGG.Draw("same")
+
+    leg = ut.prepare_leg(0.67, 0.78, 0.14, 0.18, 0.03)
+    ut.add_leg_mass(leg, mmin, mmax)
+    leg.AddEntry(hPt, "Data")
+    leg.AddEntry(hPtCoh, "Coherent MC", "l")
+    leg.AddEntry(hPtIncoh, "Incoherent MC", "l")
+    leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
+    leg.Draw("same")
+
+    uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    gPad.SetLogy()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_pt2_real
+
+#_____________________________________________________________________________
+def subtract_pt2_incoh():
+
+    #subtract functional shape from pT^2 incoherent MC
+
+    ptbin = 0.008
+    ptmin = 0.
+    ptmax = 1.
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+
+    ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV^{2})", "#it{p}_{T}^{2} (GeV^{2})")
+
+    tree_incoh.Draw("jRecPt*jRecPt >> hPt", strsel)
+
+    #incoherent functional shape
+    func_incoh_pt2 = TF1("func_incoh", "[0]*exp(-[1]*x)", 0., 10.)
+    func_incoh_pt2.SetParName(0, "A")
+    func_incoh_pt2.SetParName(1, "b")
+    func_incoh_pt2.SetNpx(1000)
+    func_incoh_pt2.SetLineColor(rt.kRed)
+
+    #values from pdf fit to log(Pt2)
+    #func_incoh_pt2.SetParameters(266.3, 3.28)
+    func_incoh_pt2.SetParameters(101953.970, 4.810)
+
+    #histogram created from functional values
+    hPtFunc = ut.prepare_TH1D("hPtFunc", ptbin, ptmin, ptmax)
+    for ibin in xrange(1,hPtFunc.GetNbinsX()+1):
+        edge = hPtFunc.GetBinLowEdge(ibin)
+        w = hPtFunc.GetBinWidth(ibin)
+        hPtFunc.SetBinContent(ibin, func_incoh_pt2.Integral(edge, edge+w))
+        hPtFunc.SetBinError(ibin, 0.)
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.01)
+
+    hPt.Draw()
+    hPtFunc.Draw("same")
+
+    uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of subtract_pt2_incoh
+
+#_____________________________________________________________________________
+def pdf_logPt2_incoh():
+
+    #PDF fit to log_10(pT^2)
+
+    #tree_in = tree_incoh
+    tree_in = tree
+
+    #ptbin = 0.04
+    ptbin = 0.12
+    ptmin = -5.
+    ptmax = 1.
+
+    mmin = 2.8
+    mmax = 3.2
+
+    #fitran = [-5., 1.]
+    fitran = [-0.9, 0.1]
+
+    binned = False
+
+    #gamma-gamma 131 evt for pT<0.18
+
+    #input data
+    pT = RooRealVar("jRecPt", "pT", 0, 10)
+    m = RooRealVar("jRecM", "mass", 0, 10)
+    dataIN = RooDataSet("data", "data", tree_in, RooArgSet(pT, m))
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    data = dataIN.reduce(strsel)
+    #x is RooRealVar for log(Pt2)
+    draw = "TMath::Log10(jRecPt*jRecPt)"
+    draw_func = RooFormulaVar("x", "log_{10}( #it{p}_{T}^{2} ) (GeV^{2})", draw, RooArgList(pT))
+    x = data.addColumn(draw_func)
+    x.setRange("fitran", fitran[0], fitran[1])
+
+    #binned data
+    nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
+    hPt = TH1D("hPt", "hPt", nbins, ptmin, ptmax)
+    #fill in binned data
+    tree_in.Draw(draw + " >> hPt", strsel)
+    dataH = RooDataHist("dataH", "dataH", RooArgList(x), hPt)
+
+    #range for plot
+    x.setMin(ptmin)
+    x.setMax(ptmax)
+    x.setRange("plotran", ptmin, ptmax)
+
+    #create the pdf
+    b = RooRealVar("b", "b", 5., 0., 10.)
+    pdf_func = "log(10.)*pow(10.,x)*exp(-b*pow(10.,x))"
+    pdf_logPt2 = RooGenericPdf("pdf_logPt2", pdf_func, RooArgList(x, b))
+
+    #make the fit
+    if binned == True:
+        r1 = pdf_logPt2.fitTo(dataH, rf.Range("fitran"), rf.Save())
+    else:
+        r1 = pdf_logPt2.fitTo(data, rf.Range("fitran"), rf.Save())
+
+    #calculate norm to number of events
+    xset = RooArgSet(x)
+    ipdf = pdf_logPt2.createIntegral(xset, rf.NormSet(xset), rf.Range("fitran"))
+    print "PDF integral:", ipdf.getVal()
+    if binned == True:
+        nevt = tree_incoh.Draw("", strsel+" && "+draw+">{0:.3f}".format(fitran[0])+" && "+draw+"<{1:.3f}".format(fitran[0], fitran[1]))
+    else:
+        nevt = data.sumEntries("x", "fitran")
+
+    print "nevt:", nevt
+    pdf_logPt2.setNormRange("fitran")
+    print "PDF norm:", pdf_logPt2.getNorm(RooArgSet(x))
+
+    #a = nevt/ipdf.getVal()
+    a = nevt/pdf_logPt2.getNorm(RooArgSet(x))
+    print "a =", a
+
+    #gamma-gamma contribution
+    hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
+    tree_gg.Draw(draw + " >> hPtGG", strsel)
+    #ut.norm_to_data(hPtGG, hPt, rt.kGreen, -5., -2.9)
+    ut.norm_to_num(hPtGG, 131.)
+
+    print "Int GG:", hPtGG.Integral()
+
+    #create canvas frame
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.01)
+
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    frame.SetTitle("")
+
+    frame.SetYTitle("Events / ({0:.3f}".format(ptbin)+" GeV^{2})")
+
+    print "Int data:", hPt.Integral()
+
+    #plot the data
+    if binned == True:
+        dataH.plotOn(frame, rf.Name("data"))
+    else:
+        data.plotOn(frame, rf.Name("data"))
+
+    pdf_logPt2.plotOn(frame, rf.Range("fitran"), rf.LineColor(rt.kRed), rf.Name("pdf_logPt2"))
+    pdf_logPt2.plotOn(frame, rf.Range("plotran"), rf.LineColor(rt.kRed), rf.Name("pdf_logPt2_full"), rf.LineStyle(rt.kDashed))
+
+    frame.Draw()
+
+    leg = ut.prepare_leg(0.57, 0.78, 0.14, 0.19, 0.03)
+    ut.add_leg_mass(leg, mmin, mmax)
+    hx = ut.prepare_TH1D("hx", 1, 0, 1)
+    hx.Draw("same")
+    ln = ut.col_lin(rt.kRed)
+    leg.AddEntry(hx, "Data")
+    leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
+    leg.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
+    leg.Draw("same")
+
+    l0 = ut.cut_line(fitran[0], 0.9, frame)
+    l1 = ut.cut_line(fitran[1], 0.9, frame)
+    #l0.Draw()
+    #l1.Draw()
+
+    desc = pdesc(frame, 0.14, 0.9, 0.057)
+    desc.set_text_size(0.03)
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("pdf_logPt2", "data", 2), -1, rt.kRed)
+    desc.itemD("#it{A}", a, -1, rt.kRed)
+    desc.itemR("#it{b}", b, rt.kRed)
+    desc.draw()
+
+    #put gamma-gamma
+    hPtGG.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of pdf_logPt2_incoh
 
 #_____________________________________________________________________________
 def fit_logPt2_incoh():
@@ -22,6 +410,8 @@ def fit_logPt2_incoh():
 
     mmin = 2.8
     mmax = 3.2
+
+    fitran = [-1., -0.1]
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 
@@ -47,25 +437,43 @@ def fit_logPt2_incoh():
 
     func_incoh_logPt2.SetParameters(3000., 5.)
 
-    r1 = (hPtIncoh.Fit(func_incoh_logPt2, "RS")).Get()
+    r1 = (hPtIncoh.Fit(func_incoh_logPt2, "RS", "", fitran[0], fitran[1])).Get()
+
+    #create pdf normalized to number of events
+    pdf_logPt2 = TF1("pdf_logPt2", "[0]*log(10.)*pow(10.,x)*exp(-[1]*pow(10.,x))", -10., 10.)
+    nevt = tree_incoh.Draw("", strsel+" && "+draw+">{0:.3f}".format(fitran[0])+" && "+draw+"<{1:.3f}".format(fitran[0], fitran[1]))
+    k_norm = nevt/func_incoh_logPt2.Integral(fitran[0], fitran[1])
+    pdf_logPt2.SetParameter(0, k_norm*func_incoh_logPt2.GetParameter(0))
+    pdf_logPt2.SetParameter(1, func_incoh_logPt2.GetParameter(1))
+    #verify the normalization:
+    print "PDF integral", pdf_logPt2.Integral(-10., 10.)
 
     hPtIncoh.Draw()
     func_incoh_logPt2.Draw("same")
 
-    leg = ut.prepare_leg(0.18, 0.82, 0.14, 0.15, 0.03)
+    leg = ut.prepare_leg(0.18, 0.78, 0.14, 0.15, 0.03)
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hPtIncoh, "Incoherent MC")
     leg.AddEntry(func_incoh_logPt2, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
     leg.Draw("same")
 
-    desc = pdesc(hPtIncoh, 0.18, 0.82, 0.057)
+    desc = pdesc(hPtIncoh, 0.18, 0.78, 0.057)
     desc.set_text_size(0.03)
     desc.itemD("#chi^{2}/ndf", r1.Chi2()/r1.Ndf(), -1, rt.kRed)
     desc.itemRes("#it{A}", r1, 0, rt.kRed)
+    desc.itemD("#it{A}", pdf_logPt2.GetParameter(0), -1, rt.kRed)
     desc.itemRes("#it{b}", r1, 1, rt.kRed)
     desc.draw()
 
-    #ut.invert_col(rt.gPad)
+    uoleg = ut.make_uo_leg(hPtIncoh, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    l0 = ut.cut_line(fitran[0], 0.9, hPtIncoh)
+    l1 = ut.cut_line(fitran[1], 0.9, hPtIncoh)
+    l0.Draw()
+    l1.Draw()
+
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of fit_logPt2_incoh
@@ -125,7 +533,7 @@ def fit_pt2_incoh():
 
     #gPad.SetLogy()
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of fit_pt2_incoh
@@ -138,10 +546,12 @@ def fit_pt_incoh():
     ptbin = 0.015
     #ptbin = math.sqrt(0.005)
     ptmin = 0.
-    ptmax = 1.
+    ptmax = 1.4
 
     mmin = 2.8
     mmax = 3.2
+
+    fitran = [0.4, 1.]
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 
@@ -151,6 +561,10 @@ def fit_pt_incoh():
     ut.put_yx_tit(hPtIncoh, "Events / ({0:.3f}".format(ptbin)+" GeV)", "#it{p}_{T} (GeV)")
 
     tree_incoh.Draw("jRecPt >> hPtIncoh", strsel)
+
+    print "Input events:", hPtIncoh.GetEntries()
+    print "Histogram integral:", hPtIncoh.Integral()
+    print "Histogram integral (w):", hPtIncoh.Integral("width")
 
     #hPtIncoh.Sumw2()
     #hPtIncoh.Scale(1./hPtIncoh.Integral("width"))
@@ -165,10 +579,31 @@ def fit_pt_incoh():
 
     func_incoh.SetParameters(3000., 5.)
 
-    r1 = (hPtIncoh.Fit(func_incoh, "RS")).Get()
+    r1 = (hPtIncoh.Fit(func_incoh, "RS", "", fitran[0], fitran[1])).Get()
+
+    print "Fit integral:", func_incoh.Integral(0., 10.)
 
     hPtIncoh.Draw()
     func_incoh.Draw("same")
+
+    #normalize fit function to number of events
+    pdf_incoh = TF1("pdf_incoh", "2*[0]*x*exp(-[1]*x*x)", 0., 10.)
+    pdf_incoh.SetParName(0, "A")
+    pdf_incoh.SetParName(1, "b")
+    #    tree_incoh.Draw("jRecPt >> hPtIncoh", strsel)
+    #strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    nevt = tree_incoh.Draw("", strsel+" && jRecPt>{0:.3f} && jRecPt<{1:.3f}".format(fitran[0], fitran[1]))
+    k_norm = nevt/func_incoh.Integral(fitran[0], fitran[1])
+    pdf_incoh.SetParameter(0, k_norm*func_incoh.GetParameter(0))
+    pdf_incoh.SetParameter(1, func_incoh.GetParameter(1))
+    #verify the normalization:
+    print "Function integral after norm:", pdf_incoh.Integral(0., 10.)
+
+    #create pdf for pT^2 and verify normalization
+    pdf_pt2 = TF1("pdf_pt2", "[0]*exp(-[1]*x)", 0., 10.)
+    pdf_pt2.SetParameter(0, pdf_incoh.GetParameter(0))
+    pdf_pt2.SetParameter(1, pdf_incoh.GetParameter(1))
+    print "PDF for pT^2 integral:", pdf_pt2.Integral(0., 10.)
 
     leg = ut.prepare_leg(0.67, 0.84, 0.14, 0.12, 0.03)
     ut.add_leg_mass(leg, mmin, mmax)
@@ -181,11 +616,20 @@ def fit_pt_incoh():
     desc.itemD("#chi^{2}/ndf", r1.Chi2()/r1.Ndf(), -1, rt.kRed)
     desc.prec = 2
     desc.itemRes("#it{A}", r1, 0, rt.kRed)
+    desc.itemD("#it{A}", pdf_incoh.GetParameter(0), -1, rt.kRed)
     desc.prec = 3
     desc.itemRes("#it{b}", r1, 1, rt.kRed)
     desc.draw()
 
-    #ut.invert_col(rt.gPad)
+    l0 = ut.cut_line(fitran[0], 0.9, hPtIncoh)
+    l1 = ut.cut_line(fitran[1], 0.9, hPtIncoh)
+    l0.Draw()
+    l1.Draw()
+
+    uoleg = ut.make_uo_leg(hPtIncoh, 0.14, 0.9, 0.01, 0.1)
+    uoleg.Draw("same")
+
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of fit_pt_incoh
@@ -199,8 +643,10 @@ def plot_pt():
     ptmin = 0.
     ptmax = 1.1
 
-    mmin = 2.8
-    mmax = 3.2
+    #mmin = 2.8
+    #mmax = 3.2
+    mmin = 3.4
+    mmax = 5.
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 
@@ -242,7 +688,7 @@ def plot_pt():
     uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
     uoleg.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_pt
@@ -256,8 +702,10 @@ def plot_pt2():
     ptmin = 0.
     ptmax = 0.2   # 0.3
 
-    mmin = 2.8
-    mmax = 3.2
+    #mmin = 2.8
+    #mmax = 3.2
+    mmin = 1.5
+    mmax = 2.6
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 
@@ -301,7 +749,7 @@ def plot_pt2():
 
     gPad.SetLogy()
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_pt2
@@ -339,7 +787,7 @@ def plot_jpsi_logPt2():
     tree_gg.Draw(draw + " >> hPtGG", strsel)
     ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -1.8) # norm for coh
     ut.norm_to_data(hPtIncoh, hPt, rt.kRed, -1.1, 1.) # for incoh
-    ut.norm_to_data(hPtGG, hPt, rt.kGreen, -5., -2.4) # for ggel
+    ut.norm_to_data(hPtGG, hPt, rt.kGreen, -5., -2.9) # for ggel
 
     hPt.Draw()
     hPtCoh.Draw("same")
@@ -359,7 +807,7 @@ def plot_jpsi_logPt2():
 
     #gPad.SetLogy()
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_jpsi_logPt2
@@ -383,7 +831,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 5
+    iplot = 9
     funclist = []
     funclist.append(plot_jpsi_logPt2) # 0
     funclist.append(plot_pt2) # 1
@@ -391,6 +839,11 @@ if __name__ == "__main__":
     funclist.append(fit_pt_incoh) # 3
     funclist.append(fit_pt2_incoh) # 4
     funclist.append(fit_logPt2_incoh) # 5
+    funclist.append(pdf_logPt2_incoh) # 6
+    funclist.append(subtract_pt2_incoh) # 7
+    funclist.append(plot_pt2_real) # 8
+    funclist.append(subtract_pt2) # 9
+    funclist.append(make_eff_pt2) # 10
 
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")

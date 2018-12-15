@@ -14,6 +14,8 @@ if __name__ == "__main__":
     #mass
     mmin = 2.1
     mmax = 2.6
+    #mmin = 3.4
+    #mmax = 4.6
 
     #pT
     ptmax = 0.17
@@ -21,9 +23,12 @@ if __name__ == "__main__":
     #number of gamma-gamma from mass fit
     Ngg = 324
     nggerr = 11
+    #Ngg = 88
+    #nggerr = 3
 
     #fraction of 1n1n events
-    ratio_1n1n = 0.136
+    #ratio_1n1n = 0.136
+    ratio_1n1n = 1.
 
     #lumi in inv. ub
     lumi = 13871.907
@@ -33,6 +38,9 @@ if __name__ == "__main__":
 
     #scale the lumi for |z| around nominal bunch crossing
     ratio_zdc_vtx = 0.502
+
+    #bemc trigger efficiency
+    trg_eff = 0.67
 
     #tof correction to efficiency
     ratio_tof = 1.433
@@ -49,8 +57,10 @@ if __name__ == "__main__":
     mctree = basedir + "slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root"
 
     #starlight total cross section of gamma-gamma -> e+e- and corresponding file
-    sigma_starlight = 2.063
-    starlight = "/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_ggel_1n1n_m1p1_5p3_pT0p4_eta1p2_4Mevt.root"
+    #sigma_starlight = 2.063
+    #starlight = "/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_ggel_1n1n_m1p1_5p3_pT0p4_eta1p2_4Mevt.root"
+    sigma_starlight = 22.801
+    starlight = "/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_ggel_m1p1_5p3_pT0p4_eta1p2_4Mevt.root"
 
 
     #configure the tree analyzer
@@ -71,8 +81,8 @@ if __name__ == "__main__":
     print "eff: ", eff[0], "+/-", eff[1]
 
     #calculate the cross section
-    sigma = float(Ngg*ratio_1n1n)/(eff[0]*bbceff*ratio_tof*lumi_scaled)
-    sigma_err = float(nggerr*ratio_1n1n)/(eff[0]*bbceff*ratio_tof*lumi_scaled)
+    sigma = float(Ngg*ratio_1n1n)/(eff[0]*trg_eff*bbceff*ratio_tof*lumi_scaled)
+    sigma_err = float(nggerr*ratio_1n1n)/(eff[0]*trg_eff*bbceff*ratio_tof*lumi_scaled)
     print "sigma:", sigma, "+/-", sigma_err
 
     #Starlight correction R_ym

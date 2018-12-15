@@ -47,8 +47,9 @@ if __name__ == "__main__":
     binned = False
 
     #integration range
-    intran = [2.1, 2.6]
-    #intran = [3.4, 4.6]
+    #intran = [2.1, 2.6]
+    intran = [3.4, 4.6]
+    #intran = [2.8, 3.2]
 
     #cmodel = rt.kMagenta
     cmodel = rt.kBlue
@@ -183,6 +184,7 @@ if __name__ == "__main__":
     leg2.SetMargin(0.17)
     ut.add_leg_y_pt(leg2, ymin, ymax, ptmax)
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
+    hx.Draw("same")
     hxLS = ut.prepare_TH1D("hxLS", 1, 0, 1)
     hxLS.SetMarkerColor(rt.kRed)
     hxLS.SetMarkerStyle(21)
@@ -225,7 +227,7 @@ if __name__ == "__main__":
     desc2.itemD("#int_{%.1f}^{%.1f}#it{#gamma#gamma}" % (intran[0], intran[1]), intBkg.getVal(), intBkg.getError(), cbkg)
     desc2.draw()
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

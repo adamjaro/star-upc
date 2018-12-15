@@ -108,6 +108,50 @@ def norm_to_data(hMC, hDat, col=rt.kBlue, lo=0., hi=-1.):
     hMC.SetMarkerColor(col)
 
 #_____________________________________________________________________________
+def norm_to_num(hMC, num, col=rt.kBlue):
+
+    #normalize hMC to a given number of entries num
+    #suppress errors to draw as line and set color,
+
+    hMC.Sumw2()
+    hMC.Scale(num/hMC.Integral())
+
+    for ibin in range(hMC.GetNbinsX()+1):
+        hMC.SetBinError(ibin, 0)
+
+    hMC.SetLineColor(col)
+    hMC.SetMarkerColor(col)
+
+#_____________________________________________________________________________
+def norm_to_integral(hMC, ival, col=rt.kBlue):
+
+    #normalize hMC to integral given by ival
+    #suppress errors to draw as line and set color,
+
+    hMC.Sumw2()
+    hMC.Scale(ival/hMC.Integral("width"))
+
+    for ibin in range(hMC.GetNbinsX()+1):
+        hMC.SetBinError(ibin, 0)
+
+    hMC.SetLineColor(col)
+    hMC.SetMarkerColor(col)
+
+#_____________________________________________________________________________
+def fill_h1_tf(hx, func, col=rt.kBlue):
+
+    #fill h1 histogram from function
+
+    for ibin in xrange(1,hx.GetNbinsX()+1):
+        edge = hx.GetBinLowEdge(ibin)
+        w = hx.GetBinWidth(ibin)
+        hx.SetBinContent(ibin, func.Integral(edge, edge+w))
+        hx.SetBinError(ibin, 0.)
+
+    hx.SetLineColor(col)
+    hx.SetMarkerColor(col)
+
+#_____________________________________________________________________________
 def box_canvas():
 
     can = TCanvas("c3", "Analysis", 768, 768)

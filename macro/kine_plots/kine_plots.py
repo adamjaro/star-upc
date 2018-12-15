@@ -2,11 +2,83 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
+from ROOT import RooRealVar, RooDataHist, RooArgList, RooCBShape, RooGaussian
+from ROOT import RooFit as rf
 
 import sys
 sys.path.append('../')
 import plot_utils as ut
 
+#_____________________________________________________________________________
+def plot_rec_minus_gen_pt2():
+
+    #reconstructed pT^2 vs. generated pT^2 for resolution
+
+    ptbin = 0.001
+    ptmin = -0.1
+    ptmax = 0.15
+
+    mmin = 2.8
+    mmax = 3.2
+
+    fitran = [-0.003, 0.05]
+    #fitran = [-0.003, 0.003]
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
+    hPt2 = ut.prepare_TH1D("hPt2", ptbin, ptmin, ptmax)
+
+    ytit = "Events / ({0:.3f}".format(ptbin)+" GeV^{2})"
+    xtit = "#it{p}_{T, reconstructed}^{2} - #it{p}_{T, generated}^{2} (GeV^{2})"
+    ut.put_yx_tit(hPt2, ytit, xtit)
+
+    draw = "(jRecPt*jRecPt)-(jGenPt*jGenPt)"
+
+    mctree.Draw(draw + " >> hPt2", strsel)
+
+    #roofit binned data
+    x = RooRealVar("x", "x", -1, 1)
+    dataH = RooDataHist("dataH", "dataH", RooArgList(x), hPt2)
+
+    x.setRange("fitran", fitran[0], fitran[1])
+
+    #reversed Crystal Ball
+    mean = RooRealVar("mean", "mean", 0., -0.1, 0.1)
+    sigma = RooRealVar("sigma", "sigma", 0.01, 0., 0.1)
+    alpha = RooRealVar("alpha", "alpha", -10., 0.)
+    n = RooRealVar("n", "n", 0., 20.)
+    pdf = RooCBShape("pdf", "pdf", x, mean, sigma, alpha, n)
+
+    #gaus = RooGaussian("gaus", "gaus", x, mean, sigma)
+
+    #make the fit
+    res = pdf.fitTo(dataH, rf.Range("fitran"), rf.Save())
+    #res = gaus.fitTo(dataH, rf.Range("fitran"), rf.Save())
+
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.015, 0.03)
+
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    frame.SetTitle("")
+
+    frame.SetYTitle(ytit)
+    frame.SetXTitle(xtit)
+
+    frame.GetXaxis().SetTitleOffset(1.2);
+    frame.GetYaxis().SetTitleOffset(1.7);
+
+    dataH.plotOn(frame, rf.Name("data"))
+
+    pdf.plotOn(frame, rf.Precision(1e-6), rf.Name("pdf"))
+    #gaus.plotOn(frame, rf.Precision(1e-6), rf.Name("gaus"))
+
+    frame.Draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_rec_minus_gen_pt2
 
 #_____________________________________________________________________________
 def plot_rec_gen_pt2():
@@ -43,7 +115,7 @@ def plot_rec_gen_pt2():
     #hPt2.SetYTitle("rec")
     #hPt2.SetXTitle("gen")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_rec_gen_pt2
@@ -580,8 +652,8 @@ if __name__ == "__main__":
 
     #MC
     basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
-    #infile_mc = "ana_slight14e1x1_sel5z.root"
-    infile_mc = "ana_slight14e3_sel5z.root"
+    infile_mc = "ana_slight14e1x1_sel5z.root"
+    #infile_mc = "ana_slight14e3_sel5z.root"
     #infile_mc = "ana_slight14e1x1_sel5z_nDphi.root"
     #infile_mc = "ana_slight14e2x1_sel5_nzvtx.root"
 
@@ -591,7 +663,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 11
+    iplot = 12
     funclist = []
     funclist.append(plot_y) # 0
     funclist.append(plot_tracks_eta) # 1
@@ -605,6 +677,7 @@ if __name__ == "__main__":
     funclist.append(plot_jpsi_pt2) # 9
     funclist.append(plot_jpsi_logPt2) # 10
     funclist.append(plot_rec_gen_pt2) # 11
+    funclist.append(plot_rec_minus_gen_pt2) # 12
 
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")
