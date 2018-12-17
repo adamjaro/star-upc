@@ -27,7 +27,9 @@ def load_starlight():
     #slight_tree.Draw("pT*pT >> hSlight")
     nall = float( slight_tree.GetEntries() )
     ny = float( slight_tree.Draw("pT*pT >> hSlight", "rapidity>-1 && rapidity<1") )
-    sigma_sl = (ny/nall)*67.958/1000. # ub to mb
+    sigma_sl_tot = 67.958 # total Starlight cross section, ub
+    sigma_sl = (ny/nall)*sigma_sl_tot/1000. # ub to mb
+    #sigma_sl = sigma_sl/2. # rapidity interval
     print "sigma_sl:", sigma_sl
     ut.norm_to_integral(hSlight, sigma_sl)
 
@@ -37,7 +39,7 @@ def load_starlight():
 
     gSlight.SetLineColor(rt.kBlue)
     #gSlight.SetLineStyle(lstyle)
-    gSlight.SetLineWidth(2)
+    gSlight.SetLineWidth(3)
 
     #hSlight.SetMaximum(7.5)
     #frame.SetMaximum(7.5)
@@ -71,7 +73,7 @@ if __name__ == "__main__":
     mmin = 2.8
     mmax = 3.2
 
-    dy = 2. # rapidity interval
+    dy = 2. # rapidity interval, for integrated sigma
 
     ngg = 131  # number of gamma-gamma from mass fit
 
@@ -82,6 +84,9 @@ if __name__ == "__main__":
 
     #scale the lumi for |z| around nominal bunch crossing
     ratio_zdc_vtx = 0.502
+
+    Reta = 0.503 # pseudorapidity preselection
+    #Reta = 1.
 
     trg_eff = 0.67 # bemc trigger efficiency
 
@@ -116,10 +121,9 @@ if __name__ == "__main__":
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
-    draw = "jRecPt*jRecPt"
 
-    tree.Draw(draw + " >> hPt" , strsel)
-    tree_gg.Draw(draw + " >> hPtGG", strsel)
+    tree.Draw("jRecPt*jRecPt >> hPt" , strsel)
+    tree_gg.Draw("jRecPt*jRecPt >> hPtGG", strsel)
 
     #incoherent functional shape
     func_incoh_pt2 = TF1("func_incoh", "[0]*exp(-[1]*x)", 0., 10.)
@@ -148,34 +152,61 @@ if __name__ == "__main__":
     print "eff: ", eff[0], "+/-", eff[1]
 
     #denominator in cross section calculation
-    den = eff[0]*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled
+    den = eff[0]*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled
     den = den*1000. # ub to mb
     print "den:", den
 
     #calculate the cross section
     sigma_tot = hPt.Integral()/den
-    print "sigma_tot", sigma_tot
-    #ut.norm_to_integral(hPt, sigma_tot) # ub to mb
+    sigma_tot_err = rt.TMath.Sqrt(hPt.Integral())/den
     hPt.Scale(sigma_tot/hPt.Integral("width"))
+    print "sigma_tot_dy", sigma_tot/dy, "+/-", sigma_tot_err/dy
+
+    #systematical errors
+    err_zdc_acc = 0.1
+    err_bemc_eff = 0.03
+    sys_err = rt.TMath.Sqrt(err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff)
+    hSys = ut.prepare_TH1D("hSys", ptbin, ptmin, ptmax)
+    hSys.SetOption("E2")
+    hSys.SetFillColor(rt.kOrange+1)
+    hSys.SetLineColor(rt.kOrange)
+    for ibin in xrange(1,hPt.GetNbinsX()+1):
+        hSys.SetBinContent(ibin, hPt.GetBinContent(ibin))
+        hSys.SetBinError(ibin, hPt.GetBinContent(ibin)*sys_err)
+        #print ibin, hPt.GetBinError(ibin)/hPt.GetBinContent(ibin)
 
     #draw the results
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
     can = ut.box_canvas()
-    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
+    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.03)
 
-    ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV^{2})", "#it{p}_{T}^{2} (GeV^{2})")
+    ytit = "d#it{#sigma}/d#it{t} (mb/GeV^{2})"
+    ut.put_yx_tit(hPt, ytit, "|#kern[0.3]{#it{t}}| (GeV^{2})", 1.4, 1.2)
 
     hPt.SetMaximum(11)
     hPt.Draw()
+
+    hSys.Draw("e2same")
+    hPt.Draw("e1same")
 
     #add Starlight prediction
     gSlight.Draw("lsame")
 
     gPad.SetLogy()
 
-    ut.invert_col(rt.gPad)
+    cleg = ut.prepare_leg(0.1, 0.96, 0.14, 0.01, 0.035)
+    cleg.AddEntry(None, "Au+Au #rightarrow J/#psi + Au+Au + XnXn, #sqrt{#it{s}_{#it{NN}}} = 200 GeV", "")
+    cleg.Draw("same")
+
+    leg = ut.prepare_leg(0.65, 0.75, 0.18, 0.16, 0.035)
+    leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    leg.AddEntry(hPt, "STAR Preliminary")
+    leg.AddEntry(gSlight, "Starlight", "l")
+    leg.Draw("same")
+
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

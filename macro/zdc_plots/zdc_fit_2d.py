@@ -141,6 +141,13 @@ def make_fit():
     leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
     leg.Draw("same")
 
+    pleg = ut.prepare_leg(0.99, 0.82, -0.4, 0.14, 0.035)
+    pleg.SetFillStyle(1001)
+    pleg.AddEntry(None, "STAR Preliminary", "")
+    pleg.AddEntry(None, "AuAu@200 GeV", "")
+    pleg.AddEntry(None, "UPC sample", "")
+    pleg.Draw("same")
+
     #ut.print_pad(gPad)
 
     #b3d = TBuffer3D(0)

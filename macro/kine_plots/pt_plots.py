@@ -15,6 +15,216 @@ import plot_utils as ut
 from parameter_descriptor import parameter_descriptor as pdesc
 
 #_____________________________________________________________________________
+def plot_pt_gg():
+
+    #pT of gamma-gamma below and above J/psi
+
+    ptbin = 0.02
+    #ptbin = 0.03
+    ptmin = 0.
+    ptmax = 1.1
+
+    mmin = 2.1
+    mmax = 2.6
+    #mmin = 3.4
+    #mmax = 5.
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+    hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
+
+    #ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV)", "#it{p}_{T} (GeV})")
+    ytit = "#gamma#gamma#rightarrow e^{+}e^{-} candidates / "+"({0:.3f}".format(ptbin)+" GeV)"
+    ut.put_yx_tit(hPt, ytit, "Dielectron #it{p}_{T} (GeV)", 1.5, 1.2)
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
+
+    draw = "jRecPt"
+
+    tree.Draw(draw + " >> hPt", strsel)
+    tree_gg.Draw(draw + " >> hPtGG", strsel)
+    ut.norm_to_data(hPtGG, hPt, rt.kGreen, 0., 0.3)
+    #ut.norm_to_data(hPtGG, hPt, rt.kGreen, 0., 0.18)
+
+    hPt.Draw()
+    hPtGG.Draw("same")
+
+    leg = ut.prepare_leg(0.67, 0.78, 0.14, 0.18, 0.03)
+    leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    ut.add_leg_mass(leg, mmin, mmax)
+    leg.AddEntry(hPt, "Data")
+    leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
+    leg.Draw("same")
+
+    pleg = ut.prepare_leg(0.33, 0.8, 0.01, 0.14, 0.035)
+    pleg.AddEntry(None, "STAR Preliminary", "")
+    pleg.AddEntry(None, "AuAu@200 GeV", "")
+    pleg.AddEntry(None, "UPC sample", "")
+    pleg.Draw("same")
+
+    #ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_pt_gg
+
+#_____________________________________________________________________________
+def pdf_logPt2_prelim():
+
+    #PDF fit to log_10(pT^2) for preliminary figure
+
+    #tree_in = tree_incoh
+    tree_in = tree
+
+    #ptbin = 0.04
+    ptbin = 0.12
+    ptmin = -5.
+    ptmax = 1.
+
+    mmin = 2.8
+    mmax = 3.2
+
+    #fitran = [-5., 1.]
+    fitran = [-0.9, 0.1]
+
+    binned = False
+
+    #gamma-gamma 131 evt for pT<0.18
+
+    #input data
+    pT = RooRealVar("jRecPt", "pT", 0, 10)
+    m = RooRealVar("jRecM", "mass", 0, 10)
+    dataIN = RooDataSet("data", "data", tree_in, RooArgSet(pT, m))
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    data = dataIN.reduce(strsel)
+    #x is RooRealVar for log(Pt2)
+    draw = "TMath::Log10(jRecPt*jRecPt)"
+    draw_func = RooFormulaVar("x", "Dielectron log_{10}( #it{p}_{T}^{2} ) (GeV^{2})", draw, RooArgList(pT))
+    x = data.addColumn(draw_func)
+    x.setRange("fitran", fitran[0], fitran[1])
+
+    #binned data
+    nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
+    hPt = TH1D("hPt", "hPt", nbins, ptmin, ptmax)
+    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin/2, ptmin, ptmax)
+    #fill in binned data
+    tree_in.Draw(draw + " >> hPt", strsel)
+    tree_coh.Draw(draw + " >> hPtCoh", strsel)
+    dataH = RooDataHist("dataH", "dataH", RooArgList(x), hPt)
+
+    #range for plot
+    x.setMin(ptmin)
+    x.setMax(ptmax)
+    x.setRange("plotran", ptmin, ptmax)
+
+    #create the pdf
+    b = RooRealVar("b", "b", 5., 0., 10.)
+    pdf_func = "log(10.)*pow(10.,x)*exp(-b*pow(10.,x))"
+    pdf_logPt2 = RooGenericPdf("pdf_logPt2", pdf_func, RooArgList(x, b))
+
+    #make the fit
+    if binned == True:
+        r1 = pdf_logPt2.fitTo(dataH, rf.Range("fitran"), rf.Save())
+    else:
+        r1 = pdf_logPt2.fitTo(data, rf.Range("fitran"), rf.Save())
+
+    #calculate norm to number of events
+    xset = RooArgSet(x)
+    ipdf = pdf_logPt2.createIntegral(xset, rf.NormSet(xset), rf.Range("fitran"))
+    print "PDF integral:", ipdf.getVal()
+    if binned == True:
+        nevt = tree_incoh.Draw("", strsel+" && "+draw+">{0:.3f}".format(fitran[0])+" && "+draw+"<{1:.3f}".format(fitran[0], fitran[1]))
+    else:
+        nevt = data.sumEntries("x", "fitran")
+
+    print "nevt:", nevt
+    pdf_logPt2.setNormRange("fitran")
+    print "PDF norm:", pdf_logPt2.getNorm(RooArgSet(x))
+
+    #a = nevt/ipdf.getVal()
+    a = nevt/pdf_logPt2.getNorm(RooArgSet(x))
+    print "a =", a
+
+    #gamma-gamma contribution
+    hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
+    tree_gg.Draw(draw + " >> hPtGG", strsel)
+    #ut.norm_to_data(hPtGG, hPt, rt.kGreen, -5., -2.9)
+    ut.norm_to_num(hPtGG, 131., rt.kGreen)
+
+    print "Int GG:", hPtGG.Integral()
+
+    #coherent contribution
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -1.8) # norm for coh
+
+    #create canvas frame
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.01, 0.01)
+
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    frame.SetTitle("")
+
+    frame.SetYTitle("J/#psi candidates / ({0:.3f}".format(ptbin)+" GeV^{2})")
+
+    frame.GetXaxis().SetTitleOffset(1.2)
+    frame.GetYaxis().SetTitleOffset(1.6)
+
+    print "Int data:", hPt.Integral()
+
+    #plot the data
+    if binned == True:
+        dataH.plotOn(frame, rf.Name("data"))
+    else:
+        data.plotOn(frame, rf.Name("data"))
+
+    pdf_logPt2.plotOn(frame, rf.Range("fitran"), rf.LineColor(rt.kRed), rf.Name("pdf_logPt2"))
+    pdf_logPt2.plotOn(frame, rf.Range("plotran"), rf.LineColor(rt.kRed), rf.Name("pdf_logPt2_full"), rf.LineStyle(rt.kDashed))
+
+    frame.Draw()
+
+    leg = ut.prepare_leg(0.6, 0.8, 0.14, 0.17, 0.03)
+    #ut.add_leg_mass(leg, mmin, mmax)
+    hx = ut.prepare_TH1D("hx", 1, 0, 1)
+    hx.Draw("same")
+    ln = ut.col_lin(rt.kRed)
+    leg.AddEntry(hx, "Data")
+    leg.AddEntry(hPtCoh, "Coherent J/#psi", "l")
+    leg.AddEntry(ln, "Incoherent parametrization", "l")
+    leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
+    #leg.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
+    leg.Draw("same")
+
+    l0 = ut.cut_line(fitran[0], 0.9, frame)
+    l1 = ut.cut_line(fitran[1], 0.9, frame)
+    #l0.Draw()
+    #l1.Draw()
+
+    pleg = ut.prepare_leg(0.12, 0.75, 0.14, 0.22, 0.03)
+    pleg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    ut.add_leg_mass(pleg, mmin, mmax)
+    pleg.AddEntry(None, "STAR Preliminary", "")
+    pleg.AddEntry(None, "AuAu@200 GeV", "")
+    pleg.AddEntry(None, "UPC sample", "")
+    pleg.Draw("same")
+
+    desc = pdesc(frame, 0.14, 0.9, 0.057)
+    desc.set_text_size(0.03)
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("pdf_logPt2", "data", 2), -1, rt.kRed)
+    desc.itemD("#it{A}", a, -1, rt.kRed)
+    desc.itemR("#it{b}", b, rt.kRed)
+    #desc.draw()
+
+    #put gamma-gamma
+    hPtGG.Draw("same")
+    hPtCoh.Draw("same")
+
+    #ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of pdf_logPt2_prelim
+
+#_____________________________________________________________________________
 def make_eff_pt2():
 
     #efficiency vs. pT^2
@@ -192,11 +402,11 @@ def plot_pt2_real():
     hPtIncoh.Draw("same")
     hPtGG.Draw("same")
 
-    leg = ut.prepare_leg(0.67, 0.78, 0.14, 0.18, 0.03)
+    leg = ut.prepare_leg(0.6, 0.78, 0.14, 0.18, 0.03)
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hPt, "Data")
     leg.AddEntry(hPtCoh, "Coherent MC", "l")
-    leg.AddEntry(hPtIncoh, "Incoherent MC", "l")
+    leg.AddEntry(hPtIncoh, "Incoherent parametrization", "l")
     leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
     leg.Draw("same")
 
@@ -205,7 +415,7 @@ def plot_pt2_real():
 
     gPad.SetLogy()
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_pt2_real
@@ -639,14 +849,14 @@ def plot_pt():
 
     #pT with coherent incoherent and gamma-gamma components
 
-    ptbin = 0.015
+    ptbin = 0.02
     ptmin = 0.
     ptmax = 1.1
 
-    #mmin = 2.8
-    #mmax = 3.2
-    mmin = 3.4
-    mmax = 5.
+    mmin = 2.8
+    mmax = 3.2
+    #mmin = 3.4
+    #mmax = 5.
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 
@@ -657,7 +867,8 @@ def plot_pt():
     hPtIncoh = ut.prepare_TH1D("hPtIncoh", ptbin, ptmin, ptmax)
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
 
-    ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV)", "#it{p}_{T} (GeV})")
+    #ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV)", "#it{p}_{T} (GeV})")
+    ut.put_yx_tit(hPt, "J/#psi candidates / ({0:.3f}".format(ptbin)+" GeV)", "Dielectron #it{p}_{T} (GeV)", 1.5, 1.2)
 
     ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
 
@@ -670,25 +881,33 @@ def plot_pt():
 
     ut.norm_to_data(hPtCoh, hPt, rt.kBlue, 0., 0.11)
     ut.norm_to_data(hPtIncoh, hPt, rt.kRed, 0.28, 1.)
-    ut.norm_to_data(hPtGG, hPt, rt.kGreen, 0., 0.03)
+    #ut.norm_to_data(hPtGG, hPt, rt.kGreen, 0., 0.03)
+    ut.norm_to_num(hPtGG, 131, rt.kGreen)
 
     hPt.Draw()
     hPtCoh.Draw("same")
     hPtIncoh.Draw("same")
     hPtGG.Draw("same")
 
-    leg = ut.prepare_leg(0.67, 0.78, 0.14, 0.18, 0.03)
+    leg = ut.prepare_leg(0.67, 0.7, 0.14, 0.25, 0.03)
+    leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hPt, "Data")
-    leg.AddEntry(hPtCoh, "Coherent MC", "l")
-    leg.AddEntry(hPtIncoh, "Incoherent MC", "l")
-    leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
+    leg.AddEntry(hPtCoh, "Coherent J/#psi", "l")
+    leg.AddEntry(hPtIncoh, "Incoherent J/#psi", "l")
+    leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
     leg.Draw("same")
 
     uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
-    uoleg.Draw("same")
+    #uoleg.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    pleg = ut.prepare_leg(0.33, 0.8, 0.01, 0.14, 0.035)
+    pleg.AddEntry(None, "STAR Preliminary", "")
+    pleg.AddEntry(None, "AuAu@200 GeV", "")
+    pleg.AddEntry(None, "UPC sample", "")
+    pleg.Draw("same")
+
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_pt
@@ -831,7 +1050,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 9
+    iplot = 12
     funclist = []
     funclist.append(plot_jpsi_logPt2) # 0
     funclist.append(plot_pt2) # 1
@@ -844,6 +1063,8 @@ if __name__ == "__main__":
     funclist.append(plot_pt2_real) # 8
     funclist.append(subtract_pt2) # 9
     funclist.append(make_eff_pt2) # 10
+    funclist.append(pdf_logPt2_prelim) # 11
+    funclist.append(plot_pt_gg) # 12
 
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")

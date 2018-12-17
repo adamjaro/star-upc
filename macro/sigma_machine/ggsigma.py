@@ -27,8 +27,8 @@ if __name__ == "__main__":
     #nggerr = 3
 
     #fraction of 1n1n events
-    #ratio_1n1n = 0.136
-    ratio_1n1n = 1.
+    ratio_1n1n = 0.136
+    #ratio_1n1n = 1.
 
     #lumi in inv. ub
     lumi = 13871.907
@@ -57,10 +57,10 @@ if __name__ == "__main__":
     mctree = basedir + "slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root"
 
     #starlight total cross section of gamma-gamma -> e+e- and corresponding file
-    #sigma_starlight = 2.063
-    #starlight = "/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_ggel_1n1n_m1p1_5p3_pT0p4_eta1p2_4Mevt.root"
-    sigma_starlight = 22.801
-    starlight = "/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_ggel_m1p1_5p3_pT0p4_eta1p2_4Mevt.root"
+    sigma_starlight = 2.063
+    starlight = "/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_ggel_1n1n_m1p1_5p3_pT0p4_eta1p2_4Mevt.root"
+    #sigma_starlight = 22.801
+    #starlight = "/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_ggel_m1p1_5p3_pT0p4_eta1p2_4Mevt.root"
 
 
     #configure the tree analyzer

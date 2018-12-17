@@ -8,6 +8,7 @@ from ROOT import RooFit as rf
 import sys
 sys.path.append('../')
 import plot_utils as ut
+from parameter_descriptor import parameter_descriptor as pdesc
 
 #_____________________________________________________________________________
 def plot_rec_minus_gen_pt2():

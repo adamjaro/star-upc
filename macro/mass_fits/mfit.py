@@ -37,7 +37,7 @@ if __name__ == "__main__":
     ymin = -1.
     ymax = 1.
 
-    ptmax = 0.17
+    ptmax = 0.18
 
     alphafix = 0.694
     nfix = 3.743
@@ -48,8 +48,8 @@ if __name__ == "__main__":
 
     #integration range
     #intran = [2.1, 2.6]
-    intran = [3.4, 4.6]
-    #intran = [2.8, 3.2]
+    #intran = [3.4, 4.6]
+    intran = [2.8, 3.2]
 
     #cmodel = rt.kMagenta
     cmodel = rt.kBlue
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     desc2.itemD("#int_{%.1f}^{%.1f}#it{#gamma#gamma}" % (intran[0], intran[1]), intBkg.getVal(), intBkg.getError(), cbkg)
     desc2.draw()
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
