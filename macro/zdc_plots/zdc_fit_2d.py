@@ -4,6 +4,7 @@ import code
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
+from ROOT import Double, TGraph, TGaxis
 from ROOT import RooRealVar, RooDataSet, RooArgSet
 from ROOT import RooDataHist
 from ROOT import TBuffer3D
@@ -15,6 +16,107 @@ import plot_utils as ut
 
 from fit_func import Model2D
 from plot_pdf import PlotPdf
+
+#_____________________________________________________________________________
+def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, ptmax, mmin, mmax):
+
+    can = ut.box_canvas(800, 700)#900, 700
+
+    xp = Double(0)
+    yp = Double(0)
+
+    #east data on the left
+    hEast = frame_east.getHist("data")
+    for ibin in xrange(hEast.GetN()):
+        hEast.GetPoint(ibin, xp, yp)
+        frame2.SetBinContent(ibin+1, yp)
+        frame2.SetBinError(ibin+1, hEast.GetErrorY(ibin))
+
+    #west data on the right
+    hWest = frame_west.getHist("data")
+    for i in xrange(hWest.GetN()):
+        hWest.GetPoint(i, xp, yp)
+        ibin = frame2.GetNbinsX()-i
+        frame2.SetBinContent(ibin, yp)
+        frame2.SetBinError(ibin, hWest.GetErrorY(i))
+
+    #east fit
+    cEast = frame_east.getCurve("model")
+    gEast = TGraph(cEast.GetN()-1)
+    for i in xrange(cEast.GetN()-1):
+        cEast.GetPoint(i, xp, yp)
+        gEast.SetPoint(i, xp, yp)
+
+    gEast.SetLineColor(rt.kRed)
+    gEast.SetLineWidth(3)
+    #gEast.SetLineStyle(rt.kDashed)
+
+    #west fit on the left
+    cWest = frame_west.getCurve("model")
+    gWest = TGraph(cWest.GetN()-1)
+    xmax = frame2.GetBinCenter(frame2.GetNbinsX())+frame2.GetBinWidth(frame2.GetNbinsX())
+    for i in xrange(cWest.GetN()-1):
+        cWest.GetPoint(i, xp, yp)
+        xplot = xmax - xp
+        gWest.SetPoint(i, xplot, yp)
+
+    gWest.SetLineColor(rt.kBlue)
+    gWest.SetLineWidth(3)
+
+    #horizontal axis
+    frame2.SetMinimum(0)
+    frame2.GetXaxis().SetNdivisions(0, rt.kFALSE)
+    #east axis
+    ypos = frame2.GetYaxis().GetXmin()
+    axisE = TGaxis(adc_min, ypos, adc_max, ypos, adc_min, adc_max)
+    ut.set_axis(axisE)
+    axisE.SetTitle("ZDC East")
+    #west axis
+    xpos = frame2.GetXaxis().GetXmax()
+    axisW = TGaxis(xpos, ypos, xpos-adc_max, ypos, adc_min, adc_max, 510, "-")
+    ut.set_axis(axisW)
+    axisW.SetLabelOffset(-0.025)
+    axisW.SetTitle("ZDC West")
+
+    #vertical axis
+    yvpos = 1.1*frame2.GetMaximum()
+    axisV = TGaxis(xpos, 0, xpos, yvpos, 0, yvpos, 510, "+L")
+    ut.set_axis(axisV)
+
+    frame2.SetYTitle("ZDC East / ({0:.0f} ADC units)".format(adc_bin))
+    axisV.SetTitle("ZDC West / ({0:.0f} ADC units)".format(adc_bin))
+
+    frame2.GetYaxis().SetTitleOffset(1.25)
+    axisV.SetTitleOffset(1.25)
+
+    gPad.SetTopMargin(0.01)
+    gPad.SetRightMargin(0.09)
+    gPad.SetBottomMargin(0.1)
+    gPad.SetLeftMargin(0.09)
+
+    frame2.Draw()
+    gEast.Draw("lsame")
+    gWest.Draw("lsame")
+
+    axisE.Draw()
+    axisW.Draw()
+    axisV.Draw()
+
+    kleg = ut.prepare_leg(0.16, 0.8, 0.32, 0.18, 0.03)
+    kleg.AddEntry(None, "AuAu@200 GeV", "")
+    kleg.AddEntry(None, "UPC sample", "")
+    ut.add_leg_pt_mass(kleg, ptmax, mmin, mmax)
+    kleg.Draw("same")
+
+    pleg = ut.prepare_leg(0.22, 0.65, 0.25, 0.1, 0.035)
+    pleg.AddEntry(gEast, "Fit projection to east", "l")
+    pleg.AddEntry(gWest, "Fit projection to west", "l")
+    pleg.Draw("same")
+
+    #ut.invert_col(gPad)
+    can.SaveAs("01fig.pdf")
+
+    #end of plot_proj_both
 
 #_____________________________________________________________________________
 def plot_projection(frame, ew):
@@ -54,18 +156,18 @@ def plot_2d(plot_pdf):
 def make_fit():
 
     adc_bin = 18  #18 for low-m gg, 20 for jpsi
-    adc_min = 10.
+    adc_min = 10.  #10
     adc_max = 700.
 
-    ptmax = 0.17
+    ptmax = 0.18
     #mmin = 1.6
     #mmax = 2.6
     mmin = 1.5
     mmax = 5.
 
     #east/west projections and 2D plot
-    ew = 0
-    p2d = 1
+    ew = 1
+    p2d = 2
 
     #plot colors
     model_col = rt.kMagenta
@@ -102,7 +204,7 @@ def make_fit():
     #print ut.table_fit_parameters(r1)
 
     #create the plot
-    can = ut.box_canvas()
+    if p2d != 2: can = ut.box_canvas()
 
     nbins, adc_max = ut.get_nbins(adc_bin, adc_min, adc_max)
     adc_east.setMax(adc_max)
@@ -128,6 +230,10 @@ def make_fit():
     plot_pdf = PlotPdf(model, adc_east, adc_west)
     if p2d == 1: plot_2d(plot_pdf)
 
+    if p2d == 2:
+        frame2 = ut.prepare_TH1D("frame2", adc_bin, adc_min, 2.*adc_max+4.1*adc_bin)
+        plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, ptmax, mmin, mmax)
+
     lhead = ["east ZDC", "west ZDC"]
     if p2d == 1:
         leg = ut.prepare_leg(0.01, 0.9, 0.3, 0.1, 0.03)
@@ -139,14 +245,14 @@ def make_fit():
     mmin_fmt = "{0:.1f}".format(mmin)
     mmax_fmt = "{0:.1f}".format(mmax)
     leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
-    leg.Draw("same")
+    #leg.Draw("same")
 
     pleg = ut.prepare_leg(0.99, 0.82, -0.4, 0.14, 0.035)
     pleg.SetFillStyle(1001)
     pleg.AddEntry(None, "STAR Preliminary", "")
     pleg.AddEntry(None, "AuAu@200 GeV", "")
     pleg.AddEntry(None, "UPC sample", "")
-    pleg.Draw("same")
+    #pleg.Draw("same")
 
     #ut.print_pad(gPad)
 
@@ -168,8 +274,9 @@ def make_fit():
     ut.log_results(out, "1n1n events: "+str(model.num_1n1n.getVal()), lmg)
     ut.log_results(out, "Ratio 1n1n / all: "+str(ratio_1n1n), lmg)
 
-    #ut.invert_col(gPad)
-    can.SaveAs("01fig.pdf")
+    if p2d != 2:
+        ut.invert_col(gPad)
+        can.SaveAs("01fig.pdf")
 
     if interactive == True: start_interactive()
 

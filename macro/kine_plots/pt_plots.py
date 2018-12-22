@@ -512,8 +512,10 @@ def pdf_logPt2_incoh():
     #binned data
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
     hPt = TH1D("hPt", "hPt", nbins, ptmin, ptmax)
+    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
     #fill in binned data
     tree_in.Draw(draw + " >> hPt", strsel)
+    tree_coh.Draw(draw + " >> hPtCoh", strsel)
     dataH = RooDataHist("dataH", "dataH", RooArgList(x), hPt)
 
     #range for plot
@@ -553,9 +555,26 @@ def pdf_logPt2_incoh():
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
     tree_gg.Draw(draw + " >> hPtGG", strsel)
     #ut.norm_to_data(hPtGG, hPt, rt.kGreen, -5., -2.9)
-    ut.norm_to_num(hPtGG, 131.)
+    ut.norm_to_num(hPtGG, 131., rt.kGreen)
 
     print "Int GG:", hPtGG.Integral()
+
+    #sum of all contributions
+    hSum = ut.prepare_TH1D("hSum", ptbin, ptmin, ptmax)
+    hSum.SetLineWidth(3)
+    #add ggel to the sum
+    hSum.Add(hPtGG)
+    #add incoherent contribution
+    func_logPt2 = TF1("pdf_logPt2", "[0]*log(10.)*pow(10.,x)*exp(-[1]*pow(10.,x))", -10., 10.)
+    func_logPt2.SetParameters(a, b.getVal())
+    hInc = ut.prepare_TH1D("hInc", ptbin, ptmin, ptmax)
+    ut.fill_h1_tf(hInc, func_logPt2)
+    hSum.Add(hInc)
+    #add coherent contribution
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
+    hSum.Add(hPtCoh)
+    #set to draw as a lines
+    ut.line_h1(hSum, rt.kBlack)
 
     #create canvas frame
     can = ut.box_canvas()
@@ -601,8 +620,15 @@ def pdf_logPt2_incoh():
     desc.itemR("#it{b}", b, rt.kRed)
     desc.draw()
 
+    #put the sum
+    hSum.Draw("same")
+
+    frame.Draw("same")
+
     #put gamma-gamma
     hPtGG.Draw("same")
+    #put coherent J/psi
+    hPtCoh.Draw("same")
 
     ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
@@ -1050,7 +1076,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 12
+    iplot = 6
     funclist = []
     funclist.append(plot_jpsi_logPt2) # 0
     funclist.append(plot_pt2) # 1

@@ -11,7 +11,7 @@ import plot_utils as ut
 from analyze_tree import AnalyzeTree
 
 #_____________________________________________________________________________
-def load_starlight():
+def load_starlight(dy):
 
     #slight = TFile.Open("/home/jaroslav/sim/starlight_data/slight_Jpsi_PbPb_coh.root")
     slight = TFile.Open("/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_Jpsi_coh_6Mevt.root")
@@ -29,7 +29,7 @@ def load_starlight():
     ny = float( slight_tree.Draw("pT*pT >> hSlight", "rapidity>-1 && rapidity<1") )
     sigma_sl_tot = 67.958 # total Starlight cross section, ub
     sigma_sl = (ny/nall)*sigma_sl_tot/1000. # ub to mb
-    #sigma_sl = sigma_sl/2. # rapidity interval
+    sigma_sl = sigma_sl/dy # rapidity interval
     print "sigma_sl:", sigma_sl
     ut.norm_to_integral(hSlight, sigma_sl)
 
@@ -38,8 +38,8 @@ def load_starlight():
         gSlight.SetPoint(ibin-1, hSlight.GetBinCenter(ibin), hSlight.GetBinContent(ibin))
 
     gSlight.SetLineColor(rt.kBlue)
-    #gSlight.SetLineStyle(lstyle)
     gSlight.SetLineWidth(3)
+    gSlight.SetLineStyle(rt.kDashDotted)
 
     #hSlight.SetMaximum(7.5)
     #frame.SetMaximum(7.5)
@@ -58,6 +58,63 @@ def load_starlight():
     return gSlight
 
 #end of load_starlight
+
+#_____________________________________________________________________________
+def load_ms():
+
+    #model by Heikki and Bjorn
+    f = open("data/to_star_ms.txt", "read")
+    t_sigma = []
+    for line in f:
+        if line[0] == "#": continue
+        point = line.split(" ")
+        t_sigma.append([float(point[0]), float(point[1])])
+
+    #scaling to XnXn
+    #kx = 67.958/463.574
+    kx = 0.1702
+    #kx = 1.
+
+    gMS = TGraphErrors(len(t_sigma))
+    for i in xrange(len(t_sigma)):
+        gMS.SetPoint(i, t_sigma[i][0], t_sigma[i][1]*kx)
+
+    gMS.SetLineColor(rt.kViolet)
+    gMS.SetLineWidth(3)
+    gMS.SetLineStyle(rt.kDashed)
+
+    return gMS
+
+#end of load_ms
+
+#_____________________________________________________________________________
+def load_cck():
+
+    #model by Guillermo at. al.
+    f = open("data/data-dtdy-y_0-RHIC-clean_CCK.dat", "read")
+    sigma = []
+    for line in f:
+        if line[0] == "#": continue
+        p = line.split("\t")
+        t = float(p[3])
+        nucl = float(p[4])
+        hs = float(p[8])
+        sigma.append({ "t":t, "nucl":nucl, "hs":hs })
+
+    #correction from gamma-Au to AuAu by Michal
+    k_auau = 9.0296
+
+    #scaling to XnXn
+    kx = 0.1702
+
+    gCCK = TGraphErrors(len(sigma))
+    for i in xrange(len(sigma)):
+        gCCK.SetPoint(i, sigma[i]["t"], sigma[i]["hs"]*k_auau*kx)
+
+    gCCK.SetLineColor(rt.kRed)
+    gCCK.SetLineWidth(3)
+
+    return gCCK
 
 #_____________________________________________________________________________
 if __name__ == "__main__":
@@ -108,7 +165,9 @@ if __name__ == "__main__":
     infile_gg = "ana_slight14e2x1_sel5_nzvtx.root"
 
     #predictions
-    gSlight = load_starlight()
+    gSlight = load_starlight(dy)
+    gMS = load_ms()
+    gCCK = load_cck()
 
     #open the inputs
     inp = TFile.Open(basedir+"/"+infile)
@@ -152,7 +211,7 @@ if __name__ == "__main__":
     print "eff: ", eff[0], "+/-", eff[1]
 
     #denominator in cross section calculation
-    den = eff[0]*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled
+    den = eff[0]*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*dy
     den = den*1000. # ub to mb
     print "den:", den
 
@@ -160,7 +219,7 @@ if __name__ == "__main__":
     sigma_tot = hPt.Integral()/den
     sigma_tot_err = rt.TMath.Sqrt(hPt.Integral())/den
     hPt.Scale(sigma_tot/hPt.Integral("width"))
-    print "sigma_tot_dy", sigma_tot/dy, "+/-", sigma_tot_err/dy
+    print "sigma_tot_dy", sigma_tot, "+/-", sigma_tot_err
 
     #systematical errors
     err_zdc_acc = 0.1
@@ -179,20 +238,33 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
+    #frame for models plot only
+    frame = ut.prepare_TH1D("frame", ptbin, ptmin, ptmax)
+
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.03)
 
     ytit = "d#it{#sigma}/d#it{t} (mb/GeV^{2})"
-    ut.put_yx_tit(hPt, ytit, "|#kern[0.3]{#it{t}}| (GeV^{2})", 1.4, 1.2)
+    xtit = "|#kern[0.3]{#it{t}}| (GeV^{2})"
+    ut.put_yx_tit(hPt, ytit, xtit, 1.4, 1.2)
 
     hPt.SetMaximum(11)
-    hPt.Draw()
+    #hPt.SetMaximum(80)
+    hPt.SetMinimum(0.0002)
+    #hPt.Draw()
 
-    hSys.Draw("e2same")
-    hPt.Draw("e1same")
+    #hSys.Draw("e2same")
+    #hPt.Draw("e1same")
+
+    ut.put_yx_tit(frame, ytit, xtit, 1.4, 1.2)
+    frame.SetMaximum(11)
+    frame.SetMinimum(1.e-5)
+    frame.Draw()
 
     #add Starlight prediction
     gSlight.Draw("lsame")
+    gMS.Draw("lsame")
+    gCCK.Draw("lsame")
 
     gPad.SetLogy()
 
@@ -204,7 +276,14 @@ if __name__ == "__main__":
     leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     leg.AddEntry(hPt, "STAR Preliminary")
     leg.AddEntry(gSlight, "Starlight", "l")
-    leg.Draw("same")
+    #leg.Draw("same")
+
+    #legend for models only
+    mleg = ut.prepare_leg(0.56, 0.75, 0.22, 0.16, 0.035)
+    mleg.AddEntry(gSlight, "Starlight set for XnXn", "l")
+    mleg.AddEntry(gMS, "MS scaled to XnXn", "l")
+    mleg.AddEntry(gCCK, "CCK-hs scaled to XnXn", "l")
+    mleg.Draw("same")
 
     #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")

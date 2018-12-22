@@ -44,6 +44,15 @@ def set_H1D(hx):
   hx.SetLabelSize(siz, "Y")
 
 #_____________________________________________________________________________
+def set_axis(axis):
+
+    axis.SetTextFont(42)
+    axis.SetLabelFont(42)
+    siz = 0.035
+    axis.SetTitleSize(siz)
+    axis.SetLabelSize(siz)
+
+#_____________________________________________________________________________
 def set_graph(tx):
 
     tx.SetMarkerStyle(rt.kFullCircle)
@@ -152,9 +161,20 @@ def fill_h1_tf(hx, func, col=rt.kBlue):
     hx.SetMarkerColor(col)
 
 #_____________________________________________________________________________
-def box_canvas():
+def line_h1(hx, col=rt.kBlue):
 
-    can = TCanvas("c3", "Analysis", 768, 768)
+    #set H1 to show as a line of bin content
+
+    for ibin in xrange(1,hx.GetNbinsX()+1):
+        hx.SetBinError(ibin, 0.)
+
+    hx.SetLineColor(col)
+    hx.SetMarkerColor(col)
+
+#_____________________________________________________________________________
+def box_canvas(dx=768, dy=768):
+
+    can = TCanvas("c3", "Analysis", dx, dy)
     rt.gStyle.SetOptStat("")
     rt.gStyle.SetPalette(1)
     rt.gStyle.SetLineWidth(2)
