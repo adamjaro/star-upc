@@ -27,18 +27,25 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
 
     #east data on the left
     hEast = frame_east.getHist("data")
+    plot_east = frame2.Clone("plot_east")
+    plot_east.SetMarkerStyle(22)
+    plot_east.SetMarkerSize(1.4)
     for ibin in xrange(hEast.GetN()):
         hEast.GetPoint(ibin, xp, yp)
-        frame2.SetBinContent(ibin+1, yp)
-        frame2.SetBinError(ibin+1, hEast.GetErrorY(ibin))
+        plot_east.SetBinContent(ibin+1, yp)
+        plot_east.SetBinError(ibin+1, hEast.GetErrorY(ibin))
+
+    frame2.SetMaximum(1.15*plot_east.GetMaximum())
 
     #west data on the right
     hWest = frame_west.getHist("data")
+    plot_west = frame2.Clone("plot_west")
+    plot_west.SetMarkerStyle(21)
     for i in xrange(hWest.GetN()):
         hWest.GetPoint(i, xp, yp)
         ibin = frame2.GetNbinsX()-i
-        frame2.SetBinContent(ibin, yp)
-        frame2.SetBinError(ibin, hWest.GetErrorY(i))
+        plot_west.SetBinContent(ibin, yp)
+        plot_west.SetBinError(ibin, hWest.GetErrorY(i))
 
     #east fit
     cEast = frame_east.getCurve("model")
@@ -71,30 +78,34 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     axisE = TGaxis(adc_min, ypos, adc_max, ypos, adc_min, adc_max)
     ut.set_axis(axisE)
     axisE.SetTitle("ZDC East")
+    axisE.SetTitleOffset(1.1)
     #west axis
     xpos = frame2.GetXaxis().GetXmax()
     axisW = TGaxis(xpos, ypos, xpos-adc_max, ypos, adc_min, adc_max, 510, "-")
     ut.set_axis(axisW)
     axisW.SetLabelOffset(-0.025)
     axisW.SetTitle("ZDC West")
+    axisW.SetTitleOffset(1.1)
 
     #vertical axis
-    yvpos = 1.1*frame2.GetMaximum()
+    yvpos = 1.*frame2.GetMaximum()
     axisV = TGaxis(xpos, 0, xpos, yvpos, 0, yvpos, 510, "+L")
     ut.set_axis(axisV)
 
     frame2.SetYTitle("ZDC East / ({0:.0f} ADC units)".format(adc_bin))
     axisV.SetTitle("ZDC West / ({0:.0f} ADC units)".format(adc_bin))
 
-    frame2.GetYaxis().SetTitleOffset(1.25)
-    axisV.SetTitleOffset(1.25)
+    frame2.GetYaxis().SetTitleOffset(1.5)
+    axisV.SetTitleOffset(1.5)
 
     gPad.SetTopMargin(0.01)
-    gPad.SetRightMargin(0.09)
-    gPad.SetBottomMargin(0.1)
-    gPad.SetLeftMargin(0.09)
+    gPad.SetRightMargin(0.1)
+    gPad.SetBottomMargin(0.08)
+    gPad.SetLeftMargin(0.1)
 
     frame2.Draw()
+    plot_east.Draw("e1same")
+    plot_west.Draw("e1same")
     gEast.Draw("lsame")
     gWest.Draw("lsame")
 
@@ -102,13 +113,23 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     axisW.Draw()
     axisV.Draw()
 
+    #kinematics legend
     kleg = ut.prepare_leg(0.16, 0.8, 0.32, 0.18, 0.03)
     kleg.AddEntry(None, "AuAu@200 GeV", "")
     kleg.AddEntry(None, "UPC sample", "")
     ut.add_leg_pt_mass(kleg, ptmax, mmin, mmax)
     kleg.Draw("same")
 
-    pleg = ut.prepare_leg(0.22, 0.65, 0.25, 0.1, 0.035)
+    #data legend
+    dleg = ut.prepare_leg(0.6, 0.8, 0.15, 0.08, 0.03)
+    dleg.AddEntry(plot_east, "ZDC East", "p")
+    dleg.AddEntry(plot_west, "ZDC West", "p")
+    #dleg.Draw("same")
+
+    #projections legend
+    pleg = ut.prepare_leg(0.24, 0.58, 0.25, 0.2, 0.035)
+    pleg.AddEntry(plot_east, "ZDC East", "p")
+    pleg.AddEntry(plot_west, "ZDC West", "p")
     pleg.AddEntry(gEast, "Fit projection to east", "l")
     pleg.AddEntry(gWest, "Fit projection to west", "l")
     pleg.Draw("same")
@@ -167,7 +188,7 @@ def make_fit():
 
     #east/west projections and 2D plot
     ew = 1
-    p2d = 2
+    p2d = 1
 
     #plot colors
     model_col = rt.kMagenta
@@ -245,14 +266,14 @@ def make_fit():
     mmin_fmt = "{0:.1f}".format(mmin)
     mmax_fmt = "{0:.1f}".format(mmax)
     leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
-    #leg.Draw("same")
+    leg.Draw("same")
 
-    pleg = ut.prepare_leg(0.99, 0.82, -0.4, 0.14, 0.035)
+    pleg = ut.prepare_leg(0.99, 0.87, -0.4, 0.11, 0.035)
     pleg.SetFillStyle(1001)
-    pleg.AddEntry(None, "STAR Preliminary", "")
+    #pleg.AddEntry(None, "STAR Preliminary", "")
     pleg.AddEntry(None, "AuAu@200 GeV", "")
     pleg.AddEntry(None, "UPC sample", "")
-    #pleg.Draw("same")
+    pleg.Draw("same")
 
     #ut.print_pad(gPad)
 
@@ -275,7 +296,7 @@ def make_fit():
     ut.log_results(out, "Ratio 1n1n / all: "+str(ratio_1n1n), lmg)
 
     if p2d != 2:
-        ut.invert_col(gPad)
+        #ut.invert_col(gPad)
         can.SaveAs("01fig.pdf")
 
     if interactive == True: start_interactive()

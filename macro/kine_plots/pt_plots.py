@@ -108,7 +108,8 @@ def pdf_logPt2_prelim():
     #binned data
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
     hPt = TH1D("hPt", "hPt", nbins, ptmin, ptmax)
-    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin/2, ptmin, ptmax)
+    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
+    hPtCoh.SetLineWidth(2)
     #fill in binned data
     tree_in.Draw(draw + " >> hPt", strsel)
     tree_coh.Draw(draw + " >> hPtCoh", strsel)
@@ -151,12 +152,26 @@ def pdf_logPt2_prelim():
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
     tree_gg.Draw(draw + " >> hPtGG", strsel)
     #ut.norm_to_data(hPtGG, hPt, rt.kGreen, -5., -2.9)
-    ut.norm_to_num(hPtGG, 131., rt.kGreen)
+    ut.norm_to_num(hPtGG, 131., rt.kGreen+1)
 
     print "Int GG:", hPtGG.Integral()
 
-    #coherent contribution
-    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -1.8) # norm for coh
+    #sum of all contributions
+    hSum = ut.prepare_TH1D("hSum", ptbin, ptmin, ptmax)
+    hSum.SetLineWidth(3)
+    #add ggel to the sum
+    hSum.Add(hPtGG)
+    #add incoherent contribution
+    func_logPt2 = TF1("pdf_logPt2", "[0]*log(10.)*pow(10.,x)*exp(-[1]*pow(10.,x))", -10., 10.)
+    func_logPt2.SetParameters(a, b.getVal())
+    hInc = ut.prepare_TH1D("hInc", ptbin, ptmin, ptmax)
+    ut.fill_h1_tf(hInc, func_logPt2)
+    hSum.Add(hInc)
+    #add coherent contribution
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
+    hSum.Add(hPtCoh)
+    #set to draw as a lines
+    ut.line_h1(hSum, rt.kBlack)
 
     #create canvas frame
     can = ut.box_canvas()
@@ -183,12 +198,13 @@ def pdf_logPt2_prelim():
 
     frame.Draw()
 
-    leg = ut.prepare_leg(0.6, 0.8, 0.14, 0.17, 0.03)
+    leg = ut.prepare_leg(0.61, 0.77, 0.16, 0.19, 0.03)
     #ut.add_leg_mass(leg, mmin, mmax)
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
     hx.Draw("same")
-    ln = ut.col_lin(rt.kRed)
-    leg.AddEntry(hx, "Data")
+    ln = ut.col_lin(rt.kRed, 2)
+    leg.AddEntry(hx, "Data", "p")
+    leg.AddEntry(hSum, "Sum", "l")
     leg.AddEntry(hPtCoh, "Coherent J/#psi", "l")
     leg.AddEntry(ln, "Incoherent parametrization", "l")
     leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
@@ -215,7 +231,12 @@ def pdf_logPt2_prelim():
     desc.itemR("#it{b}", b, rt.kRed)
     #desc.draw()
 
-    #put gamma-gamma
+    #put the sum
+    hSum.Draw("same")
+
+    frame.Draw("same")
+
+    #put gamma-gamma and coherent J/psi
     hPtGG.Draw("same")
     hPtCoh.Draw("same")
 
@@ -889,7 +910,7 @@ def plot_pt():
     can = ut.box_canvas()
 
     hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
-    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin/3., ptmin, ptmax)
+    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
     hPtIncoh = ut.prepare_TH1D("hPtIncoh", ptbin, ptmin, ptmax)
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
 
@@ -905,20 +926,34 @@ def plot_pt():
     tree_incoh.Draw(draw + " >> hPtIncoh", strsel)
     tree_gg.Draw(draw + " >> hPtGG", strsel)
 
-    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, 0., 0.11)
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, 0., 0.08)
     ut.norm_to_data(hPtIncoh, hPt, rt.kRed, 0.28, 1.)
     #ut.norm_to_data(hPtGG, hPt, rt.kGreen, 0., 0.03)
-    ut.norm_to_num(hPtGG, 131, rt.kGreen)
+    ut.norm_to_num(hPtGG, 131, rt.kGreen+1)
+
+    #sum of all contributions
+    hSum = ut.prepare_TH1D("hSum", ptbin, ptmin, ptmax)
+    hSum.SetLineWidth(3)
+    #add ggel to the sum
+    hSum.Add(hPtGG)
+    #add incoherent contribution
+    hSum.Add(hPtIncoh)
+    #add coherent contribution
+    hSum.Add(hPtCoh)
+    #set to draw as a lines
+    ut.line_h1(hSum, rt.kBlack)
 
     hPt.Draw()
+    hSum.Draw("same")
     hPtCoh.Draw("same")
     hPtIncoh.Draw("same")
     hPtGG.Draw("same")
 
-    leg = ut.prepare_leg(0.67, 0.7, 0.14, 0.25, 0.03)
+    leg = ut.prepare_leg(0.67, 0.65, 0.14, 0.3, 0.03)
     leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     ut.add_leg_mass(leg, mmin, mmax)
-    leg.AddEntry(hPt, "Data")
+    leg.AddEntry(hPt, "Data", "p")
+    leg.AddEntry(hSum, "Sum", "l")
     leg.AddEntry(hPtCoh, "Coherent J/#psi", "l")
     leg.AddEntry(hPtIncoh, "Incoherent J/#psi", "l")
     leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
@@ -1076,7 +1111,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 6
+    iplot = 2
     funclist = []
     funclist.append(plot_jpsi_logPt2) # 0
     funclist.append(plot_pt2) # 1

@@ -2,7 +2,7 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TGraphErrors, TF1
+from ROOT import TGraphErrors, TF1, vector
 
 import sys
 sys.path.append('../')
@@ -71,9 +71,7 @@ def load_ms():
         t_sigma.append([float(point[0]), float(point[1])])
 
     #scaling to XnXn
-    #kx = 67.958/463.574
     kx = 0.1702
-    #kx = 1.
 
     gMS = TGraphErrors(len(t_sigma))
     for i in xrange(len(t_sigma)):
@@ -113,6 +111,7 @@ def load_cck():
 
     gCCK.SetLineColor(rt.kRed)
     gCCK.SetLineWidth(3)
+    gCCK.SetLineStyle(9)
 
     return gCCK
 
@@ -124,7 +123,11 @@ if __name__ == "__main__":
     #range and binning
     ptbin = 0.005
     ptmin = 0.
-    ptmax = 0.12
+
+    ptmid = 0.08
+    ptlon = 0.01
+
+    ptmax = 0.109  # 0.11
 
     #mass interval
     mmin = 2.8
@@ -175,9 +178,25 @@ if __name__ == "__main__":
     inp_gg = TFile.Open(basedir_mc+"/"+infile_gg)
     tree_gg = inp_gg.Get("jRecTree")
 
+    #evaluate binning
+    print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
+    bins = vector(rt.double)()
+    bins.push_back(ptmin)
+    while True:
+        if bins[bins.size()-1] < ptmid:
+            increment = ptbin
+        else:
+            increment = ptlon
+        bins.push_back( bins[bins.size()-1] + increment )
+        if bins[bins.size()-1] > ptmax: break
+
+    print "bins2:", bins.size()-1
+
     #data and gamma-gamma histograms
-    hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
-    hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
+    #hPt = ut.prepare_TH1D("hPt", ptbin, ptmin, ptmax)
+    #hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
+    hPt = ut.prepare_TH1D_vec("hPt", bins)
+    hPtGG = ut.prepare_TH1D_vec("hPtGG", bins)
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 
@@ -189,7 +208,8 @@ if __name__ == "__main__":
     func_incoh_pt2.SetParameters(873.04, 3.28)
 
     #fill incoherent histogram from functional shape
-    hPtIncoh = ut.prepare_TH1D("hPtIncoh", ptbin, ptmin, ptmax)
+    #hPtIncoh = ut.prepare_TH1D("hPtIncoh", ptbin, ptmin, ptmax)
+    hPtIncoh = ut.prepare_TH1D_vec("hPtIncoh", bins)
     ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
 
     #normalize gamma-gamma component
@@ -225,6 +245,7 @@ if __name__ == "__main__":
     err_zdc_acc = 0.1
     err_bemc_eff = 0.03
     sys_err = rt.TMath.Sqrt(err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff)
+    print "Total sys err:", sys_err
     hSys = ut.prepare_TH1D("hSys", ptbin, ptmin, ptmax)
     hSys.SetOption("E2")
     hSys.SetFillColor(rt.kOrange+1)
@@ -244,14 +265,14 @@ if __name__ == "__main__":
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.03)
 
-    ytit = "d#it{#sigma}/d#it{t} (mb/GeV^{2})"
+    ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/GeV^{2})"
     xtit = "|#kern[0.3]{#it{t}}| (GeV^{2})"
     ut.put_yx_tit(hPt, ytit, xtit, 1.4, 1.2)
 
     hPt.SetMaximum(11)
     #hPt.SetMaximum(80)
     hPt.SetMinimum(0.0002)
-    #hPt.Draw()
+    hPt.Draw()
 
     #hSys.Draw("e2same")
     #hPt.Draw("e1same")
@@ -259,7 +280,7 @@ if __name__ == "__main__":
     ut.put_yx_tit(frame, ytit, xtit, 1.4, 1.2)
     frame.SetMaximum(11)
     frame.SetMinimum(1.e-5)
-    frame.Draw()
+    #frame.Draw()
 
     #add Starlight prediction
     gSlight.Draw("lsame")
@@ -272,17 +293,22 @@ if __name__ == "__main__":
     cleg.AddEntry(None, "Au+Au #rightarrow J/#psi + Au+Au + XnXn, #sqrt{#it{s}_{#it{NN}}} = 200 GeV", "")
     cleg.Draw("same")
 
-    leg = ut.prepare_leg(0.65, 0.75, 0.18, 0.16, 0.035)
+    leg = ut.prepare_leg(0.2, 0.82, 0.18, 0.1, 0.035)
     leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     leg.AddEntry(hPt, "STAR Preliminary")
-    leg.AddEntry(gSlight, "Starlight", "l")
-    #leg.Draw("same")
+    leg.Draw("same")
 
-    #legend for models only
-    mleg = ut.prepare_leg(0.56, 0.75, 0.22, 0.16, 0.035)
-    mleg.AddEntry(gSlight, "Starlight set for XnXn", "l")
-    mleg.AddEntry(gMS, "MS scaled to XnXn", "l")
-    mleg.AddEntry(gCCK, "CCK-hs scaled to XnXn", "l")
+    #legend about systematic error
+    eleg = ut.prepare_leg(0.2, 0.76, 0.18, 0.06, 0.028)
+    eleg.AddEntry(None, "10% normalization error", "")
+    eleg.AddEntry(None, "not shown", "")
+    eleg.Draw("same")
+
+    #legend for models
+    mleg = ut.prepare_leg(0.68, 0.75, 0.3, 0.16, 0.035)
+    mleg.AddEntry(gSlight, "STARLIGHT", "l")
+    mleg.AddEntry(gMS, "MS", "l")
+    mleg.AddEntry(gCCK, "CCK-hs", "l")
     mleg.Draw("same")
 
     #ut.invert_col(rt.gPad)

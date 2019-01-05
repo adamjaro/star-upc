@@ -29,6 +29,17 @@ def prepare_TH1D_n(name, nbins, xmin, xmax):
   return hx
 
 #_____________________________________________________________________________
+def prepare_TH1D_vec(name, vec):
+
+    #th1d from vector<double>
+
+    hx = TH1D(name, name, vec.size()-1, vec.data())
+    set_H1D(hx)
+    hx.SetTitle("");
+
+    return hx
+
+#_____________________________________________________________________________
 def set_H1D(hx):
 
   hx.SetOption("E1");
