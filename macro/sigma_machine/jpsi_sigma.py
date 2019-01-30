@@ -265,8 +265,8 @@ if __name__ == "__main__":
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.03)
 
-    ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/GeV^{2})"
-    xtit = "|#kern[0.3]{#it{t}}| (GeV^{2})"
+    ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/(GeV/c)^{2})"
+    xtit = "|#kern[0.3]{#it{t}}| ((GeV/c)^{2})"
     ut.put_yx_tit(hPt, ytit, xtit, 1.4, 1.2)
 
     hPt.SetMaximum(11)

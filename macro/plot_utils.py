@@ -222,7 +222,7 @@ def add_leg_y_pt(leg, ymin, ymax, ptmax):
 #_____________________________________________________________________________
 def add_leg_pt_mass(leg, ptmax, mmin, mmax):
 
-    leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV}", "")
+    leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV/c}", "")
     add_leg_mass(leg, mmin, mmax)
 
 #_____________________________________________________________________________
@@ -230,7 +230,7 @@ def add_leg_mass(leg, mmin, mmax):
 
     mmin_fmt = "{0:.1f}".format(mmin)
     mmax_fmt = "{0:.1f}".format(mmax)
-    leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
+    leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV/c^{2}}", "")
 
 #_____________________________________________________________________________
 def make_uo_leg(hx, xl, yl, dxl, dyl, tsiz=0.03):

@@ -114,7 +114,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     axisV.Draw()
 
     #kinematics legend
-    kleg = ut.prepare_leg(0.16, 0.8, 0.32, 0.18, 0.03)
+    kleg = ut.prepare_leg(0.16, 0.78, 0.32, 0.2, 0.035)
     kleg.AddEntry(None, "AuAu@200 GeV", "")
     kleg.AddEntry(None, "UPC sample", "")
     ut.add_leg_pt_mass(kleg, ptmax, mmin, mmax)
@@ -127,7 +127,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     #dleg.Draw("same")
 
     #projections legend
-    pleg = ut.prepare_leg(0.24, 0.58, 0.25, 0.2, 0.035)
+    pleg = ut.prepare_leg(0.24, 0.56, 0.25, 0.2, 0.035)
     pleg.AddEntry(plot_east, "ZDC East", "p")
     pleg.AddEntry(plot_west, "ZDC West", "p")
     pleg.AddEntry(gEast, "Fit projection to east", "l")
@@ -257,15 +257,15 @@ def make_fit():
 
     lhead = ["east ZDC", "west ZDC"]
     if p2d == 1:
-        leg = ut.prepare_leg(0.01, 0.9, 0.3, 0.1, 0.03)
+        leg = ut.prepare_leg(0.003, 0.9, 0.3, 0.1, 0.035)
     else:
         leg = ut.prepare_leg(0.66, 0.8, 0.32, 0.13, 0.03)
     if p2d == 0: leg.AddEntry(None, "#bf{Projection to "+lhead[ew]+"}", "")
     leg.SetMargin(0.05)
-    leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV}", "")
+    leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV/c}", "")
     mmin_fmt = "{0:.1f}".format(mmin)
     mmax_fmt = "{0:.1f}".format(mmax)
-    leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
+    leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV/c^{2}}", "")
     leg.Draw("same")
 
     pleg = ut.prepare_leg(0.99, 0.87, -0.4, 0.11, 0.035)

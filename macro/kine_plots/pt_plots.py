@@ -101,7 +101,7 @@ def pdf_logPt2_prelim():
     data = dataIN.reduce(strsel)
     #x is RooRealVar for log(Pt2)
     draw = "TMath::Log10(jRecPt*jRecPt)"
-    draw_func = RooFormulaVar("x", "Dielectron log_{10}( #it{p}_{T}^{2} ) (GeV^{2})", draw, RooArgList(pT))
+    draw_func = RooFormulaVar("x", "Dielectron log_{10}( #it{p}_{T}^{2} ) ((GeV/c)^{2})", draw, RooArgList(pT))
     x = data.addColumn(draw_func)
     x.setRange("fitran", fitran[0], fitran[1])
 
@@ -180,7 +180,7 @@ def pdf_logPt2_prelim():
     frame = x.frame(rf.Bins(nbins), rf.Title(""))
     frame.SetTitle("")
 
-    frame.SetYTitle("J/#psi candidates / ({0:.3f}".format(ptbin)+" GeV^{2})")
+    frame.SetYTitle("J/#psi candidates / ({0:.3f}".format(ptbin)+" (GeV/c)^{2})")
 
     frame.GetXaxis().SetTitleOffset(1.2)
     frame.GetYaxis().SetTitleOffset(1.6)
@@ -915,7 +915,7 @@ def plot_pt():
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
 
     #ut.put_yx_tit(hPt, "Events / ({0:.3f}".format(ptbin)+" GeV)", "#it{p}_{T} (GeV})")
-    ut.put_yx_tit(hPt, "J/#psi candidates / ({0:.3f}".format(ptbin)+" GeV)", "Dielectron #it{p}_{T} (GeV)", 1.5, 1.2)
+    ut.put_yx_tit(hPt, "J/#psi candidates / ({0:.3f}".format(ptbin)+" GeV/c)", "Dielectron #it{p}_{T} (GeV/c)", 1.5, 1.2)
 
     ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.01, 0.02)
 
@@ -949,7 +949,7 @@ def plot_pt():
     hPtIncoh.Draw("same")
     hPtGG.Draw("same")
 
-    leg = ut.prepare_leg(0.67, 0.65, 0.14, 0.3, 0.03)
+    leg = ut.prepare_leg(0.64, 0.65, 0.14, 0.3, 0.03)
     leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hPt, "Data", "p")
@@ -1111,7 +1111,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 2
+    iplot = 11
     funclist = []
     funclist.append(plot_jpsi_logPt2) # 0
     funclist.append(plot_pt2) # 1
