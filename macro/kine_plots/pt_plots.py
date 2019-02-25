@@ -436,7 +436,7 @@ def plot_pt2_real():
 
     gPad.SetLogy()
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_pt2_real
@@ -592,7 +592,8 @@ def pdf_logPt2_incoh():
     ut.fill_h1_tf(hInc, func_logPt2)
     hSum.Add(hInc)
     #add coherent contribution
-    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
+    #ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5, -2.1)
     hSum.Add(hPtCoh)
     #set to draw as a lines
     ut.line_h1(hSum, rt.kBlack)
@@ -1100,8 +1101,11 @@ if __name__ == "__main__":
     infile = "ana_muDst_run1_all_sel5z.root"
 
     #MC
+    basedir_coh = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
+    infile_coh = "ana_sartre14a1_sel5z.root"
+    #basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    #infile_coh = "ana_slight14e1x1_sel5z.root"
     basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
-    infile_coh = "ana_slight14e1x1_sel5z.root"
     infile_incoh = "ana_slight14e3_sel5z.root"
     infile_gg = "ana_slight14e2x1_sel5_nzvtx.root"
 
@@ -1111,7 +1115,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 11
+    iplot = 6
     funclist = []
     funclist.append(plot_jpsi_logPt2) # 0
     funclist.append(plot_pt2) # 1
@@ -1130,7 +1134,7 @@ if __name__ == "__main__":
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")
 
-    inp_coh = TFile.Open(basedir_mc+"/"+infile_coh)
+    inp_coh = TFile.Open(basedir_coh+"/"+infile_coh)
     tree_coh = inp_coh.Get("jRecTree")
 
     inp_incoh = TFile.Open(basedir_mc+"/"+infile_incoh)
