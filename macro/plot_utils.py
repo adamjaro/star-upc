@@ -2,6 +2,7 @@
 import ROOT as rt
 from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
 from ROOT import RooHist, TLatex, gROOT, TIter
+from ROOT.Fit import FitResult
 from ROOT import std
 
 #_____________________________________________________________________________
@@ -281,7 +282,8 @@ def log_fit_result(r1, lmg=6):
 
   ss = std.stringstream()
   r1.printMultiline(ss, 0, rt.kTRUE)
-  stream = convert_stream(ss)
+  stream = ss.str()
+
   #put parameter numbers
   line_stream = stream.split("\n")
   pnum = -2
@@ -308,13 +310,9 @@ def log_tfit_result(r1, lmg=6):
     result += "cov matrix status: " + str(r1.CovMatrixStatus()) + "\n"
 
     ss = std.stringstream()
-    gROOT.ProcessLine("\
-        void FitResultPrint(stringstream& str, const TFitResult& r1) {\
-            r1.FitResult::Print(str, kTRUE);\
-        }\
-    ")
-    rt.FitResultPrint(ss, r1)
-    result += convert_stream(ss)
+    #call to base class FitResult::Print
+    FitResult.Print(r1, ss, True)
+    result += ss.str()
 
     return insert_left_margin(result, lmg)
 
@@ -330,27 +328,18 @@ def insert_left_margin(res, lmg):
     return result
 
 #_____________________________________________________________________________
-def convert_stream(ss):
-
-    stream = ""
-    while ss.eof() == False:
-        chnum = ss.get()
-        if chnum < 0: continue
-        stream += chr(chnum)
-    return stream
-
-#_____________________________________________________________________________
-def log_fit_parameters(r1, lmg=6):
+def log_fit_parameters(r1, lmg=6, prec=3):
 
     #direct access to fit parameters
     result = ""
+    fmt = "{0:."+str(prec)+"f}"
     arglist = r1.floatParsFinal()
     idx = 0
     arg = arglist.at(idx)
     while arg != None:
-        result += " ".ljust(lmg) + arg.GetName() + " = "
-        result += "{0:.3f}".format(arg.getVal()) + " +/- "
-        result += "{0:.3f}".format(arg.getError())
+        result += "".ljust(lmg) + arg.GetName() + " = "
+        result += fmt.format(arg.getVal()) + " +/- "
+        result += fmt.format(arg.getError())
         result += "\n"
         #move to next
         idx += 1

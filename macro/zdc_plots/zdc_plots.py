@@ -410,16 +410,16 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
     #infile = "ana_muDst_run1_all_sel5.root"
-    #infile = "ana_muDst_run1_all_sel5z.root"
+    infile = "ana_muDst_run1_all_sel5z.root"
     #infile = "ana_muDst_run1a_all_sel5_tof.root"
 
     #basedir = "../../../star-upc-data/ana/muDst/muDst_run2a/gg0"
     #infile = "ana_muDst_run2a_all_gg0_v2.root"
 
-    basedir = "../../../star-upc-data/ana/muDst/muDst_run3/sel5"
-    infile = "ana_muDst_run3_all_sel5z.root"
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_run3/sel5"
+    #infile = "ana_muDst_run3_all_sel5z.root"
 
     #basedir = "../../../star-upc-data/ana/muDst/muDst_VPDZDCmon1/sel5"
     #infile = "ana_VPDZDCmon1_sel5z.root"
@@ -430,7 +430,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 5
+    iplot = 4
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1

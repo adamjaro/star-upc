@@ -518,6 +518,13 @@ def pdf_logPt2_incoh():
 
     #gamma-gamma 131 evt for pT<0.18
 
+    #output log file
+    out = open("out.txt", "w")
+    ut.log_results(out, "in "+infile+" in_coh "+infile_coh+" in_gg "+infile_gg)
+    loglist = [(x,eval(x)) for x in ["ptbin", "ptmin", "ptmax", "mmin", "mmax", "fitran", "binned"]]
+    strlog = ut.make_log_string(loglist)
+    ut.log_results(out, strlog+"\n")
+
     #input data
     pT = RooRealVar("jRecPt", "pT", 0, 10)
     m = RooRealVar("jRecM", "mass", 0, 10)
@@ -555,6 +562,8 @@ def pdf_logPt2_incoh():
     else:
         r1 = pdf_logPt2.fitTo(data, rf.Range("fitran"), rf.Save())
 
+    ut.log_results(out, ut.log_fit_result(r1))
+
     #calculate norm to number of events
     xset = RooArgSet(x)
     ipdf = pdf_logPt2.createIntegral(xset, rf.NormSet(xset), rf.Range("fitran"))
@@ -570,6 +579,9 @@ def pdf_logPt2_incoh():
 
     #a = nevt/ipdf.getVal()
     a = nevt/pdf_logPt2.getNorm(RooArgSet(x))
+    ut.log_results(out, "log_10(pT^2) parametrization:")
+    ut.log_results(out, "A = {0:.2f}".format(a))
+    ut.log_results(out, ut.log_fit_parameters(r1, 0, 2))
     print "a =", a
 
     #gamma-gamma contribution

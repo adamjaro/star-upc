@@ -166,7 +166,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 0
+    iplot = 1
     funclist = []
     funclist.append(plot_vtx_z) # 0
     funclist.append(fit_vtx_z) # 1
