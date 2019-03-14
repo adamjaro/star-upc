@@ -10,7 +10,7 @@ basedir_out     /star/u/jaroslav/star-upc/build           #output directory
 #basedir_out     /star/u/jaroslav/star-upc-data
 out_name        output.root                               #output file
 #out_name        ana/starsim/slight14e/sel5/ana_slight14e3_sel5z.root
-#out_name        ana/starsim/sartre14a/sel5/ana_sartre14a1_sel5z.root
+#out_name        ana/starsim/sartre14a/sel5/ana_sartre14a1_sel5z_bemcmc.root
 #out_name        ana/muDst/muDst_run1/sel5/ana_muDst_run1_all_sel5z_nDphi.root
 #out_name        ana/muDst/muDst_VPDZDCmon1/sel5/ana_VPDZDCmon1_sel5z.root
 
@@ -36,9 +36,9 @@ makeAllTree     0       # flag to write all triggers tree
 #maxNsigPID  9999.
 #trgProfile   -1
 maxAbsZvtx  100.
-matchTof    1
-matchBemc   0
-useBemcEff  1
+#matchTof    1
+#matchBemc   0
+#useBemcEff  1
 #maxAbsEta   9.e9
 
 #bemc efficiency
