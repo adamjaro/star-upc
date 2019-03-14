@@ -13,18 +13,11 @@ from analyze_tree import AnalyzeTree
 #_____________________________________________________________________________
 def load_starlight(dy):
 
-    #slight = TFile.Open("/home/jaroslav/sim/starlight_data/slight_Jpsi_PbPb_coh.root")
     slight = TFile.Open("/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_Jpsi_coh_6Mevt.root")
     slight_tree = slight.Get("slight_tree")
 
-    #hSlight = ut.prepare_TH1D("hSlight", 0.3, -5., 5.)
-    #frame = ut.prepare_TH1D("frame", 0.1, -5., 5.)
     hSlight = ut.prepare_TH1D("hSlight", 0.002, 0., 0.12)
-    #frame = ut.prepare_TH1D("frame", 0.002, 0., 0.12)
 
-    #slight_tree.Draw("rapidity >> hSlight")
-    #ut.norm_to_integral(hSlight, 23.16)
-    #slight_tree.Draw("pT*pT >> hSlight")
     nall = float( slight_tree.GetEntries() )
     ny = float( slight_tree.Draw("pT*pT >> hSlight", "rapidity>-1 && rapidity<1") )
     sigma_sl_tot = 67.958 # total Starlight cross section, ub
@@ -40,20 +33,6 @@ def load_starlight(dy):
     gSlight.SetLineColor(rt.kBlue)
     gSlight.SetLineWidth(3)
     gSlight.SetLineStyle(rt.kDashDotted)
-
-    #hSlight.SetMaximum(7.5)
-    #frame.SetMaximum(7.5)
-    #frame.SetMaximum(20)
-
-    #can = ut.box_canvas()
-    #hSlight.Draw()
-
-    #gPad.SetLogy()
-
-    #frame.Draw()
-    #gSlight.Draw("cx")
-    #ut.invert_col(rt.gPad)
-    #can.SaveAs("01fig.pdf")
 
     return gSlight
 
@@ -115,6 +94,31 @@ def load_cck():
 
     return gCCK
 
+#end of load_cck
+
+#_____________________________________________________________________________
+def load_sartre():
+
+    sartre = TFile.Open("/home/jaroslav/sim/sartre_tx/sartre_AuAu_200GeV_Jpsi_coh_2p7Mevt.root")
+    sartre_tree = sartre.Get("sartre_tree")
+
+    hSartre = ut.prepare_TH1D("hSartre", 0.002, 0., 0.12)
+    sartre_tree.Draw("-tval >> hSartre", "rapidity>-1 && rapidity<1")
+
+    ut.norm_to_integral(hSartre, 0.025) # now same as Starlight
+
+    gSartre = TGraphErrors(hSartre.GetNbinsX())
+    for ibin in xrange(1,hSartre.GetNbinsX()+1):
+        gSartre.SetPoint(ibin-1, hSartre.GetBinCenter(ibin), hSartre.GetBinContent(ibin))
+
+    gSartre.SetLineColor(rt.kYellow+1)
+    gSartre.SetLineWidth(3)
+    #gSartre.SetLineStyle(rt.kDashDotted)
+
+    return gSartre
+
+#end of load_sartre
+
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
@@ -171,6 +175,7 @@ if __name__ == "__main__":
     gSlight = load_starlight(dy)
     gMS = load_ms()
     gCCK = load_cck()
+    gSartre = load_sartre()
 
     #open the inputs
     inp = TFile.Open(basedir+"/"+infile)
@@ -286,6 +291,7 @@ if __name__ == "__main__":
     gSlight.Draw("lsame")
     gMS.Draw("lsame")
     gCCK.Draw("lsame")
+    gSartre.Draw("lsame")
 
     gPad.SetLogy()
 

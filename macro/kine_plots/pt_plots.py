@@ -540,10 +540,7 @@ def pdf_logPt2_incoh():
     #binned data
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
     hPt = TH1D("hPt", "hPt", nbins, ptmin, ptmax)
-    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
-    #fill in binned data
     tree_in.Draw(draw + " >> hPt", strsel)
-    tree_coh.Draw(draw + " >> hPtCoh", strsel)
     dataH = RooDataHist("dataH", "dataH", RooArgList(x), hPt)
 
     #range for plot
@@ -584,6 +581,19 @@ def pdf_logPt2_incoh():
     ut.log_results(out, ut.log_fit_parameters(r1, 0, 2))
     print "a =", a
 
+    #Coherent contribution
+    hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
+    tree_coh.Draw(draw + " >> hPtCoh", strsel)
+    #ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5, -2.1)
+
+    #Sartre generated coherent shape
+    sartre = TFile.Open("/home/jaroslav/sim/sartre_tx/sartre_AuAu_200GeV_Jpsi_coh_2p7Mevt.root")
+    sartre_tree = sartre.Get("sartre_tree")
+    hSartre = ut.prepare_TH1D("hSartre", ptbin, ptmin, ptmax)
+    sartre_tree.Draw("TMath::Log10(pT*pT) >> hSartre", "rapidity>-1 && rapidity<1")
+    ut.norm_to_data(hSartre, hPt, rt.kViolet, -5, -2.3) # norm for Sartre
+
     #gamma-gamma contribution
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
     tree_gg.Draw(draw + " >> hPtGG", strsel)
@@ -604,8 +614,6 @@ def pdf_logPt2_incoh():
     ut.fill_h1_tf(hInc, func_logPt2)
     hSum.Add(hInc)
     #add coherent contribution
-    #ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
-    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5, -2.1)
     hSum.Add(hPtCoh)
     #set to draw as a lines
     ut.line_h1(hSum, rt.kBlack)
@@ -657,12 +665,17 @@ def pdf_logPt2_incoh():
     #put the sum
     hSum.Draw("same")
 
+    #gPad.SetLogy()
+
     frame.Draw("same")
 
     #put gamma-gamma
     hPtGG.Draw("same")
     #put coherent J/psi
     hPtCoh.Draw("same")
+
+    #put Sartre generated coherent shape
+    hSartre.Draw("same")
 
     ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
@@ -995,10 +1008,10 @@ def plot_pt2():
     ptmin = 0.
     ptmax = 0.2   # 0.3
 
-    #mmin = 2.8
-    #mmax = 3.2
-    mmin = 1.5
-    mmax = 2.6
+    mmin = 2.8
+    mmax = 3.2
+    #mmin = 1.5
+    #mmax = 2.6
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
 

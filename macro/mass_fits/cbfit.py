@@ -18,18 +18,19 @@ if __name__ == "__main__":
     basedir = "../../../star-upc-data/ana/starsim"
 
     #infile = "slight14d/sel5/ana_slight14d1_sel5a.root"
-    infile = "slight14e/sel5/ana_slight14e1x1_sel5z.root"
+    #infile = "slight14e/sel5/ana_slight14e1x1_sel5z.root"
+    infile = "sartre14a/sel5/ana_sartre14a1_sel5z.root"
 
     mbin = 0.004
     mmin = 2.
     mmax = 3.6
 
-    fitran = [2., 3.22]
+    fitran = [2.8, 3.15]
 
     ymin = -1.
     ymax = 1.
 
-    ptmax = 0.17; # 0.17
+    ptmax = 0.18; # 0.17
 
     binned = False
 

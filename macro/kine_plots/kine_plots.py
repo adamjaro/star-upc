@@ -3,6 +3,7 @@
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
 from ROOT import RooRealVar, RooDataHist, RooArgList, RooCBShape, RooGaussian
+from ROOT import RooNovosibirsk
 from ROOT import RooFit as rf
 
 import sys
@@ -11,14 +12,322 @@ import plot_utils as ut
 from parameter_descriptor import parameter_descriptor as pdesc
 
 #_____________________________________________________________________________
+def plot_rec_gen_track_phi():
+
+    #track azimuthal angle phi resolution as ( phi_track_rec - phi_track_gen )/phi_track_gen
+
+    phibin = 0.0001
+    phimin = -0.02
+    phimax = 0.02
+
+    hPhiRel = ut.prepare_TH1D("hPhiRel", phibin, phimin, phimax)
+
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
+
+    mctree.Draw("(jT0phi-jGenP0phi)/jGenP0phi >> hPhiRel") # positive charge
+    mctree.Draw("(jT1phi-jGenP1phi)/jGenP1phi >>+hPhiRel") # add negative charge
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#_____________________________________________________________________________
+def plot_rec_gen_track_eta():
+
+    #track pseudorapidity resolution as ( eta_track_rec - eta_track_gen )/eta_track_gen
+
+    etabin = 0.001
+    etamin = -0.1
+    etamax = 0.1
+
+    hEtaRel = ut.prepare_TH1D("hEtaRel", etabin, etamin, etamax)
+
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
+
+    mctree.Draw("(jT0eta-jGenP0eta)/jGenP0eta >> hEtaRel") # positive charge
+    mctree.Draw("(jT1eta-jGenP1eta)/jGenP1eta >>+hEtaRel") # add negative charge
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_rec_gen_track_eta
+
+#_____________________________________________________________________________
+def plot_rec_gen_track_pt():
+
+    #track pT resolution as ( pT_track_rec - pT_track_gen )/pT_track_gen
+
+    ptbin = 0.001
+    ptmin = -0.25
+    ptmax = 0.1
+
+    #generated dielectron pT selection to input data
+    ptlo = 0.
+    pthi = 0.15
+
+    fitran = [-0.15, 0.018]
+
+    mmin = 2.8
+    mmax = 3.2
+
+    ccb = rt.kMagenta
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    strsel += " && jGenPt>{0:.3f}".format(ptlo)
+    strsel += " && jGenPt<{0:.3f}".format(pthi)
+
+    nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
+    hPtTrackRel = ut.prepare_TH1D("hPtTrackRel", ptbin, ptmin, ptmax)
+
+    ytit = "Events / ({0:.3f})".format(ptbin)
+    xtit = "(#it{p}_{T, rec}^{track} - #it{p}_{T, gen}^{track})/#it{p}_{T, gen}^{track}"
+
+    mctree.Draw("(jT0pT-jGenP0pT)/jGenP0pT >> hPtTrackRel", strsel) # positive charge
+    mctree.Draw("(jT1pT-jGenP1pT)/jGenP1pT >>+hPtTrackRel", strsel) # add negative charge
+
+    x = RooRealVar("x", "x", ptmin, ptmax)
+    x.setRange("fitran", fitran[0], fitran[1])
+    rfPtTrackRel = RooDataHist("rfPtTrackRel", "rfPtTrackRel", RooArgList(x), hPtTrackRel)
+
+    #standard Crystal Ball
+    mean = RooRealVar("mean", "mean", -0.003, -0.1, 0.1)
+    sigma = RooRealVar("sigma", "sigma", 0.01, 0., 0.9)
+    alpha = RooRealVar("alpha", "alpha", 1.2, 0., 10.)
+    n = RooRealVar("n", "n", 1.3, 0., 20.)
+    cbpdf = RooCBShape("cbpdf", "cbpdf", x, mean, sigma, alpha, n)
+
+    res = cbpdf.fitTo(rfPtTrackRel, rf.Range("fitran"), rf.Save())
+
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
+
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    ut.put_frame_yx_tit(frame, ytit, xtit)
+
+    rfPtTrackRel.plotOn(frame, rf.Name("data"))
+
+    cbpdf.plotOn(frame, rf.Precision(1e-6), rf.Name("cbpdf"), rf.LineColor(ccb))
+
+    frame.Draw()
+
+    desc = pdesc(frame, 0.2, 0.8, 0.057); #x, y, sep
+    desc.set_text_size(0.03)
+
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("cbpdf", "data", 4), -1, ccb)
+    desc.prec = 5
+    desc.itemR("mean", mean, ccb)
+    desc.itemR("#sigma", sigma, ccb)
+    desc.itemR("#alpha", alpha, ccb)
+    desc.prec = 3
+    desc.itemR("#it{n}", n, ccb)
+    desc.draw()
+
+    leg = ut.prepare_leg(0.2, 0.82, 0.21, 0.12, 0.03) # x, y, dx, dy, tsiz
+    leg.SetMargin(0.05)
+    leg.AddEntry(0, "#bf{%.3f < #it{p}_{T}^{pair} < %.3f GeV}" % (ptlo, pthi), "")
+    leg.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_rec_gen_track_pt
+
+#_____________________________________________________________________________
+def plot_rec_gen_pt_relative():
+
+    # relative pT resolution as ( pT_rec - pT_gen )/pT_gen
+
+    ptbin = 0.01
+    ptmin = -1.2
+    ptmax = 4
+
+    #generated pT selection to input data
+    ptlo = 0.
+    pthi = 0.12
+
+    fitran = [-0.1, 3]
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    strsel += " && jGenPt>{0:.3f}".format(ptlo)
+    strsel += " && jGenPt<{0:.3f}".format(pthi)
+
+    nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
+    hPtRel = ut.prepare_TH1D("hPtRel", ptbin, ptmin, ptmax)
+
+    ytit = "Events / ({0:.3f})".format(ptbin)
+    xtit = "(#it{p}_{T, rec} - #it{p}_{T, gen})/#it{p}_{T, gen}"
+
+    mctree.Draw("(jRecPt-jGenPt)/jGenPt >> hPtRel", strsel)
+
+    x = RooRealVar("x", "x", ptmin, ptmax)
+    x.setRange("fitran", fitran[0], fitran[1])
+    rfPtRel = RooDataHist("rfPtRel", "rfPtRel", RooArgList(x), hPtRel)
+
+    #reversed Crystal Ball
+    mean = RooRealVar("mean", "mean", 0., -0.1, 0.1)
+    sigma = RooRealVar("sigma", "sigma", 0.2, 0., 0.9)
+    alpha = RooRealVar("alpha", "alpha", -1.2, -10., 0.)
+    n = RooRealVar("n", "n", 1.3, 0., 20.)
+    cbpdf = RooCBShape("cbpdf", "cbpdf", x, mean, sigma, alpha, n)
+
+    res = cbpdf.fitTo(rfPtRel, rf.Range("fitran"), rf.Save())
+
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
+
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    ut.put_frame_yx_tit(frame, ytit, xtit)
+
+    rfPtRel.plotOn(frame, rf.Name("data"))
+
+    cbpdf.plotOn(frame, rf.Precision(1e-6), rf.Name("cbpdf"))
+
+    frame.Draw()
+
+    desc = pdesc(frame, 0.65, 0.8, 0.057); #x, y, sep
+    desc.set_text_size(0.03)
+
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("cbpdf", "data", 4), -1, rt.kBlue)
+    desc.prec = 5
+    desc.itemR("mean", mean, rt.kBlue)
+    desc.prec = 4
+    desc.itemR("#sigma", sigma, rt.kBlue)
+    desc.itemR("#alpha", alpha, rt.kBlue)
+    desc.prec = 3
+    desc.itemR("#it{n}", n, rt.kBlue)
+    desc.draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#_____________________________________________________________________________
+def plot_rec_minus_gen_pt():
+
+    #reconstructed pT vs. generated pT for resolution
+
+    #distribution range
+    ptbin = 0.005
+    ptmin = -0.2
+    ptmax = 0.4
+
+    #generated pT selection to input data
+    ptlo = 0
+    pthi = 0.1
+
+    #mass selection
+    mmin = 2.8
+    mmax = 3.2
+
+    #range for the fit
+    fitran = [-0.02, 0.2]
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    strsel += " && jGenPt>{0:.3f}".format(ptlo)
+    strsel += " && jGenPt<{0:.3f}".format(pthi)
+
+    nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
+    hPtDiff = ut.prepare_TH1D("hPtDiff", ptbin, ptmin, ptmax)
+
+    ytit = "Events / ({0:.3f}".format(ptbin)+" GeV)"
+    xtit = "#it{p}_{T, reconstructed} - #it{p}_{T, generated} (GeV)"
+
+    mctree.Draw("jRecPt-jGenPt >> hPtDiff", strsel)
+
+    #roofit binned data
+    x = RooRealVar("x", "x", -1, 1)
+    x.setRange("fitran", fitran[0], fitran[1])
+    rfPt = RooDataHist("rfPt", "rfPt", RooArgList(x), hPtDiff)
+
+    #reversed Crystal Ball
+    mean = RooRealVar("mean", "mean", 0., -0.1, 0.1)
+    sigma = RooRealVar("sigma", "sigma", 0.01, 0., 0.1)
+    alpha = RooRealVar("alpha", "alpha", -1.046, -10., 0.)
+    n = RooRealVar("n", "n", 1.403, 0., 20.)
+    pdf = RooCBShape("pdf", "pdf", x, mean, sigma, alpha, n)
+
+    #make the fit
+    res = pdf.fitTo(rfPt, rf.Range("fitran"), rf.Save())
+
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
+
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    ut.put_frame_yx_tit(frame, ytit, xtit)
+
+    rfPt.plotOn(frame, rf.Name("data"))
+
+    pdf.plotOn(frame, rf.Precision(1e-6), rf.Name("pdf"))
+
+    frame.Draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_rec_minus_gen_pt
+
+#_____________________________________________________________________________
+def plot_rec_gen_LogPt2():
+
+    #reconstructed log_10(pT^2) vs. generated pT^2 for resolution
+
+    ptbin = 0.05
+    ptmin = -6.
+    ptmax = 0.
+
+    mmin = 2.8
+    mmax = 3.2
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    can = ut.box_canvas()
+
+    hLogPt2 = ut.prepare_TH2D("hLogPt2", ptbin, ptmin, ptmax, ptbin, ptmin, ptmax)
+
+    #tit_str = "#it{p}_{T}"+" / ({0:.3f}".format(ptbin)+" GeV)"
+    tit_str = "log_{10}( #it{p}_{T}^{2} )"
+    ut.put_yx_tit(hLogPt2, "Reconstructed " + tit_str, "Generated " + tit_str, 1.5, 1.2)
+
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.015, 0.11)
+
+    draw = "TMath::Log10(jRecPt*jRecPt):TMath::Log10(jGenPt*jGenPt)"
+
+    gPad.SetLogz()
+
+    mctree.Draw(draw + " >> hLogPt2", strsel)
+
+    #line 1:1
+    lin = ut.col_lin(rt.kViolet, 4, rt.kDashed)
+    lin.SetX1(ptmin)
+    lin.SetY1(ptmin)
+    lin.SetX2(ptmax)
+    lin.SetY2(ptmax)
+
+    lin.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#end of plot_rec_gen_LogPt2
+
+#_____________________________________________________________________________
 def plot_rec_minus_gen_pt2():
 
     #reconstructed pT^2 vs. generated pT^2 for resolution
 
+    #distribution range
     ptbin = 0.001
     ptmin = -0.1
     ptmax = 0.15
 
+    #generated pT^2 selection to input data
+    ptlo = 0.04
+    pthi = 0.1
+
+    #mass selection
     mmin = 2.8
     mmax = 3.2
 
@@ -26,6 +335,10 @@ def plot_rec_minus_gen_pt2():
     #fitran = [-0.003, 0.003]
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    strsel += " && (jGenPt*jGenPt)>{0:.3f}".format(ptlo)
+    strsel += " && (jGenPt*jGenPt)<{0:.3f}".format(pthi)
+
+    print strsel
 
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
     hPt2 = ut.prepare_TH1D("hPt2", ptbin, ptmin, ptmax)
@@ -46,15 +359,15 @@ def plot_rec_minus_gen_pt2():
 
     #reversed Crystal Ball
     mean = RooRealVar("mean", "mean", 0., -0.1, 0.1)
-    sigma = RooRealVar("sigma", "sigma", 0.01, 0., 0.1)
-    alpha = RooRealVar("alpha", "alpha", -10., 0.)
-    n = RooRealVar("n", "n", 0., 20.)
+    sigma = RooRealVar("sigma", "sigma", 0.0011, 0., 0.1)
+    alpha = RooRealVar("alpha", "alpha", -1.046, -10., 0.)
+    n = RooRealVar("n", "n", 1.403, 0., 20.)
     pdf = RooCBShape("pdf", "pdf", x, mean, sigma, alpha, n)
 
     #gaus = RooGaussian("gaus", "gaus", x, mean, sigma)
 
     #make the fit
-    res = pdf.fitTo(dataH, rf.Range("fitran"), rf.Save())
+    #res = pdf.fitTo(dataH, rf.Range("fitran"), rf.Save())
     #res = gaus.fitTo(dataH, rf.Range("fitran"), rf.Save())
 
     can = ut.box_canvas()
@@ -86,11 +399,12 @@ def plot_rec_gen_pt2():
 
     #reconstructed pT^2 vs. generated pT^2 for resolution
 
-    ptbin = 0.005
-    #ptbin = 0.002
+    #ptbin = 0.005
+    ptbin = 0.002
     ptmin = 0.
-    ptmax = 1.
+    #ptmax = 1.
     #ptmax = 0.16
+    ptmax = 0.1
     #ptmin = 0.
     #ptmax = 0.2
 
@@ -103,18 +417,26 @@ def plot_rec_gen_pt2():
 
     hPt2 = ut.prepare_TH2D("hPt2", ptbin, ptmin, ptmax, ptbin, ptmin, ptmax)
 
-    tit_str = "#it{p}_{T}"+" / ({0:.3f}".format(ptbin)+" GeV)"
+    tit_str = "#it{p}_{T}^{2}"+" / ({0:.3f})".format(ptbin)
     ut.put_yx_tit(hPt2, "Reconstructed " + tit_str, "Generated " + tit_str, 1.5, 1.2)
 
-    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.015, 0.09)
+    ut.set_margin_lbtr(gPad, 0.11, 0.09, 0.015, 0.11)
 
-    draw = "jRecPt:jGenPt"
-    #draw = "jRecPt*jRecPt:jGenPt*jGenPt"
+    #draw = "jRecPt:jGenPt"
+    draw = "jRecPt*jRecPt:jGenPt*jGenPt"
+
+    gPad.SetLogz()
 
     mctree.Draw(draw + " >> hPt2", strsel)
 
-    #hPt2.SetYTitle("rec")
-    #hPt2.SetXTitle("gen")
+    #line 1:1
+    lin = ut.col_lin(rt.kViolet, 4, rt.kDashed)
+    lin.SetX1(ptmin)
+    lin.SetY1(ptmin)
+    lin.SetX2(ptmax)
+    lin.SetY2(ptmax)
+
+    lin.Draw("same")
 
     ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
@@ -163,8 +485,6 @@ def plot_jpsi_logPt2():
 
     uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
     uoleg.Draw("same")
-
-    #gPad.SetLogy()
 
     ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
@@ -415,8 +735,8 @@ def plot_tracks_chi2():
     cmin = 0.
     cmax = 4.
 
-    mmin = 1.5
-    mmax = 5.
+    mmin = 2.8
+    mmax = 3.2
 
     ptmax = 0.17
 
@@ -441,7 +761,7 @@ def plot_tracks_chi2():
     hChi2.Draw("e1same")
     hChi2MC.Draw("same")
 
-    leg = ut.prepare_leg(0.67, 0.8, 0.14, 0.16, 0.03)
+    leg = ut.prepare_leg(0.64, 0.8, 0.14, 0.16, 0.03)
     ut.add_leg_pt_mass(leg, ptmax, mmin, mmax)
     leg.AddEntry(hChi2, "Data")
     leg.AddEntry(hChi2MC, "MC", "l")
@@ -558,10 +878,10 @@ def plot_tracks_eta():
     etabin = 0.09
     etamax = 1.1
 
-    mmin = 1.5
-    mmax = 5
+    mmin = 2.8
+    mmax = 3.2
 
-    ptmax = 0.17
+    ptmax = 0.18
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f} && jRecPt<{2:.3f}".format(mmin, mmax, ptmax)
 
@@ -574,7 +894,7 @@ def plot_tracks_eta():
 
     ut.set_margin_lbtr(gPad, 0.1, 0.08, 0.014, 0.01)
 
-    hEta.SetMaximum(220)
+    hEta.SetMaximum(100) # 220
 
     tree.Draw("jT0eta >> hEta", strsel)
     tree.Draw("jT1eta >>+hEta", strsel)
@@ -585,7 +905,7 @@ def plot_tracks_eta():
     hEta.Draw()
     hEtaMC.Draw("same")
 
-    leg = ut.prepare_leg(0.67, 0.8, 0.14, 0.16, 0.03)
+    leg = ut.prepare_leg(0.64, 0.8, 0.14, 0.16, 0.03)
     ut.add_leg_pt_mass(leg, ptmax, mmin, mmax)
     leg.AddEntry(hEta, "Data")
     leg.AddEntry(hEtaMC, "MC", "l")
@@ -652,11 +972,15 @@ if __name__ == "__main__":
     #infile = "ana_muDst_run1_all_sel5z_nDphi.root"
 
     #MC
-    basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
-    infile_mc = "ana_slight14e1x1_sel5z.root"
+    #basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    #infile_mc = "ana_slight14e1x1_sel5z.root"
     #infile_mc = "ana_slight14e3_sel5z.root"
     #infile_mc = "ana_slight14e1x1_sel5z_nDphi.root"
     #infile_mc = "ana_slight14e2x1_sel5_nzvtx.root"
+    basedir_mc = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
+    infile_mc = "ana_sartre14a1_sel5z.root"
+    #infile_mc = "ana_sartre14a1_sel5z_tof.root"
+    #infile_mc = "ana_sartre14a1_sel5z_bemcmc.root"
 
     interactive = False
 
@@ -664,7 +988,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 12
+    iplot = 16
     funclist = []
     funclist.append(plot_y) # 0
     funclist.append(plot_tracks_eta) # 1
@@ -679,6 +1003,12 @@ if __name__ == "__main__":
     funclist.append(plot_jpsi_logPt2) # 10
     funclist.append(plot_rec_gen_pt2) # 11
     funclist.append(plot_rec_minus_gen_pt2) # 12
+    funclist.append(plot_rec_gen_LogPt2) # 13
+    funclist.append(plot_rec_minus_gen_pt) # 14
+    funclist.append(plot_rec_gen_pt_relative) # 15
+    funclist.append(plot_rec_gen_track_pt) # 16
+    funclist.append(plot_rec_gen_track_eta) # 17
+    funclist.append(plot_rec_gen_track_phi) # 18
 
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")

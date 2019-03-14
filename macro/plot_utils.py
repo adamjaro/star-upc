@@ -108,6 +108,18 @@ def put_yx_tit(hx, ytit, xtit, yofs=1.5, xofs=1.1):
     hx.SetTitleOffset(xofs, "X")
 
 #_____________________________________________________________________________
+def put_frame_yx_tit(frame, ytit, xtit, yofs=1.7, xofs=1.2):
+
+    frame.SetTitle("")
+
+    frame.SetYTitle(ytit)
+    frame.SetXTitle(xtit)
+
+    frame.GetYaxis().SetTitleOffset(yofs);
+    frame.GetXaxis().SetTitleOffset(xofs);
+
+
+#_____________________________________________________________________________
 def norm_to_data(hMC, hDat, col=rt.kBlue, lo=0., hi=-1.):
 
     #normalize MC hMC to data hDat, suppress errors to draw as line and set color,
