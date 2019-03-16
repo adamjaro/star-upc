@@ -78,7 +78,7 @@ def plot_rec_gen_track_pt():
     strsel += " && jGenPt<{0:.3f}".format(pthi)
 
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
-    hPtTrackRel = ut.prepare_TH1D("hPtTrackRel", ptbin, ptmin, ptmax)
+    hPtTrackRel = ut.prepare_TH1D_n("hPtTrackRel", nbins, ptmin, ptmax)
 
     ytit = "Events / ({0:.3f})".format(ptbin)
     xtit = "(#it{p}_{T, rec}^{track} - #it{p}_{T, gen}^{track})/#it{p}_{T, gen}^{track}"
@@ -99,15 +99,26 @@ def plot_rec_gen_track_pt():
 
     res = cbpdf.fitTo(rfPtTrackRel, rf.Range("fitran"), rf.Save())
 
+    #generate new distribution according to the fit
+    gROOT.LoadMacro("cb_gen.h")
+    #Crystal Ball generator, min, max, mean, sigma, alpha, n
+    cbgen = rt.cb_gen(-0.18, 0.05, -0.00226, 0.00908, 1.40165, 1.114)
+    hRelGen = ut.prepare_TH1D_n("hRelGen", nbins, ptmin, ptmax)
+    rt.cb_generate_n(cbgen, hRelGen, int(hPtTrackRel.GetEntries()))
+    rfRelGen = RooDataHist("rfRelGen", "rfRelGen", RooArgList(x), hRelGen)
+
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
 
     frame = x.frame(rf.Bins(nbins), rf.Title(""))
     ut.put_frame_yx_tit(frame, ytit, xtit)
 
-    rfPtTrackRel.plotOn(frame, rf.Name("data"))
+    #rfPtTrackRel.plotOn(frame, rf.Name("data"))
+
+    rfRelGen.plotOn(frame, rf.Name("data"))
 
     cbpdf.plotOn(frame, rf.Precision(1e-6), rf.Name("cbpdf"), rf.LineColor(ccb))
+
 
     frame.Draw()
 
