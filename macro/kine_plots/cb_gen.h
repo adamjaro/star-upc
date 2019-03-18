@@ -73,6 +73,53 @@ void cb_generate_n(cb_gen &gen, TH1D &hx, Int_t n) {
 
 }//cb_generate_n
 
+//_____________________________________________________________________________
+void cb_apply_smear(cb_gen &gen, TTree &mctree, TH1D &hx) {
+
+  //test function to introduce smearing to the original distribution
+  Double_t pt0, pt1, gpt0, gpt1;
+  mctree.SetBranchAddress("jT0pT", &pt0);
+  mctree.SetBranchAddress("jT1pT", &pt1);
+  mctree.SetBranchAddress("jGenP0pT", &gpt0);
+  mctree.SetBranchAddress("jGenP1pT", &gpt1);
+
+  //tree loop
+  for(Int_t i=0; i<mctree.GetEntries(); i++) {
+
+    mctree.GetEntry(i);
+
+    //pt0 -= 0.01;
+    //pt1 -= 0.01;
+
+    pt0 += gen.generate();
+    pt1 += gen.generate();
+
+    Double_t r0 = (pt0 - gpt0)/gpt0;
+    Double_t r1 = (pt1 - gpt1)/gpt1;
+
+    hx.Fill(r0);
+    hx.Fill(r1);
+
+  }//tree loop
+
+  mctree.ResetBranchAddresses();
+
+}//cb_apply_smear_n
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

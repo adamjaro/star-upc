@@ -76,6 +76,7 @@ def plot_rec_gen_track_pt():
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
     strsel += " && jGenPt>{0:.3f}".format(ptlo)
     strsel += " && jGenPt<{0:.3f}".format(pthi)
+    strsel = ""
 
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
     hPtTrackRel = ut.prepare_TH1D_n("hPtTrackRel", nbins, ptmin, ptmax)
@@ -102,10 +103,17 @@ def plot_rec_gen_track_pt():
     #generate new distribution according to the fit
     gROOT.LoadMacro("cb_gen.h")
     #Crystal Ball generator, min, max, mean, sigma, alpha, n
-    cbgen = rt.cb_gen(-0.18, 0.05, -0.00226, 0.00908, 1.40165, 1.114)
+    cbgen = rt.cb_gen(ptmin, ptmax, -0.00226, 0.00908, 1.40165, 1.114)  #  -0.18, 0.05
     hRelGen = ut.prepare_TH1D_n("hRelGen", nbins, ptmin, ptmax)
+    ut.set_H1D_col(hRelGen, rt.kBlue)
     rt.cb_generate_n(cbgen, hRelGen, int(hPtTrackRel.GetEntries()))
     rfRelGen = RooDataHist("rfRelGen", "rfRelGen", RooArgList(x), hRelGen)
+
+    #generate distribution with additional smearing applied
+    hRelSmear = ut.prepare_TH1D_n("hRelSmear", nbins, ptmin, ptmax)
+    ut.set_H1D_col(hRelSmear, rt.kOrange)
+    #tcopy = mctree.CopyTree(strsel)
+    rt.cb_apply_smear(cbgen, mctree, hRelSmear)
 
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
@@ -113,14 +121,17 @@ def plot_rec_gen_track_pt():
     frame = x.frame(rf.Bins(nbins), rf.Title(""))
     ut.put_frame_yx_tit(frame, ytit, xtit)
 
-    #rfPtTrackRel.plotOn(frame, rf.Name("data"))
+    rfPtTrackRel.plotOn(frame, rf.Name("data"))
 
-    rfRelGen.plotOn(frame, rf.Name("data"))
+    #rfRelGen.plotOn(frame, rf.Name("data"))
 
     cbpdf.plotOn(frame, rf.Precision(1e-6), rf.Name("cbpdf"), rf.LineColor(ccb))
 
 
     frame.Draw()
+
+    hRelGen.Draw("e1same")
+    hRelSmear.Draw("e1same")
 
     desc = pdesc(frame, 0.2, 0.8, 0.057); #x, y, sep
     desc.set_text_size(0.03)

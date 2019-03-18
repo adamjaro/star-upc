@@ -45,8 +45,9 @@ def set_H1D(hx):
 
   hx.SetOption("E1");
   hx.SetMarkerStyle(rt.kFullCircle);
-  hx.SetMarkerColor(rt.kBlack)
-  hx.SetLineColor(rt.kBlack);
+  #hx.SetMarkerColor(rt.kBlack)
+  #hx.SetLineColor(rt.kBlack);
+  set_H1D_col(hx, rt.kBlack)
   hx.SetLineWidth(2);
   hx.SetYTitle("Counts");
   siz = 0.035;
@@ -54,6 +55,12 @@ def set_H1D(hx):
   hx.SetLabelSize(siz)
   hx.SetTitleSize(siz, "Y")
   hx.SetLabelSize(siz, "Y")
+
+#_____________________________________________________________________________
+def set_H1D_col(hx, col):
+
+    hx.SetMarkerColor(col)
+    hx.SetLineColor(col);
 
 #_____________________________________________________________________________
 def set_axis(axis):
