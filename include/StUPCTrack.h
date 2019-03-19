@@ -33,6 +33,7 @@ public:
   //setters
   void setFlag(Flag flg);
 
+  void setPt(Double_t pt) {mPt = pt;}
   void setPtEtaPhi(Double_t pt, Double_t eta, Double_t phi) {mPt = pt; mEta = eta; mPhi = phi;}
 
   void setDcaXY(Float_t dca) { mDcaXY = dca; }

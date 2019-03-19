@@ -28,6 +28,7 @@
 #include "StUPCVertex.h"
 #include "THB1D.h"
 #include "ArgumentParser.h"
+#include "GenerateCB.h"
 
 using namespace std;
 
@@ -99,11 +100,13 @@ enum TrkCount{ kTrkAll=1, kBemc, kTof, kMaxTrkCnt }; // track counter
 TH1I *hAnaPerRun, *hSelPerRun;
 THB1D *hMass;
 Bool_t makeAllTree=0;
+GenerateCB *genCB;
 
 //functions
 Bool_t RunTracksV0(StUPCTrack *pair[]);
 Bool_t RunTracksV1(StUPCTrack *pair[]);
 inline Bool_t selectTrack(const StUPCTrack *trk);
+void PutTrackPtSmear(StUPCTrack *trk);
 Double_t fitFuncErf(Double_t xVal, Double_t *par);
 Bool_t RunMC();
 void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentzVector &v0, const TLorentzVector &v1);
@@ -212,6 +215,9 @@ int main(int argc, char* argv[]) {
     //tracks
     StUPCTrack *pair[2] = {0,0};
     if( !(*RunTracks[pairSel])(pair) ) continue;
+    //introduce additional smearing in track pT
+    PutTrackPtSmear(pair[0]);
+    PutTrackPtSmear(pair[1]);
 
     SortTracks(pair); //put positive track first
 
@@ -290,6 +296,9 @@ int main(int argc, char* argv[]) {
   outfile->Close();
   if(infile) infile->Close();
   //infileBemc->Close();
+
+  //clean-up
+  delete genCB;
 
   return 0;
 
@@ -427,6 +436,16 @@ inline Bool_t selectTrack(const StUPCTrack *trk) {
   return kTRUE;
 
 }//selectTrack
+
+//_____________________________________________________________________________
+void PutTrackPtSmear(StUPCTrack *trk) {
+
+  //introduce additional track pT smearing
+
+  //generate a value from track relative pT resolution and apply it as a new pT
+  trk->setPt( trk->getPt()*(genCB->Generate() + 1.) );
+
+}//PutTrackPtSmear
 
 //_____________________________________________________________________________
 Double_t fitFuncErf(Double_t xVal, Double_t *par) {
@@ -904,6 +923,13 @@ void Init() {
   hMass = new THB1D("hMass", "hMass", 70, 0.9, 5.);
   rand3 = new TRandom3();
   rand3->SetSeed(5572323);
+
+  //CrystalBall generator for track pT smearing
+  //parameters are         min,  max,    mean,    sigma,   alpha,   n
+  //genCB = new GenerateCB(-0.18, 0.05, -0.00226, 0.00908, 0.3, 4.);
+  //genCB = new GenerateCB(-0.25, 0.05, -0.00226, 0.01816, 0.3, 4.);
+  //genCB = new GenerateCB(-0.5, 0.05, -0.00226, 0.00908, 0.2, 2.);
+  genCB = new GenerateCB(-0.18, 0.05, 0., 0.00908, 1.40165, 1.114);
 
 }//Init
 

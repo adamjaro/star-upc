@@ -43,7 +43,7 @@ string(REPLACE "\n" "" ROOT_FLAGS "${ROOT_FLAGS_CMD}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_FLAGS}")
 
 #libraries
-set(ROOT_DEPS Core EG Hist Physics RIO Tree MathCore)
+set(ROOT_DEPS Core EG Hist Physics RIO Tree MathCore RooFit RooFitCore Minuit)
 
 #include dir
 execute_process(COMMAND root-config --libdir OUTPUT_VARIABLE ROOT_LIBDIR_CMD)
