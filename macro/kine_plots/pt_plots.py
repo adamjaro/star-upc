@@ -647,7 +647,8 @@ def pdf_logPt2_incoh():
     ln = ut.col_lin(rt.kRed)
     leg.AddEntry(hx, "Data")
     leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
-    leg.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
+    #leg.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
+    leg.AddEntry(ln, "Incoherent fit", "l")
     leg.Draw("same")
 
     l0 = ut.cut_line(fitran[0], 0.9, frame)
@@ -660,7 +661,7 @@ def pdf_logPt2_incoh():
     desc.itemD("#chi^{2}/ndf", frame.chiSquare("pdf_logPt2", "data", 2), -1, rt.kRed)
     desc.itemD("#it{A}", a, -1, rt.kRed)
     desc.itemR("#it{b}", b, rt.kRed)
-    desc.draw()
+    #desc.draw()
 
     #put the sum
     hSum.Draw("same")
@@ -677,7 +678,12 @@ def pdf_logPt2_incoh():
     #put Sartre generated coherent shape
     hSartre.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    leg2 = ut.prepare_leg(0.14, 0.85, 0.14, 0.08, 0.03)
+    leg2.AddEntry(hPtCoh, "Sartre MC reconstructed", "l")
+    leg2.AddEntry(hSartre, "Sartre MC generated", "l")
+    leg2.Draw("same")
+
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of pdf_logPt2_incoh
@@ -1127,7 +1133,9 @@ if __name__ == "__main__":
 
     #MC
     basedir_coh = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
-    infile_coh = "ana_sartre14a1_sel5z.root"
+    #infile_coh = "ana_sartre14a1_sel5z.root"
+    infile_coh = "ana_sartre14a1_sel5z_s0.root"
+    #infile_coh = "ana_sartre14a1_sel5z_s6.root"
     #basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
     #infile_coh = "ana_slight14e1x1_sel5z.root"
     basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"

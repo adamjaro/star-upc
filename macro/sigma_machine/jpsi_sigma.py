@@ -277,7 +277,7 @@ if __name__ == "__main__":
     hPt.SetMaximum(11)
     #hPt.SetMaximum(80)
     hPt.SetMinimum(0.0002)
-    hPt.Draw()
+    #hPt.Draw()
 
     #hSys.Draw("e2same")
     #hPt.Draw("e1same")
@@ -285,7 +285,7 @@ if __name__ == "__main__":
     ut.put_yx_tit(frame, ytit, xtit, 1.4, 1.2)
     frame.SetMaximum(11)
     frame.SetMinimum(1.e-5)
-    #frame.Draw()
+    frame.Draw()
 
     #add Starlight prediction
     gSlight.Draw("lsame")
@@ -302,19 +302,20 @@ if __name__ == "__main__":
     leg = ut.prepare_leg(0.2, 0.82, 0.18, 0.1, 0.035)
     leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     leg.AddEntry(hPt, "STAR Preliminary")
-    leg.Draw("same")
+    #leg.Draw("same")
 
     #legend about systematic error
     eleg = ut.prepare_leg(0.2, 0.76, 0.18, 0.06, 0.028)
     eleg.AddEntry(None, "10% normalization error", "")
     eleg.AddEntry(None, "not shown", "")
-    eleg.Draw("same")
+    #eleg.Draw("same")
 
     #legend for models
-    mleg = ut.prepare_leg(0.68, 0.75, 0.3, 0.16, 0.035)
+    mleg = ut.prepare_leg(0.68, 0.7, 0.3, 0.19, 0.035)
     mleg.AddEntry(gSlight, "STARLIGHT", "l")
     mleg.AddEntry(gMS, "MS", "l")
     mleg.AddEntry(gCCK, "CCK-hs", "l")
+    mleg.AddEntry(gSartre, "Sartre", "l")
     mleg.Draw("same")
 
     #ut.invert_col(rt.gPad)

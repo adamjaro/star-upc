@@ -225,9 +225,9 @@ if __name__ == "__main__":
     desc2 = pdesc(frame, 0.77, 0.6, 0.045)
     desc2.prec = 0
     desc2.itemD("#int_{%.1f}^{%.1f}#it{#gamma#gamma}" % (intran[0], intran[1]), intBkg.getVal(), intBkg.getError(), cbkg)
-    desc2.draw()
+    #desc2.draw()
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

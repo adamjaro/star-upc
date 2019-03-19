@@ -91,8 +91,11 @@ void cb_apply_smear(cb_gen &gen, TTree &mctree, TH1D &hx) {
     //pt0 -= 0.01;
     //pt1 -= 0.01;
 
-    pt0 += gen.generate();
-    pt1 += gen.generate();
+    //pt0 += gen.generate();
+    //pt1 += gen.generate();
+
+    pt0 = pt0*(gen.generate() + 1.);
+    pt1 = pt1*(gen.generate() + 1.);
 
     Double_t r0 = (pt0 - gpt0)/gpt0;
     Double_t r1 = (pt1 - gpt1)/gpt1;

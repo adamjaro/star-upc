@@ -22,6 +22,7 @@ class parameter_descriptor(object):
       self.eqsep = (gxmax-gxmin)*nsep # space between name of the variable and equal sign
       self.tsiz = 0.035 #text size
       self.prec = 3 # precision
+      self.fmt = "f" # notation, fixed point on exponent
       self.lnam = TLatex() # put names
       self.lnam.SetTextFont(42)
       self.lnam.SetTextSize(self.tsiz)
@@ -43,7 +44,8 @@ class parameter_descriptor(object):
 
    #_____________________________________________________________________________
    def itemD(self, nam, val, err=-1., col=rt.kBlack):
-      sval = "{0:.{1:d}f}".format(val, self.prec)
+      #sval = "{0:.{1:d}f}".format(val, self.prec)
+      sval = "{0:.{1:d}{2:s}}".format(val, self.prec, self.fmt)
       if err > -1.: sval = self.put_err(sval, err)
       self.item(nam, sval, col)
 
@@ -64,7 +66,7 @@ class parameter_descriptor(object):
 
    #_____________________________________________________________________________
    def put_err(self, val, err):
-      val += " #pm {0:.{1:d}f}".format(err, self.prec)
+      val += " #pm {0:.{1:d}{2:s}}".format(err, self.prec, self.fmt)
       return val
 
    #_____________________________________________________________________________

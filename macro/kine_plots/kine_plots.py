@@ -3,7 +3,7 @@
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
 from ROOT import RooRealVar, RooDataHist, RooArgList, RooCBShape, RooGaussian
-from ROOT import RooNovosibirsk
+from ROOT import RooNovosibirsk, RooBifurGauss, RooBreitWigner
 from ROOT import RooFit as rf
 
 import sys
@@ -20,15 +20,79 @@ def plot_rec_gen_track_phi():
     phimin = -0.02
     phimax = 0.02
 
-    hPhiRel = ut.prepare_TH1D("hPhiRel", phibin, phimin, phimax)
+    #ptlo = 0.
+    #pthi = 0.9
+
+    fitran = [-0.01, 0.01]
+
+    mmin = 2.8
+    mmax = 3.2
+
+    cbw = rt.kBlue
+
+    #output log file
+    out = open("out.txt", "w")
+    #log fit parameters
+    loglist1 = [(x,eval(x)) for x in ["infile_mc", "phibin", "phimin", "phimax"]]
+    loglist2 = [(x,eval(x)) for x in ["fitran", "mmin", "mmax"]]
+    strlog = ut.make_log_string(loglist1, loglist2)
+    ut.log_results(out, strlog+"\n")
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    #strsel += " && jGenPt>{0:.3f}".format(ptlo)
+    #strsel += " && jGenPt<{0:.3f}".format(pthi)
+
+    nbins, phimax = ut.get_nbins(phibin, phimin, phimax)
+    hPhiRel = ut.prepare_TH1D_n("hPhiRel", nbins, phimin, phimax)
+
+    ytit = "Events / ({0:.4f})".format(phibin)
+    xtit = "(#phi_{rec} - #phi_{gen})/#phi_{gen}"
+
+    mctree.Draw("(jT0phi-jGenP0phi)/jGenP0phi >> hPhiRel", strsel) # positive charge
+    mctree.Draw("(jT1phi-jGenP1phi)/jGenP1phi >>+hPhiRel", strsel) # add negative charge
+
+    x = RooRealVar("x", "x", phimin, phimax)
+    x.setRange("fitran", fitran[0], fitran[1])
+    rfPhiRel = RooDataHist("rfPhiRel", "rfPhiRel", RooArgList(x), hPhiRel)
+
+    #Breit-Wigner pdf
+    mean = RooRealVar("mean", "mean", 0., -0.1, 0.1)
+    sigma = RooRealVar("sigma", "sigma", 0.01, 0., 0.9)
+    bwpdf = RooBreitWigner("bwpdf", "bwpdf", x, mean, sigma)
+
+    res = bwpdf.fitTo(rfPhiRel, rf.Range("fitran"), rf.Save())
+
+    #log fit results
+    ut.log_results(out, ut.log_fit_result(res))
 
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
 
-    mctree.Draw("(jT0phi-jGenP0phi)/jGenP0phi >> hPhiRel") # positive charge
-    mctree.Draw("(jT1phi-jGenP1phi)/jGenP1phi >>+hPhiRel") # add negative charge
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    ut.put_frame_yx_tit(frame, ytit, xtit)
 
-    ut.invert_col(rt.gPad)
+    rfPhiRel.plotOn(frame, rf.Name("data"))
+
+    bwpdf.plotOn(frame, rf.Precision(1e-6), rf.Name("bwpdf"))
+
+    frame.Draw()
+
+    desc = pdesc(frame, 0.12, 0.93, 0.057); #x, y, sep
+    desc.set_text_size(0.03)
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("bwpdf", "data", 2), -1, cbw)
+    desc.prec = 2
+    desc.fmt = "e"
+    desc.itemR("mean", mean, cbw)
+    desc.itemR("#sigma", sigma, cbw)
+
+    desc.draw()
+
+    leg = ut.make_uo_leg(hPhiRel, 0.5, 0.8, 0.2, 0.2)
+    #leg.Draw("same")
+
+    #print "Entries: ", hPhiRel.GetEntries()
+
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #_____________________________________________________________________________
@@ -40,15 +104,74 @@ def plot_rec_gen_track_eta():
     etamin = -0.1
     etamax = 0.1
 
-    hEtaRel = ut.prepare_TH1D("hEtaRel", etabin, etamin, etamax)
+    #ptlo = 0.
+    #pthi = 0.9
+
+    fitran = [-0.06, 0.06]
+
+    mmin = 2.8
+    mmax = 3.2
+
+    cbw = rt.kBlue
+
+    #output log file
+    out = open("out.txt", "w")
+    #log fit parameters
+    loglist1 = [(x,eval(x)) for x in ["infile_mc", "etabin", "etamin", "etamax"]]
+    loglist2 = [(x,eval(x)) for x in ["fitran", "mmin", "mmax"]]
+    strlog = ut.make_log_string(loglist1, loglist2)
+    ut.log_results(out, strlog+"\n")
+
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    #strsel += " && jGenPt>{0:.3f}".format(ptlo)
+    #strsel += " && jGenPt<{0:.3f}".format(pthi)
+
+    nbins, etamax = ut.get_nbins(etabin, etamin, etamax)
+    hEtaRel = ut.prepare_TH1D_n("hEtaRel", nbins, etamin, etamax)
+
+    ytit = "Events / ({0:.3f})".format(etabin)
+    xtit = "(#eta_{rec} - #eta_{gen})/#eta_{gen}"
+
+    mctree.Draw("(jT0eta-jGenP0eta)/jGenP0eta >> hEtaRel", strsel) # positive charge
+    mctree.Draw("(jT1eta-jGenP1eta)/jGenP1eta >>+hEtaRel", strsel) # add negative charge
+
+    x = RooRealVar("x", "x", etamin, etamax)
+    x.setRange("fitran", fitran[0], fitran[1])
+    rfEtaRel = RooDataHist("rfEtaRel", "rfEtaRel", RooArgList(x), hEtaRel)
+
+    #Breit-Wigner pdf
+    mean = RooRealVar("mean", "mean", 0., -0.1, 0.1)
+    sigma = RooRealVar("sigma", "sigma", 0.01, 0., 0.9)
+    bwpdf = RooBreitWigner("bwpdf", "bwpdf", x, mean, sigma)
+
+    res = bwpdf.fitTo(rfEtaRel, rf.Range("fitran"), rf.Save())
+
+    #log fit results
+    ut.log_results(out, ut.log_fit_result(res))
 
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
 
-    mctree.Draw("(jT0eta-jGenP0eta)/jGenP0eta >> hEtaRel") # positive charge
-    mctree.Draw("(jT1eta-jGenP1eta)/jGenP1eta >>+hEtaRel") # add negative charge
+    frame = x.frame(rf.Bins(nbins), rf.Title(""))
+    ut.put_frame_yx_tit(frame, ytit, xtit)
 
-    ut.invert_col(rt.gPad)
+    rfEtaRel.plotOn(frame, rf.Name("data"))
+
+    bwpdf.plotOn(frame, rf.Precision(1e-6), rf.Name("bwpdf"))
+
+    frame.Draw()
+
+    desc = pdesc(frame, 0.13, 0.9, 0.057); #x, y, sep
+    desc.set_text_size(0.03)
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("bwpdf", "data", 2), -1, cbw)
+    desc.prec = 2
+    desc.fmt = "e"
+    desc.itemR("mean", mean, cbw)
+    desc.itemR("#sigma", sigma, cbw)
+
+    desc.draw()
+
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_rec_gen_track_eta
@@ -59,24 +182,32 @@ def plot_rec_gen_track_pt():
     #track pT resolution as ( pT_track_rec - pT_track_gen )/pT_track_gen
 
     ptbin = 0.001
-    ptmin = -0.25
+    ptmin = -0.3
     ptmax = 0.1
 
     #generated dielectron pT selection to input data
-    ptlo = 0.
-    pthi = 0.15
+    ptlo = 0.2
+    pthi = 1
 
     fitran = [-0.15, 0.018]
 
     mmin = 2.8
     mmax = 3.2
 
-    ccb = rt.kMagenta
+    ccb = rt.kBlue
+
+    #output log file
+    out = open("out.txt", "w")
+    #log fit parameters
+    loglist1 = [(x,eval(x)) for x in ["infile_mc", "ptbin", "ptmin", "ptmax"]]
+    loglist2 = [(x,eval(x)) for x in ["ptlo", "pthi", "fitran", "mmin", "mmax"]]
+    strlog = ut.make_log_string(loglist1, loglist2)
+    ut.log_results(out, strlog+"\n")
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
     strsel += " && jGenPt>{0:.3f}".format(ptlo)
     strsel += " && jGenPt<{0:.3f}".format(pthi)
-    strsel = ""
+    #strsel = ""
 
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
     hPtTrackRel = ut.prepare_TH1D_n("hPtTrackRel", nbins, ptmin, ptmax)
@@ -100,20 +231,24 @@ def plot_rec_gen_track_pt():
 
     res = cbpdf.fitTo(rfPtTrackRel, rf.Range("fitran"), rf.Save())
 
+    #log fit results
+    ut.log_results(out, ut.log_fit_result(res))
+
     #generate new distribution according to the fit
     gROOT.LoadMacro("cb_gen.h")
     #Crystal Ball generator, min, max, mean, sigma, alpha, n
-    cbgen = rt.cb_gen(ptmin, ptmax, -0.00226, 0.00908, 1.40165, 1.114)  #  -0.18, 0.05
+    #cbgen = rt.cb_gen(-0.18, 0.05, -0.00226, 0.00908, 1.40165, 1.114)  #  -0.18, 0.05  ptmin, ptmax
+    cbgen = rt.cb_gen(-0.5, 0.05, -0.00226, 0.00908, 0.2, 2.)  #  -0.18, 0.05  ptmin, ptmax
     hRelGen = ut.prepare_TH1D_n("hRelGen", nbins, ptmin, ptmax)
     ut.set_H1D_col(hRelGen, rt.kBlue)
-    rt.cb_generate_n(cbgen, hRelGen, int(hPtTrackRel.GetEntries()))
+    #rt.cb_generate_n(cbgen, hRelGen, int(hPtTrackRel.GetEntries()))
     rfRelGen = RooDataHist("rfRelGen", "rfRelGen", RooArgList(x), hRelGen)
 
     #generate distribution with additional smearing applied
     hRelSmear = ut.prepare_TH1D_n("hRelSmear", nbins, ptmin, ptmax)
     ut.set_H1D_col(hRelSmear, rt.kOrange)
     #tcopy = mctree.CopyTree(strsel)
-    rt.cb_apply_smear(cbgen, mctree, hRelSmear)
+    #rt.cb_apply_smear(cbgen, mctree, hRelSmear)
 
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
@@ -130,8 +265,8 @@ def plot_rec_gen_track_pt():
 
     frame.Draw()
 
-    hRelGen.Draw("e1same")
-    hRelSmear.Draw("e1same")
+    #hRelGen.Draw("e1same")
+    #hRelSmear.Draw("e1same")
 
     desc = pdesc(frame, 0.2, 0.8, 0.057); #x, y, sep
     desc.set_text_size(0.03)
@@ -147,10 +282,10 @@ def plot_rec_gen_track_pt():
 
     leg = ut.prepare_leg(0.2, 0.82, 0.21, 0.12, 0.03) # x, y, dx, dy, tsiz
     leg.SetMargin(0.05)
-    leg.AddEntry(0, "#bf{%.3f < #it{p}_{T}^{pair} < %.3f GeV}" % (ptlo, pthi), "")
+    leg.AddEntry(0, "#bf{%.1f < #it{p}_{T}^{pair} < %.1f GeV}" % (ptlo, pthi), "")
     leg.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_rec_gen_track_pt
@@ -158,20 +293,28 @@ def plot_rec_gen_track_pt():
 #_____________________________________________________________________________
 def plot_rec_gen_pt_relative():
 
-    # relative pT resolution as ( pT_rec - pT_gen )/pT_gen
+    # relative dielectron pT resolution as ( pT_rec - pT_gen )/pT_gen
 
     ptbin = 0.01
     ptmin = -1.2
     ptmax = 4
 
     #generated pT selection to input data
-    ptlo = 0.
-    pthi = 0.12
+    ptlo = 0.2
+    pthi = 1.
 
     fitran = [-0.1, 3]
 
     mmin = 2.8
     mmax = 3.2
+
+    #output log file
+    out = open("out.txt", "w")
+    #log fit parameters
+    loglist1 = [(x,eval(x)) for x in ["infile_mc", "ptbin", "ptmin", "ptmax"]]
+    loglist2 = [(x,eval(x)) for x in ["ptlo", "pthi", "fitran", "mmin", "mmax"]]
+    strlog = ut.make_log_string(loglist1, loglist2)
+    ut.log_results(out, strlog+"\n")
 
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
     strsel += " && jGenPt>{0:.3f}".format(ptlo)
@@ -198,6 +341,9 @@ def plot_rec_gen_pt_relative():
 
     res = cbpdf.fitTo(rfPtRel, rf.Range("fitran"), rf.Save())
 
+    #log fit results
+    ut.log_results(out, ut.log_fit_result(res))
+
     can = ut.box_canvas()
     ut.set_margin_lbtr(gPad, 0.12, 0.1, 0.05, 0.03)
 
@@ -223,7 +369,12 @@ def plot_rec_gen_pt_relative():
     desc.itemR("#it{n}", n, rt.kBlue)
     desc.draw()
 
-    ut.invert_col(rt.gPad)
+    leg = ut.prepare_leg(0.6, 0.82, 0.21, 0.12, 0.03) # x, y, dx, dy, tsiz
+    leg.SetMargin(0.05)
+    leg.AddEntry(0, "#bf{%.1f < #it{p}_{T}^{pair} < %.1f GeV}" % (ptlo, pthi), "")
+    leg.Draw("same")
+
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #_____________________________________________________________________________
@@ -1010,7 +1161,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 16
+    iplot = 18
     funclist = []
     funclist.append(plot_y) # 0
     funclist.append(plot_tracks_eta) # 1

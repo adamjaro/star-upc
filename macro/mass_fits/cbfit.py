@@ -19,13 +19,15 @@ if __name__ == "__main__":
 
     #infile = "slight14d/sel5/ana_slight14d1_sel5a.root"
     #infile = "slight14e/sel5/ana_slight14e1x1_sel5z.root"
-    infile = "sartre14a/sel5/ana_sartre14a1_sel5z.root"
+    #infile = "sartre14a/sel5/ana_sartre14a1_sel5z.root"
+    infile = "sartre14a/sel5/ana_sartre14a1_sel5z_s6.root"
 
     mbin = 0.004
     mmin = 2.
     mmax = 3.6
 
-    fitran = [2.8, 3.15]
+    #fitran = [2.8, 3.15]
+    fitran = [2.6, 3.2]
 
     ymin = -1.
     ymax = 1.
@@ -39,7 +41,7 @@ if __name__ == "__main__":
     lmg = 4; # left margin in text output
 
     #strdat = "MC coherent #it{J}/#it{#psi}#rightarrow e^{+}e^{-}"
-    strdat = "Embedding MC coherent #it{J}/#it{#psi}"
+    strdat = "Embedding MC coherent #it{J}/#it{#psi}, Sartre"
 
     #-- end of config --
 
@@ -125,6 +127,7 @@ if __name__ == "__main__":
     leg = ut.prepare_leg(0.16, 0.85, 0.35, 0.08, 0.029) # x, y, dx, dy, tsiz
     leg.SetMargin(0.14)
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
+    hx.Draw("same")
     leg.AddEntry(hx, strdat)
     leg.Draw("same")
 
