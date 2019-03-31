@@ -60,6 +60,7 @@ TTree *jGenTree;
 Double_t jGenPt, jGenPt2, jGenM, jGenY;
 Double_t jGenP0pT, jGenP0eta, jGenP0phi, jGenP1pT, jGenP1eta, jGenP1phi;
 Double_t jGenVtxX, jGenVtxY, jGenVtxZ;
+Bool_t jAccept;
 
 const Double_t kUdf=-9.e9;//default for undefined
 const Double_t kInf=9.e9; // infinity representation
@@ -108,7 +109,7 @@ Bool_t RunTracksV1(StUPCTrack *pair[]);
 inline Bool_t selectTrack(const StUPCTrack *trk);
 void PutTrackPtSmear(StUPCTrack *trk);
 Double_t fitFuncErf(Double_t xVal, Double_t *par);
-Bool_t RunMC();
+Bool_t RunMC(Bool_t accept);
 void FillRecTree(StUPCTrack *pair[], const TLorentzVector &vpair, const TLorentzVector &v0, const TLorentzVector &v1);
 void FillAllTree();
 void SortTracks(StUPCTrack *pair[]);
@@ -192,9 +193,7 @@ int main(int argc, char* argv[]) {
     //get the event
     upcTree->GetEntry(iev);
 
-    if(isMC) RunMC(); // MC
-
-    //trigger
+    //trigger, only in data
     if( !isMC && trgProfile==0 && !upcEvt->getTrigger(kUPCJpsiB_1) && !upcEvt->getTrigger(kUPCJpsiB_2) ) continue;
     if( !isMC && trgProfile==1 && !upcEvt->getTrigger(kZero_bias) ) continue;
     if( !isMC && trgProfile==2 && !upcEvt->getTrigger(kUPCmain_1) && !upcEvt->getTrigger(kUPCmain_2) ) continue;
@@ -214,7 +213,10 @@ int main(int argc, char* argv[]) {
 
     //tracks
     StUPCTrack *pair[2] = {0,0};
-    if( !(*RunTracks[pairSel])(pair) ) continue;
+    if( !(*RunTracks[pairSel])(pair) ) {
+      if(isMC) RunMC(kFALSE);
+      continue;
+    }
     //introduce additional smearing in track pT
     PutTrackPtSmear(pair[0]);
     PutTrackPtSmear(pair[1]);
@@ -222,24 +224,35 @@ int main(int argc, char* argv[]) {
     SortTracks(pair); //put positive track first
 
     //opening angle at BEMC
-    if( GetDeltaPhi(pair[0]->getBemcPhi(), pair[1]->getBemcPhi()) < minDphiBemc ) continue;
+    if( GetDeltaPhi(pair[0]->getBemcPhi(), pair[1]->getBemcPhi()) < minDphiBemc ) {
+      if(isMC) RunMC(kFALSE);
+      continue;
+    }
     hEvtCount->Fill( kDphiBemc );
 
     //electron PID
     Double_t pid0 = pair[0]->getNSigmasTPCElectron();
     Double_t pid1 = pair[1]->getNSigmasTPCElectron();
     //accept pairs with nsig0^2 + nsig1^2 < maxsig^2
-    if( pid0*pid0 + pid1*pid1 > maxNsigPID*maxNsigPID ) continue;
+    if( pid0*pid0 + pid1*pid1 > maxNsigPID*maxNsigPID ) {
+      if(isMC) RunMC(kFALSE);
+      continue;
+    }
     hEvtCount->Fill( kPID );
 
     //z_vtx, tracks in pair are already from same vtx, track 0 used to get vtx object
-    if( TMath::Abs(pair[0]->getVertex()->getPosZ()) > maxAbsZvtx ) continue;
-    //if( TMath::Abs(upcEvt->getZdcVertexZ()-26.) < maxAbsZvtx ) continue;
+    if( TMath::Abs(pair[0]->getVertex()->getPosZ()) > maxAbsZvtx ) {
+      if(isMC) RunMC(kFALSE);
+      continue;
+    }
     hEvtCount->Fill( kZvtx );
 
     //difference in ZDC and TPC z-vertex
     Double_t dvtx = upcEvt->getZdcVertexZ() - pair[0]->getVertex()->getPosZ();
-    if( dvtx < minDVtx || dvtx > maxDVtx ) continue;
+    if( dvtx < minDVtx || dvtx > maxDVtx ) {
+      if(isMC) RunMC(kFALSE);
+      continue;
+    }
     hEvtCount->Fill( kDvtx );
 
     //pair rapidity
@@ -247,13 +260,19 @@ int main(int argc, char* argv[]) {
     pair[0]->getLorentzVector(v0, trackMass);
     pair[1]->getLorentzVector(v1, trackMass);
     TLorentzVector vpair = v0 + v1; //sum of tracks 4-vectors
-    if( TMath::Abs( vpair.Rapidity() ) > maxAbsY ) continue;
+    if( TMath::Abs( vpair.Rapidity() ) > maxAbsY ) {
+      if(isMC) RunMC(kFALSE);
+      continue;
+    }
     hEvtCount->Fill( kRap );
 
     //sign selection
     Short_t qTrk0 = pair[0]->getCharge();
     Short_t qTrk1 = pair[1]->getCharge();
-    if( qTrk0*qTrk1*sign < 0 ) continue;
+    if( qTrk0*qTrk1*sign < 0 ) {
+      if(isMC) RunMC(kFALSE);
+      continue;
+    }
     hEvtCount->Fill( kSign );
 
     //event selected
@@ -263,6 +282,9 @@ int main(int argc, char* argv[]) {
 
     //fill output tree
     FillRecTree(pair, vpair, v0, v1);
+
+    //MC
+    if(isMC) RunMC(kTRUE);
 
     //J/psi mass
     if( vpair.M() > 2.8 && vpair.M() < 3.2 ) {
@@ -454,7 +476,7 @@ Double_t fitFuncErf(Double_t xVal, Double_t *par) {
 }
 
 //_____________________________________________________________________________
-Bool_t RunMC() {
+Bool_t RunMC(Bool_t accept) {
 
   //MC particles
   hGenCount->Fill( kGenAll );
@@ -519,6 +541,7 @@ Bool_t RunMC() {
   if( TMath::Abs(jGenY) > maxAbsY ) return kFALSE;
 
   //MC event selected
+  jAccept = accept; // flag if event was accepted by reconstruction
   jGenTree->Fill();
   hGenCount->Fill( kGenSel );
 
@@ -849,6 +872,13 @@ TFile *CreateOutputTree(const string& out) {
     jGenTree ->Branch("jGenVtxX", &jGenVtxX, "jGenVtxX/D");
     jGenTree ->Branch("jGenVtxY", &jGenVtxY, "jGenVtxY/D");
     jGenTree ->Branch("jGenVtxZ", &jGenVtxZ, "jGenVtxZ/D");
+    //reconstructed quantities in generated tree
+    jGenTree ->Branch("jRecPt", &jRecPt, "jRecPt/D");
+    jGenTree ->Branch("jRecPt2", &jRecPt2, "jRecPt2/D");
+    jGenTree ->Branch("jRecY", &jRecY, "jRecY/D");
+    jGenTree ->Branch("jRecM", &jRecM, "jRecM/D");
+    //flag if the event was accepted in reconstruction
+    jGenTree ->Branch("jAccept", &jAccept, "jAccept/O");
   }
 
   //all triggers tree

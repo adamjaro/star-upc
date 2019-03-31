@@ -7,9 +7,9 @@
 
 
 //_____________________________________________________________________________
-void RunFilterMaker(string filelist="txt/sim_sartre14a1.list",
+void RunFilterMaker(string filelist="txt/sim_bgen14a1_v0.list",
                     Int_t nFiles=999999,
-                    string outfile="../star-upc-data/trees/starsim/StUPC_sartre14a1.root") {
+                    string outfile="../star-upc-data/trees/starsim/StUPC_bgen14a1_v0.root") {
 
   //maker config
   Int_t isMC = 2; // 0 - data,  1 - starsim MC,  2 - embedding MC
