@@ -1,0 +1,255 @@
+#!/usr/bin/python
+
+import ROOT as rt
+from ROOT import gPad, gROOT, gStyle, TFile, gSystem
+from ROOT import TF1, vector
+
+gSystem.Load("/home/jaroslav/root/RooUnfold_Rev360/libRooUnfold")
+from ROOT import RooUnfoldResponse, RooUnfoldBayes, RooUnfoldSvd
+
+import sys
+sys.path.append('../')
+import plot_utils as ut
+
+from models import *
+
+#_____________________________________________________________________________
+if __name__ == "__main__":
+
+    gROOT.SetBatch()
+
+    ptbin = 0.004   # 0.005 0.003
+    ptmin = 0.
+
+    ptmid = 0.06  # 0.08, value > ptmax will switch it off
+    ptlon = 0.01
+
+    ptmax = 0.109
+
+    #mass interval
+    mmin = 2.8
+    mmax = 3.2
+
+    dy = 2. # rapidity interval, for integrated sigma
+
+    ngg = 131  # number of gamma-gamma from mass fit
+
+    lumi = 13871.907 # lumi in inv. ub
+
+    #correction to luminosity for ana/triggered events
+    ratio_ana = 3420950./3694000
+
+    #scale the lumi for |z| around nominal bunch crossing
+    ratio_zdc_vtx = 0.502
+
+    Reta = 0.503 # pseudorapidity preselection
+    #Reta = 1.
+
+    trg_eff = 0.67 # bemc trigger efficiency
+
+    ratio_tof = 1.433 # tof correction to efficiency
+
+    bbceff = 0.97 # BBC veto inefficiency
+
+    zdc_acc = 0.7 # ZDC acceptance to XnXn
+
+    br = 0.05971 # dielectrons branching ratio
+
+    #data
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    infile = "ana_muDst_run1_all_sel5z.root"
+
+    #MC
+    basedir_sl = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    infile_sl = "ana_slight14e1x2_s6_sel5z.root"
+    #
+    basedir_sart = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
+    infile_sart = "ana_sartre14a1_sel5z_s6_v2.root"
+    #
+    basedir_bgen = "../../../star-upc-data/ana/starsim/bgen14a/sel5"
+    infile_bgen = "ana_bgen14a1_v0_sel5z_s6.root"
+    #
+    basedir_gg = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    infile_gg = "ana_slight14e2x1_sel5_nzvtx.root"
+
+    #model predictions
+    gSlight = load_starlight(dy)
+    gSartre = load_sartre()
+    gFlat = loat_flat_pt2()
+    gMS = load_ms()
+    gCCK = load_cck()
+
+    #open the inputs
+    inp = TFile.Open(basedir+"/"+infile)
+    tree = inp.Get("jRecTree")
+    #
+    inp_gg = TFile.Open(basedir_gg+"/"+infile_gg)
+    tree_gg = inp_gg.Get("jRecTree")
+    #
+    inp_sl = TFile.Open(basedir_sl+"/"+infile_sl)
+    tree_sl_gen = inp_sl.Get("jGenTree")
+    #
+    inp_sart = TFile.Open(basedir_sart+"/"+infile_sart)
+    tree_sart_gen = inp_sart.Get("jGenTree")
+    #
+    inp_bgen = TFile.Open(basedir_bgen+"/"+infile_bgen)
+    tree_bgen_gen = inp_bgen.Get("jGenTree")
+
+    #evaluate binning
+    print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
+
+    bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
+    print "bins2:", bins.size()-1
+
+    #load the data
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+
+    hPt = ut.prepare_TH1D_vec("hPt", bins)
+    tree.Draw("jRecPt*jRecPt >> hPt" , strsel)
+
+    #gamma-gamma component
+    hPtGG = ut.prepare_TH1D_vec("hPtGG", bins)
+    tree_gg.Draw("jRecPt*jRecPt >> hPtGG", strsel)
+
+    #normalize the gamma-gamma component
+    ut.norm_to_num(hPtGG, ngg, rt.kGreen)
+
+    #incoherent functional shape
+    func_incoh_pt2 = TF1("func_incoh", "[0]*exp(-[1]*x)", 0., 10.)
+    func_incoh_pt2.SetParameters(873.04, 3.28)
+
+    #fill incoherent histogram from functional shape
+    hPtIncoh = ut.prepare_TH1D_vec("hPtIncoh", bins)
+    ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
+
+    #subtract gamma-gamma and incoherent components
+    hPt.Sumw2()
+    hPt.Add(hPtGG, -1)
+    hPt.Add(hPtIncoh, -1)
+
+    #scale the luminosity
+    lumi_scaled = lumi*ratio_ana*ratio_zdc_vtx
+    print "lumi_scaled:", lumi_scaled
+
+    #denominator for deconvoluted distribution, conversion ub to mb
+    den = 0.85*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*1000.*dy
+
+    #apply the denominator
+    scale_den = hPt.Integral()/den
+    hPt.Scale(scale_den/hPt.Integral("width"))
+
+    #deconvolution
+    deconv_min = bins[0]
+    deconv_max = bins[bins.size()-1]
+    deconv_nbin = bins.size()-1
+    gROOT.LoadMacro("fill_response_matrix.C")
+
+    #Starlight response
+    #resp_sl = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
+    resp_sl = RooUnfoldResponse(hPt, hPt)
+    rt.fill_response_matrix(tree_sl_gen, resp_sl)
+    #
+    unfold_sl = RooUnfoldBayes(resp_sl, hPt, 15)
+    #unfold_sl = RooUnfoldSvd(resp_sl, hPt, 15)
+    hPtSl = unfold_sl.Hreco()
+    ut.set_H1D(hPtSl)
+
+    #Sartre response
+    #resp_sart = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
+    resp_sart = RooUnfoldResponse(hPt, hPt)
+    rt.fill_response_matrix(tree_sart_gen, resp_sart)
+    #
+    unfold_sart = RooUnfoldBayes(resp_sart, hPt, 10)
+    hPtSart = unfold_sart.Hreco()
+    ut.set_H1D(hPtSart)
+    hPtSart.SetMarkerStyle(21)
+
+    #Flat pT^2 response
+    #resp_bgen = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
+    resp_bgen = RooUnfoldResponse(hPt, hPt)
+    rt.fill_response_matrix(tree_bgen_gen, resp_bgen)
+    #
+    unfold_bgen = RooUnfoldBayes(resp_bgen, hPt, 14)
+    hPtFlat = unfold_bgen.Hreco()
+    ut.set_H1D(hPtFlat)
+    hPtFlat.SetMarkerStyle(22)
+    hPtFlat.SetMarkerSize(1.3)
+
+
+
+
+    #draw the results
+    gStyle.SetPadTickX(1)
+    gStyle.SetFrameLineWidth(2)
+
+    #frame for models plot only
+    frame = ut.prepare_TH1D("frame", ptbin, ptmin, ptmax)
+
+    can = ut.box_canvas()
+    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.03, 0.03)
+
+    ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/(GeV/c)^{2})"
+    xtit = "|#kern[0.3]{#it{t}}| ((GeV/c)^{2})"
+
+    ut.put_yx_tit(frame, ytit, xtit, 1.4, 1.2)
+    frame.SetMaximum(11)
+    #frame.SetMinimum(1.e-6)
+    frame.SetMinimum(2e-4)
+    frame.Draw()
+
+    #hPtSl.Draw("e1same")
+    #hPtSart.Draw("e1same")
+    #hPtFlat.Draw("e1same")
+
+    #put model predictions
+    gSlight.Draw("lsame")
+    gSartre.Draw("lsame")
+    gFlat.Draw("lsame")
+
+    #gMS.Draw("lsame")
+    #gCCK.Draw("lsame")
+
+    gPad.SetLogy()
+
+    #legend for models
+    mleg = ut.prepare_leg(0.68, 0.8, 0.3, 0.16, 0.035)
+    #mleg = ut.prepare_leg(0.68, 0.8, 0.3, 0.12, 0.035)
+    mleg.AddEntry(gSlight, "Starlight", "l")
+    #mleg.AddEntry(gMS, "MS", "l")
+    #mleg.AddEntry(gCCK, "CCK-hs", "l")
+    mleg.AddEntry(gSartre, "Sartre", "l")
+    mleg.AddEntry(gFlat, "Flat #it{p}_{T}^{2}", "l")
+    mleg.Draw("same")
+
+    #legend for deconvolution method
+    dleg = ut.prepare_leg(0.3, 0.75, 0.2, 0.18, 0.035)
+    #dleg = ut.prepare_leg(0.3, 0.83, 0.2, 0.1, 0.035)
+    dleg.AddEntry(None, "Unfolding with:", "")
+    dleg.AddEntry(hPtSl, "Starlight", "p")
+    #dleg.AddEntry(hPtSart, "Sartre", "p")
+    dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
+    #dleg.Draw("same")
+
+    #ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+    #to prevent 'pure virtual method called'
+    gPad.Close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

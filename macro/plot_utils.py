@@ -1,9 +1,9 @@
 
 import ROOT as rt
 from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
-from ROOT import RooHist, TLatex, gROOT, TIter
+from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors
 from ROOT.Fit import FitResult
-from ROOT import std
+from ROOT import std, vector
 
 #_____________________________________________________________________________
 def prepare_TH1D(name, binsiz, xmin, xmax):
@@ -19,6 +19,22 @@ def get_nbins(binsiz, xmin, xmax):
   xmax = xmin + float(binsiz*nbins) # move max up to pass the bins
 
   return nbins, xmax
+
+#_____________________________________________________________________________
+def get_bins_vec_2pt(bin1, bin2, xmin, xmax, xmid):
+
+    #evaluate binning with bin1 width below xmid and bin2 above xmid
+    bins = vector(rt.double)()
+    bins.push_back(xmin)
+    while True:
+        if bins[bins.size()-1] < xmid:
+            increment = bin1
+        else:
+            increment = bin2
+        bins.push_back( bins[bins.size()-1] + increment )
+        if bins[bins.size()-1] > xmax: break
+
+    return bins
 
 #_____________________________________________________________________________
 def prepare_TH1D_n(name, nbins, xmin, xmax):
@@ -55,6 +71,7 @@ def set_H1D(hx):
   hx.SetLabelSize(siz)
   hx.SetTitleSize(siz, "Y")
   hx.SetLabelSize(siz, "Y")
+  hx.SetTitle("")
 
 #_____________________________________________________________________________
 def set_H1D_col(hx, col):
@@ -78,6 +95,15 @@ def set_graph(tx):
     tx.SetMarkerColor(rt.kBlack)
     tx.SetLineColor(rt.kBlack)
     tx.SetLineWidth(2)
+
+#_____________________________________________________________________________
+def h1_to_graph(hx):
+
+    tx = TGraphErrors(hx.GetNbinsX())
+    for ibin in xrange(1,hx.GetNbinsX()+1):
+        tx.SetPoint(ibin-1, hx.GetBinCenter(ibin), hx.GetBinContent(ibin))
+
+    return tx
 
 #_____________________________________________________________________________
 def prepare_TH2D(name, xbin, xmin, xmax, ybin, ymin, ymax):

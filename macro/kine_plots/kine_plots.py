@@ -611,7 +611,7 @@ def plot_rec_gen_pt2():
 
     lin.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_rec_gen_pt2
@@ -1150,10 +1150,16 @@ if __name__ == "__main__":
     #infile_mc = "ana_slight14e3_sel5z.root"
     #infile_mc = "ana_slight14e1x1_sel5z_nDphi.root"
     #infile_mc = "ana_slight14e2x1_sel5_nzvtx.root"
-    basedir_mc = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
-    infile_mc = "ana_sartre14a1_sel5z.root"
+    #basedir_mc = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
+    #infile_mc = "ana_sartre14a1_sel5z_s6_v2.root"
     #infile_mc = "ana_sartre14a1_sel5z_tof.root"
     #infile_mc = "ana_sartre14a1_sel5z_bemcmc.root"
+
+    #basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    #infile_mc = "ana_slight14e1x2_s6_sel5z.root"
+
+    basedir_mc = "../../../star-upc-data/ana/starsim/bgen14a/sel5"
+    infile_mc = "ana_bgen14a1_v0_sel5z_s6.root"
 
     interactive = False
 
@@ -1161,7 +1167,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 18
+    iplot = 11
     funclist = []
     funclist.append(plot_y) # 0
     funclist.append(plot_tracks_eta) # 1

@@ -2,7 +2,10 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TGraphErrors, TF1, vector
+from ROOT import TGraphErrors, TF1, vector, cout
+
+gSystem.Load("/home/jaroslav/root/RooUnfold_Rev360/libRooUnfold")
+from ROOT import RooUnfoldResponse, RooUnfoldBayes
 
 import sys
 sys.path.append('../')
@@ -10,114 +13,7 @@ import plot_utils as ut
 
 from analyze_tree import AnalyzeTree
 
-#_____________________________________________________________________________
-def load_starlight(dy):
-
-    slight = TFile.Open("/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_Jpsi_coh_6Mevt.root")
-    slight_tree = slight.Get("slight_tree")
-
-    hSlight = ut.prepare_TH1D("hSlight", 0.002, 0., 0.12)
-
-    nall = float( slight_tree.GetEntries() )
-    ny = float( slight_tree.Draw("pT*pT >> hSlight", "rapidity>-1 && rapidity<1") )
-    sigma_sl_tot = 67.958 # total Starlight cross section, ub
-    sigma_sl = (ny/nall)*sigma_sl_tot/1000. # ub to mb
-    sigma_sl = sigma_sl/dy # rapidity interval
-    print "sigma_sl:", sigma_sl
-    ut.norm_to_integral(hSlight, sigma_sl)
-
-    gSlight = TGraphErrors(hSlight.GetNbinsX())
-    for ibin in xrange(1,hSlight.GetNbinsX()+1):
-        gSlight.SetPoint(ibin-1, hSlight.GetBinCenter(ibin), hSlight.GetBinContent(ibin))
-
-    gSlight.SetLineColor(rt.kBlue)
-    gSlight.SetLineWidth(3)
-    gSlight.SetLineStyle(rt.kDashDotted)
-
-    return gSlight
-
-#end of load_starlight
-
-#_____________________________________________________________________________
-def load_ms():
-
-    #model by Heikki and Bjorn
-    f = open("data/to_star_ms.txt", "read")
-    t_sigma = []
-    for line in f:
-        if line[0] == "#": continue
-        point = line.split(" ")
-        t_sigma.append([float(point[0]), float(point[1])])
-
-    #scaling to XnXn
-    kx = 0.1702
-
-    gMS = TGraphErrors(len(t_sigma))
-    for i in xrange(len(t_sigma)):
-        gMS.SetPoint(i, t_sigma[i][0], t_sigma[i][1]*kx)
-
-    gMS.SetLineColor(rt.kViolet)
-    gMS.SetLineWidth(3)
-    gMS.SetLineStyle(rt.kDashed)
-
-    return gMS
-
-#end of load_ms
-
-#_____________________________________________________________________________
-def load_cck():
-
-    #model by Guillermo at. al.
-    f = open("data/data-dtdy-y_0-RHIC-clean_CCK.dat", "read")
-    sigma = []
-    for line in f:
-        if line[0] == "#": continue
-        p = line.split("\t")
-        t = float(p[3])
-        nucl = float(p[4])
-        hs = float(p[8])
-        sigma.append({ "t":t, "nucl":nucl, "hs":hs })
-
-    #correction from gamma-Au to AuAu by Michal
-    k_auau = 9.0296
-
-    #scaling to XnXn
-    kx = 0.1702
-
-    gCCK = TGraphErrors(len(sigma))
-    for i in xrange(len(sigma)):
-        gCCK.SetPoint(i, sigma[i]["t"], sigma[i]["hs"]*k_auau*kx)
-
-    gCCK.SetLineColor(rt.kRed)
-    gCCK.SetLineWidth(3)
-    gCCK.SetLineStyle(9)
-
-    return gCCK
-
-#end of load_cck
-
-#_____________________________________________________________________________
-def load_sartre():
-
-    sartre = TFile.Open("/home/jaroslav/sim/sartre_tx/sartre_AuAu_200GeV_Jpsi_coh_2p7Mevt.root")
-    sartre_tree = sartre.Get("sartre_tree")
-
-    hSartre = ut.prepare_TH1D("hSartre", 0.002, 0., 0.12)
-    sartre_tree.Draw("-tval >> hSartre", "rapidity>-1 && rapidity<1")
-
-    ut.norm_to_integral(hSartre, 0.025) # now same as Starlight
-
-    gSartre = TGraphErrors(hSartre.GetNbinsX())
-    for ibin in xrange(1,hSartre.GetNbinsX()+1):
-        gSartre.SetPoint(ibin-1, hSartre.GetBinCenter(ibin), hSartre.GetBinContent(ibin))
-
-    gSartre.SetLineColor(rt.kYellow+1)
-    gSartre.SetLineWidth(3)
-    #gSartre.SetLineStyle(rt.kDashDotted)
-
-    return gSartre
-
-#end of load_sartre
+from models import load_starlight, load_ms, load_cck
 
 #_____________________________________________________________________________
 if __name__ == "__main__":
@@ -125,13 +21,13 @@ if __name__ == "__main__":
     gROOT.SetBatch()
 
     #range and binning
-    ptbin = 0.005
+    ptbin = 0.005   # 0.005 0.003
     ptmin = 0.
 
-    ptmid = 0.08
+    ptmid = 0.08  # 0.08, value > ptmax will switch it off
     ptlon = 0.01
 
-    ptmax = 0.109  # 0.11
+    ptmax = 0.109  # 0.11  0.109
 
     #mass interval
     mmin = 2.8
@@ -167,33 +63,45 @@ if __name__ == "__main__":
     infile = "ana_muDst_run1_all_sel5z.root"
 
     #MC
-    basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
     infile_coh = "ana_slight14e1x1_sel5z.root"
+    #
+    #basedir_coh = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
+    #infile_coh = "ana_sartre14a1_sel5z_s6_v2.root"
+    #
+    #basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    #infile_coh = "ana_slight14e1x2_v0_s6_sel5z.root"
+    # 
+    basedir_gg = "../../../star-upc-data/ana/starsim/slight14e/sel5"
     infile_gg = "ana_slight14e2x1_sel5_nzvtx.root"
 
     #predictions
     gSlight = load_starlight(dy)
     gMS = load_ms()
     gCCK = load_cck()
-    gSartre = load_sartre()
+    #gSartre = load_sartre()
 
     #open the inputs
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")
-    inp_gg = TFile.Open(basedir_mc+"/"+infile_gg)
+    inp_gg = TFile.Open(basedir_gg+"/"+infile_gg)
     tree_gg = inp_gg.Get("jRecTree")
+    inp_coh = TFile.Open(basedir_coh+"/"+infile_coh)
+    tree_coh_gen = inp_coh.Get("jGenTree")
 
     #evaluate binning
     print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
     bins = vector(rt.double)()
-    bins.push_back(ptmin)
-    while True:
-        if bins[bins.size()-1] < ptmid:
-            increment = ptbin
-        else:
-            increment = ptlon
-        bins.push_back( bins[bins.size()-1] + increment )
-        if bins[bins.size()-1] > ptmax: break
+    #bins.push_back(ptmin)
+    #while True:
+    #    if bins[bins.size()-1] < ptmid:
+    #        increment = ptbin
+    #    else:
+    #        increment = ptlon
+    #    bins.push_back( bins[bins.size()-1] + increment )
+    #    if bins[bins.size()-1] > ptmax: break
+
+    bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
 
     print "bins2:", bins.size()-1
 
@@ -229,10 +137,33 @@ if __name__ == "__main__":
     lumi_scaled = lumi*ratio_ana*ratio_zdc_vtx
     print "lumi_scaled:", lumi_scaled
 
+    #deconvolution
+    #deconv_min = bins[0]
+    #deconv_max = bins[bins.size()-1]
+    #deconv_nbin = bins.size()-1
+    #response = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin/2, deconv_min, deconv_max)
+    #gROOT.LoadMacro("fill_response_matrix.C")
+    #rt.fill_response_matrix(tree_coh_gen, response)
+    #response.Print()
+
+    #unfold = RooUnfoldBayes(response, hPt, 15)
+    #hPtRec = unfold.Hreco()
+    #ut.set_H1D(hPtRec)
+    #hPtRec.SetTitle("")
+
+    #denominator for deconvoluted distribution, conversion ub to mb
+    #den = 0.85*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*1000.*dy
+    # 
+
+    #cross section after deconvolution
+    #sigma_tot = hPtRec.Integral()/den
+    #hPtRec.Scale(sigma_tot/hPtRec.Integral("width"))
+    #print "sigma_tot_dy, deconvoluted", sigma_tot
+
     #get efficiency
     ana = AnalyzeTree()
     ana.SetMass(mmin, mmax)
-    eff = ana.AnalyzeMC(basedir_mc+"/"+infile_coh)
+    eff = ana.AnalyzeMC(basedir_coh+"/"+infile_coh)
     print "eff: ", eff[0], "+/-", eff[1]
 
     #denominator in cross section calculation
@@ -273,11 +204,16 @@ if __name__ == "__main__":
     ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/(GeV/c)^{2})"
     xtit = "|#kern[0.3]{#it{t}}| ((GeV/c)^{2})"
     ut.put_yx_tit(hPt, ytit, xtit, 1.4, 1.2)
+    #ut.put_yx_tit(hPtRec, ytit, xtit, 1.4, 1.2)
 
     hPt.SetMaximum(11)
     #hPt.SetMaximum(80)
     hPt.SetMinimum(0.0002)
-    #hPt.Draw()
+    hPt.Draw()
+
+    #hPtRec.SetMaximum(11)
+    #hPtRec.SetMinimum(0.0002)
+    #hPtRec.Draw()
 
     #hSys.Draw("e2same")
     #hPt.Draw("e1same")
@@ -285,13 +221,13 @@ if __name__ == "__main__":
     ut.put_yx_tit(frame, ytit, xtit, 1.4, 1.2)
     frame.SetMaximum(11)
     frame.SetMinimum(1.e-5)
-    frame.Draw()
+    #frame.Draw()
 
     #add Starlight prediction
     gSlight.Draw("lsame")
     gMS.Draw("lsame")
     gCCK.Draw("lsame")
-    gSartre.Draw("lsame")
+    #gSartre.Draw("lsame")
 
     gPad.SetLogy()
 
@@ -302,20 +238,20 @@ if __name__ == "__main__":
     leg = ut.prepare_leg(0.2, 0.82, 0.18, 0.1, 0.035)
     leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     leg.AddEntry(hPt, "STAR Preliminary")
-    #leg.Draw("same")
+    leg.Draw("same")
 
     #legend about systematic error
     eleg = ut.prepare_leg(0.2, 0.76, 0.18, 0.06, 0.028)
     eleg.AddEntry(None, "10% normalization error", "")
     eleg.AddEntry(None, "not shown", "")
-    #eleg.Draw("same")
+    eleg.Draw("same")
 
     #legend for models
-    mleg = ut.prepare_leg(0.68, 0.7, 0.3, 0.19, 0.035)
+    mleg = ut.prepare_leg(0.68, 0.75, 0.3, 0.16, 0.035)
     mleg.AddEntry(gSlight, "STARLIGHT", "l")
     mleg.AddEntry(gMS, "MS", "l")
     mleg.AddEntry(gCCK, "CCK-hs", "l")
-    mleg.AddEntry(gSartre, "Sartre", "l")
+    #mleg.AddEntry(gSartre, "Sartre", "l")
     mleg.Draw("same")
 
     #ut.invert_col(rt.gPad)

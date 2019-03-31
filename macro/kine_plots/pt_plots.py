@@ -6,7 +6,7 @@ import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
 from ROOT import TF1, TH1D, TGraphAsymmErrors
 from ROOT import RooRealVar, RooDataSet, RooArgSet, RooDataHist, RooArgList, RooGenericPdf
-from ROOT import RooFormulaVar
+from ROOT import RooFormulaVar, TGaxis, TMath
 from ROOT import RooFit as rf
 
 import sys
@@ -426,17 +426,17 @@ def plot_pt2_real():
     leg = ut.prepare_leg(0.6, 0.78, 0.14, 0.18, 0.03)
     ut.add_leg_mass(leg, mmin, mmax)
     leg.AddEntry(hPt, "Data")
-    leg.AddEntry(hPtCoh, "Coherent MC", "l")
+    leg.AddEntry(hPtCoh, "Coherent MC, Sartre", "l")
     leg.AddEntry(hPtIncoh, "Incoherent parametrization", "l")
     leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
     leg.Draw("same")
 
     uoleg = ut.make_uo_leg(hPt, 0.14, 0.9, 0.01, 0.1)
-    uoleg.Draw("same")
+    #uoleg.Draw("same")
 
     gPad.SetLogy()
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of plot_pt2_real
@@ -624,6 +624,7 @@ def pdf_logPt2_incoh():
 
     frame = x.frame(rf.Bins(nbins), rf.Title(""))
     frame.SetTitle("")
+    frame.SetMaximum(75)
 
     frame.SetYTitle("Events / ({0:.3f}".format(ptbin)+" GeV^{2})")
 
@@ -640,15 +641,25 @@ def pdf_logPt2_incoh():
 
     frame.Draw()
 
+    amin = TMath.Power(10, ptmin)
+    amax = TMath.Power(10, ptmax)-1
+    print amin, amax
+    pt2func = TF1("f1","TMath::Power(10, x)",amin,amax)#TMath::Power(x, 10)
+    aPt2 = TGaxis(-5, 75, 1, 75,"f1",510,"-");
+    ut.set_axis(aPt2)
+    aPt2.SetTitle("pt2");
+    #aPt2.Draw();
+
     leg = ut.prepare_leg(0.57, 0.78, 0.14, 0.19, 0.03)
     ut.add_leg_mass(leg, mmin, mmax)
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
     hx.Draw("same")
     ln = ut.col_lin(rt.kRed)
     leg.AddEntry(hx, "Data")
+    leg.AddEntry(hPtCoh, "Sartre MC", "l")
     leg.AddEntry(hPtGG, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "l")
     #leg.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
-    leg.AddEntry(ln, "Incoherent fit", "l")
+    #leg.AddEntry(ln, "Incoherent fit", "l")
     leg.Draw("same")
 
     l0 = ut.cut_line(fitran[0], 0.9, frame)
@@ -656,12 +667,12 @@ def pdf_logPt2_incoh():
     #l0.Draw()
     #l1.Draw()
 
-    desc = pdesc(frame, 0.14, 0.9, 0.057)
+    desc = pdesc(frame, 0.14, 0.8, 0.054)
     desc.set_text_size(0.03)
     desc.itemD("#chi^{2}/ndf", frame.chiSquare("pdf_logPt2", "data", 2), -1, rt.kRed)
     desc.itemD("#it{A}", a, -1, rt.kRed)
     desc.itemR("#it{b}", b, rt.kRed)
-    #desc.draw()
+    desc.draw()
 
     #put the sum
     hSum.Draw("same")
@@ -676,11 +687,12 @@ def pdf_logPt2_incoh():
     hPtCoh.Draw("same")
 
     #put Sartre generated coherent shape
-    hSartre.Draw("same")
+    #hSartre.Draw("same")
 
-    leg2 = ut.prepare_leg(0.14, 0.85, 0.14, 0.08, 0.03)
-    leg2.AddEntry(hPtCoh, "Sartre MC reconstructed", "l")
-    leg2.AddEntry(hSartre, "Sartre MC generated", "l")
+    leg2 = ut.prepare_leg(0.14, 0.9, 0.14, 0.08, 0.03)
+    leg2.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
+    #leg2.AddEntry(hPtCoh, "Sartre MC reconstructed", "l")
+    #leg2.AddEntry(hSartre, "Sartre MC generated", "l")
     leg2.Draw("same")
 
     #ut.invert_col(rt.gPad)
@@ -1134,7 +1146,7 @@ if __name__ == "__main__":
     #MC
     basedir_coh = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
     #infile_coh = "ana_sartre14a1_sel5z.root"
-    infile_coh = "ana_sartre14a1_sel5z_s0.root"
+    infile_coh = "ana_sartre14a1_sel5z_s6_v2.root"
     #infile_coh = "ana_sartre14a1_sel5z_s6.root"
     #basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
     #infile_coh = "ana_slight14e1x1_sel5z.root"
