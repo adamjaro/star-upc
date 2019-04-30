@@ -9,7 +9,7 @@ import plot_utils as ut
 #_____________________________________________________________________________
 def load_starlight(dy):
 
-    slight = TFile.Open("/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_Jpsi_coh_int0_6Mevt.root")
+    slight = TFile.Open("/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_Jpsi_coh_intmax0p34_6Mevt.root")
     slight_tree = slight.Get("slight_tree")
 
     hSlight = ut.prepare_TH1D("hSlight", 0.002, 0., 0.12)

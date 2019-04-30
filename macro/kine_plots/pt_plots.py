@@ -583,9 +583,12 @@ def pdf_logPt2_incoh():
 
     #Coherent contribution
     hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
+    hPtCoh.Sumw2()
     tree_coh.Draw(draw + " >> hPtCoh", strsel)
     #ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
-    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5, -2.1)
+    #ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5, -2.1)
+    ut.norm_to_num(hPtCoh, 405, rt.kBlue)
+    print "Coherent integral:", hPtCoh.Integral()
 
     #Sartre generated coherent shape
     sartre = TFile.Open("/home/jaroslav/sim/sartre_tx/sartre_AuAu_200GeV_Jpsi_coh_2p7Mevt.root")
@@ -602,6 +605,13 @@ def pdf_logPt2_incoh():
 
     print "Int GG:", hPtGG.Integral()
 
+    #psi' contribution
+    psiP = TFile.Open(basedir_mc+"/ana_slight14e4x1_s6_sel5z.root")
+    psiP_tree = psiP.Get("jRecTree")
+    hPtPsiP = ut.prepare_TH1D("hPtPsiP", ptbin, ptmin, ptmax)
+    psiP_tree.Draw(draw + " >> hPtPsiP", strsel)
+    ut.norm_to_num(hPtPsiP, 12, rt.kViolet)
+
     #sum of all contributions
     hSum = ut.prepare_TH1D("hSum", ptbin, ptmin, ptmax)
     hSum.SetLineWidth(3)
@@ -615,6 +625,8 @@ def pdf_logPt2_incoh():
     hSum.Add(hInc)
     #add coherent contribution
     hSum.Add(hPtCoh)
+    #add psi(2S) contribution
+    hSum.Add(hPtPsiP)
     #set to draw as a lines
     ut.line_h1(hSum, rt.kBlack)
 
@@ -689,13 +701,16 @@ def pdf_logPt2_incoh():
     #put Sartre generated coherent shape
     #hSartre.Draw("same")
 
+    #put psi(2S) contribution
+    hPtPsiP.Draw("same")
+
     leg2 = ut.prepare_leg(0.14, 0.9, 0.14, 0.08, 0.03)
     leg2.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
     #leg2.AddEntry(hPtCoh, "Sartre MC reconstructed", "l")
     #leg2.AddEntry(hSartre, "Sartre MC generated", "l")
     leg2.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #end of pdf_logPt2_incoh

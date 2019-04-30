@@ -2,7 +2,7 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TF1, vector
+from ROOT import TF1, vector, TMath
 
 gSystem.Load("/home/jaroslav/root/RooUnfold_Rev360/libRooUnfold")
 from ROOT import RooUnfoldResponse, RooUnfoldBayes, RooUnfoldSvd
@@ -122,10 +122,17 @@ if __name__ == "__main__":
     hPtIncoh = ut.prepare_TH1D_vec("hPtIncoh", bins)
     ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
 
+    print "Entries before gamma-gamma and incoherent subtraction:", hPt.GetEntries()
+
     #subtract gamma-gamma and incoherent components
     hPt.Sumw2()
     hPt.Add(hPtGG, -1)
+    print "Gamma-gamma entries:", hPtGG.Integral()
+    print "Entries after gamma-gamma subtraction:", hPt.Integral()
+    print "Incoherent entries:", hPtIncoh.Integral()
     hPt.Add(hPtIncoh, -1)
+
+    print "Entries after all subtraction:", hPt.Integral()
 
     #scale the luminosity
     lumi_scaled = lumi*ratio_ana*ratio_zdc_vtx
@@ -156,13 +163,13 @@ if __name__ == "__main__":
 
     #Sartre response
     #resp_sart = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
-    resp_sart = RooUnfoldResponse(hPt, hPt)
-    rt.fill_response_matrix(tree_sart_gen, resp_sart)
+    #resp_sart = RooUnfoldResponse(hPt, hPt)
+    #rt.fill_response_matrix(tree_sart_gen, resp_sart)
     #
-    unfold_sart = RooUnfoldBayes(resp_sart, hPt, 10)
-    hPtSart = unfold_sart.Hreco()
-    ut.set_H1D(hPtSart)
-    hPtSart.SetMarkerStyle(21)
+    #unfold_sart = RooUnfoldBayes(resp_sart, hPt, 10)
+    #hPtSart = unfold_sart.Hreco()
+    #ut.set_H1D(hPtSart)
+    #hPtSart.SetMarkerStyle(21)
 
     #Flat pT^2 response
     #resp_bgen = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
@@ -175,8 +182,30 @@ if __name__ == "__main__":
     hPtFlat.SetMarkerStyle(22)
     hPtFlat.SetMarkerSize(1.3)
 
-
-
+    #systematical errors
+    err_zdc_acc = 0.1
+    err_bemc_eff = 0.03
+    #sys_err = rt.TMath.Sqrt(err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff)
+    sys_err = err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff
+    print "Total sys err:", sys_err
+    hSys = ut.prepare_TH1D_vec("hSys", bins)
+    hSys.SetOption("E2")
+    hSys.SetFillColor(rt.kOrange+1)
+    hSys.SetLineColor(rt.kOrange)
+    for ibin in xrange(1,hPtFlat.GetNbinsX()+1):
+        hSys.SetBinContent(ibin, hPtFlat.GetBinContent(ibin))
+        sig_sl = hPtSl.GetBinContent(ibin)
+        sig_fl = hPtFlat.GetBinContent(ibin)
+        err_deconv = TMath.Abs(sig_fl-sig_sl)/sig_fl
+        print "err_deconv", err_deconv
+        #sys_err += err_deconv*err_deconv
+        sys_err_sq = sys_err + err_deconv*err_deconv
+        sys_err_bin = TMath.Sqrt(sys_err_sq)
+        stat_err = hPtFlat.GetBinError(ibin)/hPtFlat.GetBinContent(ibin)
+        tot_err = TMath.Sqrt(stat_err*stat_err + sys_err_sq)
+        #hSys.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*err_deconv)
+        hSys.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*sys_err_bin)
+        hPtFlat.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*tot_err)
 
     #draw the results
     gStyle.SetPadTickX(1)
@@ -186,7 +215,8 @@ if __name__ == "__main__":
     frame = ut.prepare_TH1D("frame", ptbin, ptmin, ptmax)
 
     can = ut.box_canvas()
-    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.03, 0.03)
+    #ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.03, 0.03)
+    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.03)
 
     ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/(GeV/c)^{2})"
     xtit = "|#kern[0.3]{#it{t}}| ((GeV/c)^{2})"
@@ -197,28 +227,41 @@ if __name__ == "__main__":
     frame.SetMinimum(2e-4)
     frame.Draw()
 
+    #hSys.Draw("e2same")
+
     #hPtSl.Draw("e1same")
     #hPtSart.Draw("e1same")
-    #hPtFlat.Draw("e1same")
+    hPtFlat.Draw("e1same")
 
     #put model predictions
     gSlight.Draw("lsame")
-    gSartre.Draw("lsame")
-    gFlat.Draw("lsame")
+    #gSartre.Draw("lsame")
+    #gFlat.Draw("lsame")
 
-    #gMS.Draw("lsame")
-    #gCCK.Draw("lsame")
+    gMS.Draw("lsame")
+    gCCK.Draw("lsame")
+
+    frame.Draw("same")
 
     gPad.SetLogy()
 
+    cleg = ut.prepare_leg(0.1, 0.96, 0.14, 0.01, 0.035)
+    cleg.AddEntry(None, "Au+Au #rightarrow J/#psi + Au+Au + XnXn, #sqrt{#it{s}_{#it{NN}}} = 200 GeV", "")
+    cleg.Draw("same")
+
+    leg = ut.prepare_leg(0.45, 0.82, 0.18, 0.1, 0.035)
+    leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    leg.AddEntry(hPt, "STAR")
+    leg.Draw("same")
+
     #legend for models
-    mleg = ut.prepare_leg(0.68, 0.8, 0.3, 0.16, 0.035)
+    mleg = ut.prepare_leg(0.68, 0.76, 0.3, 0.16, 0.035)
     #mleg = ut.prepare_leg(0.68, 0.8, 0.3, 0.12, 0.035)
-    mleg.AddEntry(gSlight, "Starlight", "l")
-    #mleg.AddEntry(gMS, "MS", "l")
-    #mleg.AddEntry(gCCK, "CCK-hs", "l")
-    mleg.AddEntry(gSartre, "Sartre", "l")
-    mleg.AddEntry(gFlat, "Flat #it{p}_{T}^{2}", "l")
+    mleg.AddEntry(gSlight, "STARLIGHT", "l")
+    mleg.AddEntry(gMS, "MS", "l")
+    mleg.AddEntry(gCCK, "CCK-hs", "l")
+    #mleg.AddEntry(gSartre, "Sartre", "l")
+    #mleg.AddEntry(gFlat, "Flat #it{p}_{T}^{2}", "l")
     mleg.Draw("same")
 
     #legend for deconvolution method
