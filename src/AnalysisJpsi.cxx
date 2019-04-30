@@ -218,8 +218,10 @@ int main(int argc, char* argv[]) {
       continue;
     }
     //introduce additional smearing in track pT
-    PutTrackPtSmear(pair[0]);
-    PutTrackPtSmear(pair[1]);
+    //if(isMC) {
+    //PutTrackPtSmear(pair[0]);
+    //PutTrackPtSmear(pair[1]);
+    //}
 
     SortTracks(pair); //put positive track first
 
