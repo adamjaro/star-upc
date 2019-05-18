@@ -91,11 +91,11 @@ Int_t StUPCFilterMaker::Init()
 
   //build the trigger ID table
   //
-  //mTrgIDs[ kUPCJpsiB_1 ] = 450705; // UPCJpsiB, Run14 AuAu, 1st id
+  mTrgIDs[ kUPCJpsiB_1 ] = 450705; // UPCJpsiB, Run14 AuAu, 1st id
   mTrgRan[ kUPCJpsiB_1 ][0] = 15084052;
   mTrgRan[ kUPCJpsiB_1 ][1] = 15167014;
   //
-  //mTrgIDs[ kUPCJpsiB_2 ] = 450725; // UPCJpsiB, Run14 AuAu, 2nd id
+  mTrgIDs[ kUPCJpsiB_2 ] = 450725; // UPCJpsiB, Run14 AuAu, 2nd id
   mTrgRan[ kUPCJpsiB_2 ][0] = 15153036;
   mTrgRan[ kUPCJpsiB_2 ][1] = 15167007;
   //
@@ -131,11 +131,11 @@ Int_t StUPCFilterMaker::Init()
   mTrgRan[ kMain11_3 ][0] = 12146003;
   mTrgRan[ kMain11_3 ][1] = 12171017;
   //
-  mTrgIDs[ kMon_1 ] = 450013; // VPD-ZDC-novtx-mon, 1st physics id
+  //mTrgIDs[ kMon_1 ] = 450013; // VPD-ZDC-novtx-mon, 1st physics id
   mTrgRan[ kMon_1 ][0] = 15076101;
   mTrgRan[ kMon_1 ][1] = 15167014;
   //
-  mTrgIDs[ kMon_2 ] = 450023; // VPD-ZDC-novtx-mon, 2nd physics id
+  //mTrgIDs[ kMon_2 ] = 450023; // VPD-ZDC-novtx-mon, 2nd physics id
   mTrgRan[ kMon_2 ][0] = 15153036;
   mTrgRan[ kMon_2 ][1] = 15167007;
 

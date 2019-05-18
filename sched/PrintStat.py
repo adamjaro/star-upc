@@ -7,7 +7,7 @@ import sys
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    basedir="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_VPDZDCmon1/*"
+    basedir="/gpfs01/star/pwg/jaroslav/star-upc/trees/muDst/muDst_run4/*"
 
 
     #command line argumets
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     #running jobs
     running = []
-    cmd = "condor_q -submitter jaroslav -format \"%s\\n\" CMD"
+    cmd = "condor_q jaroslav"
     out = Popen(cmd.split(), stdout=PIPE).communicate()[0].split("\n")
     for job in out:
         i1 = job.find("sched/sched")+len("sched/sched")

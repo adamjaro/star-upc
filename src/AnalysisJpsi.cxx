@@ -218,10 +218,10 @@ int main(int argc, char* argv[]) {
       continue;
     }
     //introduce additional smearing in track pT
-    //if(isMC) {
-    //PutTrackPtSmear(pair[0]);
-    //PutTrackPtSmear(pair[1]);
-    //}
+    if(isMC) {
+      PutTrackPtSmear(pair[0]);
+      PutTrackPtSmear(pair[1]);
+    }
 
     SortTracks(pair); //put positive track first
 
@@ -494,6 +494,15 @@ Bool_t RunMC(Bool_t accept) {
 
   //particle vertex IDs
   Int_t v0id=-1, v1id=-2;
+
+  /*
+  cout << "RunMC:" << endl;
+  for(Int_t imc=0; imc<upcEvt->getNumberOfMCParticles(); imc++) {
+    TParticle *mcp = upcEvt->getMCParticle(imc);
+    if(!mcp) continue;
+    cout << "imc: " << imc << ", pdg: " << mcp->GetPdgCode() << endl; 
+  }
+  */
 
   //mc loop
   for(Int_t imc=0; imc<upcEvt->getNumberOfMCParticles(); imc++) {
