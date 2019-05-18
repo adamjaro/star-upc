@@ -224,9 +224,9 @@ if __name__ == "__main__":
     #frame.Draw()
 
     #add Starlight prediction
-    gSlight.Draw("lsame")
     gMS.Draw("lsame")
     gCCK.Draw("lsame")
+    gSlight.Draw("lsame")
     #gSartre.Draw("lsame")
 
     gPad.SetLogy()
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     #mleg.AddEntry(gSartre, "Sartre", "l")
     mleg.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

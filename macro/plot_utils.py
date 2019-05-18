@@ -37,6 +37,27 @@ def get_bins_vec_2pt(bin1, bin2, xmin, xmax, xmid):
     return bins
 
 #_____________________________________________________________________________
+def get_bins_vec_3pt(bin1, bin2, bin3, xmin, xmax, xmid1, xmid2):
+
+    #evaluate binning with bin1 below xmid1, bin2 between xmid1 and xmid2
+    #and bin3 above xmid2
+
+    bins = vector(rt.double)()
+    bins.push_back(xmin)
+
+    while True:
+        xpos = bins[bins.size()-1]
+
+        increment = bin1
+        if xpos > xmid1: increment = bin2
+        if xpos > xmid2: increment = bin3
+
+        bins.push_back( xpos + increment )
+        if bins[bins.size()-1] > xmax: break
+
+    return bins
+
+#_____________________________________________________________________________
 def prepare_TH1D_n(name, nbins, xmin, xmax):
 
   hx = TH1D(name, name, nbins, xmin, xmax)
@@ -202,6 +223,17 @@ def norm_to_integral(hMC, ival, col=rt.kBlue):
 
     hMC.SetLineColor(col)
     hMC.SetMarkerColor(col)
+
+#_____________________________________________________________________________
+def norm_to_den_w(hx, den):
+
+    #divide bins by denominator den and bin width
+
+    for ibin in xrange(hx.GetNbinsX()+1):
+        hx.SetBinContent(ibin, hx.GetBinContent(ibin)/(den*hx.GetBinWidth(ibin)))
+        hx.SetBinError(ibin, hx.GetBinError(ibin)/(den*hx.GetBinWidth(ibin)))
+
+    set_H1D(hx)
 
 #_____________________________________________________________________________
 def fill_h1_tf(hx, func, col=rt.kBlue):

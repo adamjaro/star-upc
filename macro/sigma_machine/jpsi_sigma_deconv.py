@@ -18,13 +18,20 @@ if __name__ == "__main__":
 
     gROOT.SetBatch()
 
-    ptbin = 0.004   # 0.005 0.003
+    #range for |t|
     ptmin = 0.
+    ptmax = 0.1  #   0.109  0.01 for interference range
 
-    ptmid = 0.06  # 0.08, value > ptmax will switch it off
-    ptlon = 0.01
+    #default binning
+    ptbin = 0.004   # 0.004  0.0005 for interference range
 
-    ptmax = 0.109
+    #long bins at high |t|
+    ptmid = 0.06  # 0.08, value > ptmax will switch it off   0.06
+    ptlon = 0.01  # 0.01
+
+    #short bins at low |t|
+    ptlow = 0.01
+    ptshort = 0.002
 
     #mass interval
     mmin = 2.8
@@ -61,7 +68,8 @@ if __name__ == "__main__":
 
     #MC
     basedir_sl = "../../../star-upc-data/ana/starsim/slight14e/sel5"
-    infile_sl = "ana_slight14e1x2_s6_sel5z.root"
+    #infile_sl = "ana_slight14e1x2_s6_sel5z.root"
+    infile_sl = "ana_slight14e1x3_s6_sel5z.root"
     #
     basedir_sart = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
     infile_sart = "ana_sartre14a1_sel5z_s6_v2.root"
@@ -98,7 +106,8 @@ if __name__ == "__main__":
     #evaluate binning
     print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
 
-    bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
+    #bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
+    bins = ut.get_bins_vec_3pt(ptshort, ptbin, ptlon, ptmin, ptmax, ptlow, ptmid)
     print "bins2:", bins.size()-1
 
     #load the data
@@ -141,10 +150,6 @@ if __name__ == "__main__":
     #denominator for deconvoluted distribution, conversion ub to mb
     den = 0.85*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*1000.*dy
 
-    #apply the denominator
-    scale_den = hPt.Integral()/den
-    hPt.Scale(scale_den/hPt.Integral("width"))
-
     #deconvolution
     deconv_min = bins[0]
     deconv_max = bins[bins.size()-1]
@@ -159,7 +164,9 @@ if __name__ == "__main__":
     unfold_sl = RooUnfoldBayes(resp_sl, hPt, 15)
     #unfold_sl = RooUnfoldSvd(resp_sl, hPt, 15)
     hPtSl = unfold_sl.Hreco()
-    ut.set_H1D(hPtSl)
+    #ut.set_H1D(hPtSl)
+    #apply the denominator and bin width
+    ut.norm_to_den_w(hPtSl, den)
 
     #Sartre response
     #resp_sart = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
@@ -178,7 +185,9 @@ if __name__ == "__main__":
     #
     unfold_bgen = RooUnfoldBayes(resp_bgen, hPt, 14)
     hPtFlat = unfold_bgen.Hreco()
-    ut.set_H1D(hPtFlat)
+    #ut.set_H1D(hPtFlat)
+    #apply the denominator and bin width
+    ut.norm_to_den_w(hPtFlat, den)
     hPtFlat.SetMarkerStyle(22)
     hPtFlat.SetMarkerSize(1.3)
 
@@ -197,7 +206,7 @@ if __name__ == "__main__":
         sig_sl = hPtSl.GetBinContent(ibin)
         sig_fl = hPtFlat.GetBinContent(ibin)
         err_deconv = TMath.Abs(sig_fl-sig_sl)/sig_fl
-        print "err_deconv", err_deconv
+        #print "err_deconv", err_deconv
         #sys_err += err_deconv*err_deconv
         sys_err_sq = sys_err + err_deconv*err_deconv
         sys_err_bin = TMath.Sqrt(sys_err_sq)
@@ -205,7 +214,7 @@ if __name__ == "__main__":
         tot_err = TMath.Sqrt(stat_err*stat_err + sys_err_sq)
         #hSys.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*err_deconv)
         hSys.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*sys_err_bin)
-        hPtFlat.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*tot_err)
+        #hPtFlat.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*tot_err)
 
     #draw the results
     gStyle.SetPadTickX(1)
@@ -224,22 +233,22 @@ if __name__ == "__main__":
     ut.put_yx_tit(frame, ytit, xtit, 1.4, 1.2)
     frame.SetMaximum(11)
     #frame.SetMinimum(1.e-6)
-    frame.SetMinimum(2e-4)
+    #frame.SetMinimum(2e-4)
+    frame.SetMinimum(3e-5)
     frame.Draw()
 
     #hSys.Draw("e2same")
 
-    #hPtSl.Draw("e1same")
+    hPtSl.Draw("e1same")
     #hPtSart.Draw("e1same")
     hPtFlat.Draw("e1same")
 
     #put model predictions
-    gSlight.Draw("lsame")
     #gSartre.Draw("lsame")
     #gFlat.Draw("lsame")
-
     gMS.Draw("lsame")
     gCCK.Draw("lsame")
+    gSlight.Draw("lsame")
 
     frame.Draw("same")
 
@@ -251,7 +260,9 @@ if __name__ == "__main__":
 
     leg = ut.prepare_leg(0.45, 0.82, 0.18, 0.1, 0.035)
     leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
-    leg.AddEntry(hPt, "STAR")
+    hx = ut.prepare_TH1D("hx", 1, 0, 1)
+    leg.AddEntry(hx, "STAR")
+    hx.Draw("same")
     leg.Draw("same")
 
     #legend for models
@@ -273,13 +284,14 @@ if __name__ == "__main__":
     dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
     #dleg.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
     gPad.Close()
 
-
+    #beep when finished
+    gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
 
 
 

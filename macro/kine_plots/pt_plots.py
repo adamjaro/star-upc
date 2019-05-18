@@ -584,18 +584,22 @@ def pdf_logPt2_incoh():
     #Coherent contribution
     hPtCoh = ut.prepare_TH1D("hPtCoh", ptbin, ptmin, ptmax)
     hPtCoh.Sumw2()
-    tree_coh.Draw(draw + " >> hPtCoh", strsel)
-    #ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
+    #tree_coh.Draw(draw + " >> hPtCoh", strsel)
+    tree_coh.Draw("TMath::Log10(jGenPt*jGenPt) >> hPtCoh", strsel)
+    ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5., -2.2) # norm for coh
     #ut.norm_to_data(hPtCoh, hPt, rt.kBlue, -5, -2.1)
-    ut.norm_to_num(hPtCoh, 405, rt.kBlue)
+    #ut.norm_to_num(hPtCoh, 405, rt.kBlue)
     print "Coherent integral:", hPtCoh.Integral()
+
+
+    #TMath::Log10(jRecPt*jRecPt)
 
     #Sartre generated coherent shape
     sartre = TFile.Open("/home/jaroslav/sim/sartre_tx/sartre_AuAu_200GeV_Jpsi_coh_2p7Mevt.root")
     sartre_tree = sartre.Get("sartre_tree")
     hSartre = ut.prepare_TH1D("hSartre", ptbin, ptmin, ptmax)
     sartre_tree.Draw("TMath::Log10(pT*pT) >> hSartre", "rapidity>-1 && rapidity<1")
-    ut.norm_to_data(hSartre, hPt, rt.kViolet, -5, -2.3) # norm for Sartre
+    ut.norm_to_data(hSartre, hPt, rt.kViolet, -5, -2) # norm for Sartre
 
     #gamma-gamma contribution
     hPtGG = ut.prepare_TH1D("hPtGG", ptbin, ptmin, ptmax)
@@ -626,7 +630,7 @@ def pdf_logPt2_incoh():
     #add coherent contribution
     hSum.Add(hPtCoh)
     #add psi(2S) contribution
-    hSum.Add(hPtPsiP)
+    #hSum.Add(hPtPsiP)
     #set to draw as a lines
     ut.line_h1(hSum, rt.kBlack)
 
@@ -687,7 +691,7 @@ def pdf_logPt2_incoh():
     desc.draw()
 
     #put the sum
-    hSum.Draw("same")
+    #hSum.Draw("same")
 
     #gPad.SetLogy()
 
@@ -702,7 +706,7 @@ def pdf_logPt2_incoh():
     #hSartre.Draw("same")
 
     #put psi(2S) contribution
-    hPtPsiP.Draw("same")
+    #hPtPsiP.Draw("same")
 
     leg2 = ut.prepare_leg(0.14, 0.9, 0.14, 0.08, 0.03)
     leg2.AddEntry(ln, "ln(10)*#it{A}*10^{log_{10}#it{p}_{T}^{2}}exp(-#it{b}10^{log_{10}#it{p}_{T}^{2}})", "l")
@@ -1159,12 +1163,12 @@ if __name__ == "__main__":
     infile = "ana_muDst_run1_all_sel5z.root"
 
     #MC
-    basedir_coh = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
+    #basedir_coh = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
     #infile_coh = "ana_sartre14a1_sel5z.root"
-    infile_coh = "ana_sartre14a1_sel5z_s6_v2.root"
+    #infile_coh = "ana_sartre14a1_sel5z_s6_v2.root"
     #infile_coh = "ana_sartre14a1_sel5z_s6.root"
-    #basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
-    #infile_coh = "ana_slight14e1x1_sel5z.root"
+    basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    infile_coh = "ana_slight14e1x3_s6_sel5z.root"
     basedir_mc = "../../../star-upc-data/ana/starsim/slight14e/sel5"
     infile_incoh = "ana_slight14e3_sel5z.root"
     infile_gg = "ana_slight14e2x1_sel5_nzvtx.root"

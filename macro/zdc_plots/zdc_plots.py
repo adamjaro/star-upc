@@ -13,6 +13,49 @@ import plot_utils as ut
 from parameter_descriptor import parameter_descriptor as pdesc
 
 #_____________________________________________________________________________
+def plot_zdc_smd():
+
+    #ZDC SMD data
+
+    zbin = 1
+    zmin = 0
+    zmax = 1500
+
+    draw = "jZdsEV", "East vertical"
+    #draw = "jZdsEH", "East horizontal"
+
+    #draw = "jZdsWV", "West vertical"
+    #draw = "jZdsWH", "West horizontal"
+
+    can = ut.box_canvas()
+
+    atree = inp.Get("jAllTree")
+    #atree = inp.Get("jRecTree")
+
+    hFrame = ut.prepare_TH2D("hFrame", 1, 0, 8, zbin, zmin, zmax)
+    #hFrame.SetMaximum(1000)
+    #hFrame.SetMaximum(85)
+    hFrame.SetMaximum(50000)
+    ut.put_yx_tit(hFrame, "ADC counts", "SMD segment")
+
+    for i in xrange(8):
+        atree.Draw(draw[0]+str(i+1)+":"+str(i)+" >>+hFrame")
+
+    ut.set_margin_lbtr(gPad, 0.1, 0.08, 0.04, 0.14)
+
+    gPad.SetLogz()
+
+    hFrame.Draw()
+
+    leg = ut.prepare_leg(0.54, 0.85, 0.1, 0.1)
+    leg.AddEntry(None, draw[1], "")
+    leg.Draw("same")
+
+    ut.invert_col(gPad)
+
+    can.SaveAs("01fig.pdf")
+
+#_____________________________________________________________________________
 def plot_zdc_vtx_alltrg():
 
     #ZDC vertex from all triggered events
@@ -410,9 +453,9 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
     #infile = "ana_muDst_run1_all_sel5.root"
-    infile = "ana_muDst_run1_all_sel5z.root"
+    #infile = "ana_muDst_run1_all_sel5z.root"
     #infile = "ana_muDst_run1a_all_sel5_tof.root"
 
     #basedir = "../../../star-upc-data/ana/muDst/muDst_run2a/gg0"
@@ -424,13 +467,16 @@ if __name__ == "__main__":
     #basedir = "../../../star-upc-data/ana/muDst/muDst_VPDZDCmon1/sel5"
     #infile = "ana_VPDZDCmon1_sel5z.root"
 
+    basedir = "../../../star-upcDst-data"
+    infile = "output.root"
+
     interactive = False
 
     if interactive == False: gROOT.SetBatch()
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 4
+    iplot = 6
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1
@@ -438,6 +484,7 @@ if __name__ == "__main__":
     funclist.append(plot_zdc_tpc_vtx) # 3
     funclist.append(plot_zdc_tpc_vtx_diff) # 4
     funclist.append(plot_zdc_vtx_alltrg) # 5
+    funclist.append(plot_zdc_smd) # 6
 
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")

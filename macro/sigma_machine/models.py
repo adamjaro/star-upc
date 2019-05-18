@@ -12,21 +12,30 @@ def load_starlight(dy):
     slight = TFile.Open("/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_Jpsi_coh_intmax0p34_6Mevt.root")
     slight_tree = slight.Get("slight_tree")
 
-    hSlight = ut.prepare_TH1D("hSlight", 0.002, 0., 0.12)
+    #hSlight = ut.prepare_TH1D("hSlight", 0.002, 0., 0.12)
+    hSlight = ut.prepare_TH1D_vec("hSlight", ut.get_bins_vec_2pt(0.0002, 0.002, 0, 0.12, 0.004))
 
     nall = float( slight_tree.GetEntries() )
     ny = float( slight_tree.Draw("pT*pT >> hSlight", "rapidity>-1 && rapidity<1") )
+
+    #normalize to the width of each bin, necessary for variable binning
+    for ibin in xrange(hSlight.GetNbinsX()+1):
+        hSlight.SetBinContent(ibin, hSlight.GetBinContent(ibin)/hSlight.GetBinWidth(ibin))
+
     sigma_sl_tot = 67.958 # total Starlight cross section, ub
     sigma_sl = (ny/nall)*sigma_sl_tot/1000. # ub to mb
     sigma_sl = sigma_sl/dy # rapidity interval
     print "sigma_sl:", sigma_sl
+
+    #normalize to Starlight total cross section
     ut.norm_to_integral(hSlight, sigma_sl)
 
+    #convert to graph
     gSlight = ut.h1_to_graph(hSlight)
 
     gSlight.SetLineColor(rt.kBlue)
     gSlight.SetLineWidth(3)
-    gSlight.SetLineStyle(rt.kDashDotted)
+    gSlight.SetLineStyle(9) # kDashDotted
 
     return gSlight
 
@@ -52,7 +61,7 @@ def load_ms():
 
     gMS.SetLineColor(rt.kViolet)
     gMS.SetLineWidth(3)
-    gMS.SetLineStyle(rt.kDashed)
+    gMS.SetLineStyle(rt.kDashDotted) # kDashed
 
     return gMS
 
@@ -84,7 +93,7 @@ def load_cck():
 
     gCCK.SetLineColor(rt.kRed)
     gCCK.SetLineWidth(3)
-    gCCK.SetLineStyle(9)
+    gCCK.SetLineStyle(rt.kDashed) # 9
 
     return gCCK
 
