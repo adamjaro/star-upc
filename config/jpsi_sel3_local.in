@@ -1,15 +1,15 @@
 
 #input and output
-basedir_in      /home/jaroslav/analyza/star-upc           #input directory
-in_name         trees/starsim/StUPC_slight14b2x2.root     #input file
-#in_name         StUPC_muDst_run1_all.root
+basedir_in      /home/jaroslav/analyza/star-upc-data      #input directory
+#in_name         trees/starsim/StUPC_slight14b2x2.root     #input file
+in_name         trees/muDst/muDst_run0/StUPC_muDst_run0_all.root
 
 basedir_out     /home/jaroslav/analyza/star-upc/build     #output directory
 out_name        output.root                               #output file
 #out_name        ana/starsim/slight14b2/sel3/ana_slight14b2x2_sel3_nzvtx.root
 
 #selection criteria
-sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
+sign            1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
 trgProfile      0       # trigger profile, 0: Jpsi-B, 1: zero-bias, 2: main 2014, 3: main 2010+11
 pairSel         0       # pair selection version, 0: already same vertex, 1: pair and then vertex
 minNhits        14      # min number of track hits
@@ -30,9 +30,10 @@ makeAllTree     0       # flag to write all triggers tree
 #maxNsigPID  9999.
 #maxAbsZvtx  9999.
 #matchTof    1
-matchBemc   0
-useBemcEff  1
+#matchBemc   0
+#useBemcEff  1
 #maxAbsEta   9.e9
+maxAbsZvtx  100.
 
 #bemc efficiency
 #conv/sel0, run3, ptot

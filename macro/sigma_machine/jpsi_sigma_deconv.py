@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     #range for |t|
     ptmin = 0.
-    ptmax = 0.1  #   0.109  0.01 for interference range
+    ptmax = 0.109  #   0.109  0.01 for interference range
 
     #default binning
     ptbin = 0.004   # 0.004  0.0005 for interference range
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     #short bins at low |t|
     ptlow = 0.01
-    ptshort = 0.002
+    ptshort = 0.0005
 
     #mass interval
     mmin = 2.8
@@ -76,6 +76,7 @@ if __name__ == "__main__":
     #
     basedir_bgen = "../../../star-upc-data/ana/starsim/bgen14a/sel5"
     infile_bgen = "ana_bgen14a1_v0_sel5z_s6.root"
+    #infile_bgen = "ana_bgen14a2_sel5z_s6.root"
     #
     basedir_gg = "../../../star-upc-data/ana/starsim/slight14e/sel5"
     infile_gg = "ana_slight14e2x1_sel5_nzvtx.root"
@@ -106,8 +107,8 @@ if __name__ == "__main__":
     #evaluate binning
     print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
 
-    #bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
-    bins = ut.get_bins_vec_3pt(ptshort, ptbin, ptlon, ptmin, ptmax, ptlow, ptmid)
+    bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
+    #bins = ut.get_bins_vec_3pt(ptshort, ptbin, ptlon, ptmin, ptmax, ptlow, ptmid)
     print "bins2:", bins.size()-1
 
     #load the data
@@ -188,8 +189,8 @@ if __name__ == "__main__":
     #ut.set_H1D(hPtFlat)
     #apply the denominator and bin width
     ut.norm_to_den_w(hPtFlat, den)
-    hPtFlat.SetMarkerStyle(22)
-    hPtFlat.SetMarkerSize(1.3)
+    #hPtFlat.SetMarkerStyle(22)
+    #hPtFlat.SetMarkerSize(1.3)
 
     #systematical errors
     err_zdc_acc = 0.1
@@ -234,12 +235,12 @@ if __name__ == "__main__":
     frame.SetMaximum(11)
     #frame.SetMinimum(1.e-6)
     #frame.SetMinimum(2e-4)
-    frame.SetMinimum(3e-5)
+    frame.SetMinimum(1e-5)  # 3e-5
     frame.Draw()
 
     #hSys.Draw("e2same")
 
-    hPtSl.Draw("e1same")
+    #hPtSl.Draw("e1same")
     #hPtSart.Draw("e1same")
     hPtFlat.Draw("e1same")
 
@@ -284,7 +285,7 @@ if __name__ == "__main__":
     dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
     #dleg.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
