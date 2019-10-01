@@ -1,7 +1,7 @@
 
 import ROOT as rt
 from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
-from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors
+from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors, TGaxis
 from ROOT.Fit import FitResult
 from ROOT import std, vector
 
@@ -583,9 +583,29 @@ def invert_col(pad, bgcol=rt.kBlack):
             if obj.GetLineColor() == rt.kBlack:
                 obj.SetLineColor(fgcol)
                 obj.SetMarkerColor(fgcol)
+      #TGaxis
+      if obj.InheritsFrom(TGaxis.Class()) == True:
+            obj.SetLineColor(fgcol)
+            obj.SetLabelColor(fgcol)
+            obj.SetTitleColor(fgcol)
       #move to next item
       obj = next()
 
+#_____________________________________________________________________________
+def invert_col_can(can):
+
+   #set foreground and background color for the entire TCanvas
+
+    bgcol = rt.kBlack
+    can.SetFillColor(bgcol)
+
+    i = 1
+    while True:
+        pad = can.GetPad(i)
+        if type(pad) is rt.TVirtualPad: break
+
+        invert_col(pad, bgcol)
+        i += 1
 
 
 

@@ -2,7 +2,7 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TF1
+from ROOT import TF1, TGaxis
 from ROOT import RooFit as rf
 from ROOT import RooRealVar, RooDataSet, RooFormulaVar, RooArgSet, RooArgList
 from ROOT import RooDataHist, RooHistPdf, RooAddPdf, RooGenericPdf, RooGaussian
@@ -18,7 +18,7 @@ def fit():
 
     ptbin = 0.12
     ptmin = -5.
-    ptmax = 1.
+    ptmax = 1.01
 
     mmin = 2.8
     mmax = 3.2
@@ -58,31 +58,14 @@ def fit():
     incpdf = RooGenericPdf("incpdf", inc_form, RooArgList(logPtSq, bval))
     ninc = RooRealVar("ninc", "ninc", 100, 0, 1e4)
 
-    #signal ansatz
-    sig1_mean = RooRealVar("sig1_mean", "sig1_mean", -2.3, -5, 1)
-    sig1_mean.setConstant()
-    sig1_sig = RooRealVar("sig1_sig", "sig1_sig", 0.4, 0, 5)
-    sig1_sig.setConstant()
-    sig1_pdf = RooGaussian("sig1_pdf", "sig1_pdf", logPtSq, sig1_mean, sig1_sig)
-    nsig1 = RooRealVar("nsig1", "nsig1", 100, 0, 1e4)
-
-    sig2_mean = RooRealVar("sig2_mean", "sig2_mean", -1.5, -5, 1)
-    #sig2_mean.setConstant()
-    sig2_sig = RooRealVar("sig2_sig", "sig2_sig", 0.2, 0, 5)
-    sig2_sig.setConstant()
-    sig2_pdf = RooGaussian("sig2_pdf", "sig2_pdf", logPtSq, sig2_mean, sig2_sig)
-    nsig2 = RooRealVar("nsig2", "nsig2", 50, 0, 1e4)
-
-
-    #fit model
-    model = RooAddPdf("model", "model", RooArgList(ggpdf, incpdf, sig1_pdf, sig2_pdf), RooArgList(ngg, ninc, nsig1, nsig2))
-
-    #make the fit
-    res = model.fitTo(data, rf.Save())
-
     #create canvas frame
-    can = ut.box_canvas()
-    ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.01, 0.01)
+    gStyle.SetPadTickY(1)
+    can = ut.box_canvas(1086, 543) # square area is still 768^2
+    can.SetMargin(0, 0, 0, 0)
+    can.Divide(2, 1, 0, 0)
+
+    can.cd(1)
+    ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.01, 0)
 
     frame = logPtSq.frame(rf.Bins(nbins), rf.Title(""))
     frame.SetTitle("")
@@ -97,17 +80,56 @@ def fit():
     #plot the data
     data.plotOn(frame, rf.Name("data"))
 
-    #plot the model
-    model.plotOn(frame, rf.Name("model"), rf.LineColor(rt.kOrange-3))
-
-    model.plotOn(frame, rf.Name("gg"), rf.Components("ggpdf"), rf.LineColor(rt.kGreen))
-    model.plotOn(frame, rf.Name("inc"), rf.Components("incpdf"), rf.LineColor(rt.kRed))
-    model.plotOn(frame, rf.Name("sig1"), rf.Components("sig1_pdf"), rf.LineColor(rt.kBlue))
-    model.plotOn(frame, rf.Name("sig2"), rf.Components("sig2_pdf"), rf.LineColor(rt.kBlue))
-
     frame.Draw()
 
-    ut.invert_col(rt.gPad)
+    #plot pT^2 on the right
+
+    ptsq_bin = 0.005
+    ptsq_min = 1e-5
+    ptsq_max = 0.2
+
+    #pT^2 variable from pT
+    ptsq_form = RooFormulaVar("ptsq", "ptsq", "jRecPt*jRecPt", RooArgList(pT))
+    ptsq = data.addColumn( ptsq_form )
+
+    #pT^2 bins and range for pT^2 plot
+    ptsq_nbins, ptsq_max = ut.get_nbins(ptsq_bin, ptsq_min, ptsq_max)
+    ptsq.setMin(ptsq_min)
+    ptsq.setMax(ptsq_max)
+
+    #make the pT^2 plot
+    can.cd(2)
+    gPad.SetLogy()
+    ut.set_margin_lbtr(gPad, 0, 0.1, 0.01, 0.15)
+
+    ptsq_frame = ptsq.frame(rf.Bins(ptsq_nbins), rf.Title(""))
+    ptsq_frame.SetTitle("")
+
+    ptsq_frame.SetXTitle("#it{p}_{T}^{2} (GeV^{2})")
+    ptsq_frame.GetXaxis().SetTitleOffset(1.2)
+
+    data.plotOn(ptsq_frame, rf.Name("data"))
+
+    ptsq_frame.SetMaximum(600)
+    ptsq_frame.SetMinimum(0.101)
+
+    ptsq_frame.Draw()
+
+    #vertical axis for pT^2 plot
+    xpos = ptsq_frame.GetXaxis().GetXmax()
+    ypos = ptsq_frame.GetMaximum()
+    ymin = ptsq_frame.GetMinimum()
+
+    ptsq_axis = TGaxis(xpos, 0, xpos, ypos, ymin, ypos, 510, "+GL")
+    ut.set_axis(ptsq_axis)
+    ptsq_axis.SetMoreLogLabels()
+
+    ptsq_axis.SetTitle("Events / ({0:.3f}".format(ptsq_bin)+" GeV^{2})")
+    ptsq_axis.SetTitleOffset(2.2)
+
+    ptsq_axis.Draw()
+
+    ut.invert_col_can(can)
     can.SaveAs("01fig.pdf")
 
 
