@@ -23,6 +23,9 @@ def fit():
     mmin = 2.8
     mmax = 3.2
 
+    #range for incoherent fit
+    fitran = [-0.9, 0.1]
+
     #input data
     pT = RooRealVar("jRecPt", "pT", 0, 10)
     m = RooRealVar("jRecM", "mass", 0, 10)
@@ -35,11 +38,13 @@ def fit():
     logPtSq_draw = "TMath::Log10(jRecPt*jRecPt)"
     logPtSq_form = RooFormulaVar("logPtSq", "logPtSq", logPtSq_draw, RooArgList(pT))
     logPtSq = data.addColumn( logPtSq_form )
+    logPtSq.setRange("fitran", fitran[0], fitran[1])
 
     #bins and range for the plot
     nbins, ptmax = ut.get_nbins(ptbin, ptmin, ptmax)
     logPtSq.setMin(ptmin)
     logPtSq.setMax(ptmax)
+    logPtSq.setRange("plotran", ptmin, ptmax)
 
     #gamma-gamma -> e+e- hist pdf
     hGG = ut.prepare_TH1D("hGG", ptbin, ptmin, ptmax)
@@ -52,11 +57,20 @@ def fit():
 
     #incoherent parametrization
     bval = RooRealVar("bval", "bval", 3.3, 0, 10)
-    #bval.setVal(3.3)
-    bval.setConstant()
     inc_form = "log(10.)*pow(10.,logPtSq)*exp(-bval*pow(10.,logPtSq))"
     incpdf = RooGenericPdf("incpdf", inc_form, RooArgList(logPtSq, bval))
-    ninc = RooRealVar("ninc", "ninc", 100, 0, 1e4)
+
+    #make the incoherent fit
+    res = incpdf.fitTo(data, rf.Range("fitran"), rf.Save())
+
+    #get incoherent norm to the number of events
+    lset = RooArgSet(logPtSq)
+    iinc = incpdf.createIntegral(lset, rf.NormSet(lset), rf.Range("fitran"))
+    inc_nevt = data.sumEntries("logPtSq", "fitran")
+    incpdf.setNormRange("fitran")
+    aval = RooRealVar("aval", "aval", inc_nevt/incpdf.getNorm(lset))
+    #print "A =", aval.getVal()
+    #print "b =", bval.getVal()
 
     #create canvas frame
     gStyle.SetPadTickY(1)
@@ -80,13 +94,17 @@ def fit():
     #plot the data
     data.plotOn(frame, rf.Name("data"))
 
+    #incoherent parametrization
+    incpdf.plotOn(frame, rf.Range("fitran"), rf.LineColor(rt.kRed), rf.Name("incpdf"))
+    incpdf.plotOn(frame, rf.Range("plotran"), rf.LineColor(rt.kRed), rf.Name("incpdf_full"), rf.LineStyle(rt.kDashed))
+
     frame.Draw()
 
     #plot pT^2 on the right
 
-    ptsq_bin = 0.005
+    ptsq_bin = 0.02
     ptsq_min = 1e-5
-    ptsq_max = 0.2
+    ptsq_max = 1
 
     #pT^2 variable from pT
     ptsq_form = RooFormulaVar("ptsq", "ptsq", "jRecPt*jRecPt", RooArgList(pT))
@@ -111,9 +129,38 @@ def fit():
     data.plotOn(ptsq_frame, rf.Name("data"))
 
     ptsq_frame.SetMaximum(600)
-    ptsq_frame.SetMinimum(0.101)
+    ptsq_frame.SetMinimum(0.8) # 0.101
 
     ptsq_frame.Draw()
+
+    #incoherent parametrization in pT^2
+    inc_ptsq = TF1("inc_ptsq", "[0]*exp(-[1]*x)", 0., 10.)
+    inc_ptsq.SetParameters(aval.getVal(), bval.getVal())
+
+    #incoherent histogram from parametrization
+    hInc = ut.prepare_TH1D_n("hInc", ptsq_nbins, ptsq_min, ptsq_max)
+    ut.fill_h1_tf(hInc, inc_ptsq, rt.kRed)
+    print "nbins:", ptsq_nbins
+    ninc = 0
+    for i in xrange(hInc.GetNbinsX()+1):
+        ninc += hInc.GetBinContent(i)
+        edge = hInc.GetBinLowEdge(i)
+        print edge, hInc.GetBinContent(i), inc_ptsq.Eval(edge), hInc.GetBinContent(i)/inc_ptsq.Eval(edge)
+
+    print "ninc:", hInc.Integral(), hInc.GetBinContent(0), hInc.GetBinContent(ptsq_nbins+1)
+    print "ninc:", ninc
+
+    #hInc.Draw("same")
+
+    #scale the incoherent parametrization to the scale of the plot
+    print "iinc_all:", inc_ptsq.Integral(0, 10)
+    print "iinc:", inc_ptsq.Integral(ptsq_min, ptsq_max)
+
+    #inc_scale = inc_ptsq.Integral(ptsq_min, ptsq_max) / (inc_ptsq.Integral(0, 10))
+    inc_ptsq.SetParameter(0, inc_ptsq.GetParameter(0)*ptsq_bin)
+    #inc_ptsq.SetParameter(0, inc_ptsq.GetParameter(0)*inc_scale)
+
+    inc_ptsq.Draw("same")
 
     #vertical axis for pT^2 plot
     xpos = ptsq_frame.GetXaxis().GetXmax()
