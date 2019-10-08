@@ -14,17 +14,29 @@ import plot_utils as ut
 #_____________________________________________________________________________
 def fit():
 
-    #fit to log_10(pT^2) with components
+    #fit to log_10(pT^2) with components and plot of plain pT^2
 
+    #range in log_10(pT^2)
     ptbin = 0.12
     ptmin = -5.
     ptmax = 1.01
+
+    #range in pT^2
+    ptsq_bin = 0.01
+    ptsq_min = 1e-5
+    ptsq_max = 1
 
     mmin = 2.8
     mmax = 3.2
 
     #range for incoherent fit
     fitran = [-0.9, 0.1]
+
+    #number of gamma-gamma events
+    ngg = 131
+
+    #number of psi' events
+    npsiP = 20
 
     #input data
     pT = RooRealVar("jRecPt", "pT", 0, 10)
@@ -35,7 +47,8 @@ def fit():
     data = data_all.reduce( strsel )
 
     #create log(pT^2) from pT
-    logPtSq_draw = "TMath::Log10(jRecPt*jRecPt)"
+    ptsq_draw = "jRecPt*jRecPt" # will be used for pT^2
+    logPtSq_draw = "TMath::Log10("+ptsq_draw+")"
     logPtSq_form = RooFormulaVar("logPtSq", "logPtSq", logPtSq_draw, RooArgList(pT))
     logPtSq = data.addColumn( logPtSq_form )
     logPtSq.setRange("fitran", fitran[0], fitran[1])
@@ -46,14 +59,8 @@ def fit():
     logPtSq.setMax(ptmax)
     logPtSq.setRange("plotran", ptmin, ptmax)
 
-    #gamma-gamma -> e+e- hist pdf
-    hGG = ut.prepare_TH1D("hGG", ptbin, ptmin, ptmax)
-    tree_gg.Draw( logPtSq_draw+" >> hGG", strsel )
-    dhGG = RooDataHist("dhGG", "dhGG", RooArgList(logPtSq), hGG)
-    ggpdf = RooHistPdf("ggpdf", "ggpdf", RooArgSet(logPtSq), dhGG, 0)
-    ngg = RooRealVar("ngg", "ngg", 130, 0, 1e4)
-    ngg.setVal(131)
-    ngg.setConstant()
+    #range for pT^2
+    ptsq_nbins, ptsq_max = ut.get_nbins(ptsq_bin, ptsq_min, ptsq_max)
 
     #incoherent parametrization
     bval = RooRealVar("bval", "bval", 3.3, 0, 10)
@@ -71,6 +78,28 @@ def fit():
     aval = RooRealVar("aval", "aval", inc_nevt/incpdf.getNorm(lset))
     #print "A =", aval.getVal()
     #print "b =", bval.getVal()
+
+    #gamma-gamma contribution
+    hGG = ut.prepare_TH1D_n("hGG", nbins, ptmin, ptmax)
+    tree_gg.Draw( logPtSq_draw+" >> hGG", strsel )
+    ut.norm_to_num(hGG, ngg, rt.kGreen)
+
+    #gamma-gamma in pT^2
+    hGG_ptsq = ut.prepare_TH1D_n("hGG_ptsq", ptsq_nbins, ptsq_min, ptsq_max)
+    tree_gg.Draw( ptsq_draw+" >> hGG_ptsq", strsel )
+    ut.norm_to_num(hGG_ptsq, ngg, rt.kGreen)
+
+    #psi' contribution
+    psiP_file = TFile.Open(basedir_mc+"/ana_slight14e4x1_s6_sel5z.root")
+    psiP_tree = psiP_file.Get("jRecTree")
+    hPsiP = ut.prepare_TH1D_n("hPsiP", nbins, ptmin, ptmax)
+    psiP_tree.Draw(logPtSq_draw+" >> hPsiP", strsel)
+    ut.norm_to_num(hPsiP, npsiP, rt.kViolet)
+
+    #psi' in pT^2
+    hPsiP_ptsq = ut.prepare_TH1D_n("hPsiP_ptsq", ptsq_nbins, ptsq_min, ptsq_max)
+    psiP_tree.Draw(ptsq_draw+" >> hPsiP_ptsq", strsel)
+    ut.norm_to_num(hPsiP_ptsq, npsiP, rt.kViolet)
 
     #create canvas frame
     gStyle.SetPadTickY(1)
@@ -100,18 +129,19 @@ def fit():
 
     frame.Draw()
 
+    #add gamma-gamma contribution
+    hGG.Draw("same")
+
+    #add psi'
+    hPsiP.Draw("same")
+
     #plot pT^2 on the right
 
-    ptsq_bin = 0.02
-    ptsq_min = 1e-5
-    ptsq_max = 1
-
     #pT^2 variable from pT
-    ptsq_form = RooFormulaVar("ptsq", "ptsq", "jRecPt*jRecPt", RooArgList(pT))
+    ptsq_form = RooFormulaVar("ptsq", "ptsq", ptsq_draw, RooArgList(pT))
     ptsq = data.addColumn( ptsq_form )
 
-    #pT^2 bins and range for pT^2 plot
-    ptsq_nbins, ptsq_max = ut.get_nbins(ptsq_bin, ptsq_min, ptsq_max)
+    #range for pT^2 plot
     ptsq.setMin(ptsq_min)
     ptsq.setMax(ptsq_max)
 
@@ -133,34 +163,20 @@ def fit():
 
     ptsq_frame.Draw()
 
-    #incoherent parametrization in pT^2
+    #incoherent parametrization in pT^2, scaled to the plot
     inc_ptsq = TF1("inc_ptsq", "[0]*exp(-[1]*x)", 0., 10.)
-    inc_ptsq.SetParameters(aval.getVal(), bval.getVal())
-
-    #incoherent histogram from parametrization
-    hInc = ut.prepare_TH1D_n("hInc", ptsq_nbins, ptsq_min, ptsq_max)
-    ut.fill_h1_tf(hInc, inc_ptsq, rt.kRed)
-    print "nbins:", ptsq_nbins
-    ninc = 0
-    for i in xrange(hInc.GetNbinsX()+1):
-        ninc += hInc.GetBinContent(i)
-        edge = hInc.GetBinLowEdge(i)
-        print edge, hInc.GetBinContent(i), inc_ptsq.Eval(edge), hInc.GetBinContent(i)/inc_ptsq.Eval(edge)
-
-    print "ninc:", hInc.Integral(), hInc.GetBinContent(0), hInc.GetBinContent(ptsq_nbins+1)
-    print "ninc:", ninc
-
-    #hInc.Draw("same")
-
-    #scale the incoherent parametrization to the scale of the plot
-    print "iinc_all:", inc_ptsq.Integral(0, 10)
-    print "iinc:", inc_ptsq.Integral(ptsq_min, ptsq_max)
-
-    #inc_scale = inc_ptsq.Integral(ptsq_min, ptsq_max) / (inc_ptsq.Integral(0, 10))
-    inc_ptsq.SetParameter(0, inc_ptsq.GetParameter(0)*ptsq_bin)
-    #inc_ptsq.SetParameter(0, inc_ptsq.GetParameter(0)*inc_scale)
+    inc_ptsq.SetParameters(aval.getVal()*ptsq_bin, bval.getVal())
 
     inc_ptsq.Draw("same")
+
+    #add gamma-gamma in pT^2
+    hGG_ptsq.Draw("same")
+
+    #add psi' in pT^2
+    hPsiP_ptsq.Draw("same")
+
+    #redraw the frame
+    #ptsq_frame.Draw("same")
 
     #vertical axis for pT^2 plot
     xpos = ptsq_frame.GetXaxis().GetXmax()

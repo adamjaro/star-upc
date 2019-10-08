@@ -1,7 +1,7 @@
 
 import ROOT as rt
 from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
-from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors, TGaxis
+from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors, TGaxis, TF1
 from ROOT.Fit import FitResult
 from ROOT import std, vector
 
@@ -565,6 +565,13 @@ def invert_col(pad, bgcol=rt.kBlack):
       #F2
       if obj.InheritsFrom(TF2.Class()) == True:
         axes = [obj.GetXaxis(), obj.GetYaxis(), obj.GetZaxis()]
+        for i in range(len(axes)):
+            axes[i].SetAxisColor(fgcol)
+            axes[i].SetLabelColor(fgcol)
+            axes[i].SetTitleColor(fgcol)
+      #F1
+      if obj.InheritsFrom(TF1.Class()) == True:
+        axes = [obj.GetXaxis(), obj.GetYaxis()]
         for i in range(len(axes)):
             axes[i].SetAxisColor(fgcol)
             axes[i].SetLabelColor(fgcol)
