@@ -22,7 +22,7 @@ def fit():
     ptmax = 1.01
 
     #range in pT^2
-    ptsq_bin = 0.01
+    ptsq_bin = 0.03
     ptsq_min = 1e-5
     ptsq_max = 1
 
@@ -106,11 +106,12 @@ def fit():
     can = ut.box_canvas(1086, 543) # square area is still 768^2
     can.SetMargin(0, 0, 0, 0)
     can.Divide(2, 1, 0, 0)
+    gStyle.SetLineWidth(1)
 
     can.cd(1)
     ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.01, 0)
 
-    frame = logPtSq.frame(rf.Bins(nbins), rf.Title(""))
+    frame = logPtSq.frame(rf.Bins(nbins))
     frame.SetTitle("")
     frame.SetMaximum(75)
 
@@ -121,11 +122,11 @@ def fit():
     frame.GetYaxis().SetTitleOffset(1.6)
 
     #plot the data
-    data.plotOn(frame, rf.Name("data"))
+    data.plotOn(frame, rf.Name("data"), rf.LineWidth(2))
 
     #incoherent parametrization
-    incpdf.plotOn(frame, rf.Range("fitran"), rf.LineColor(rt.kRed), rf.Name("incpdf"))
-    incpdf.plotOn(frame, rf.Range("plotran"), rf.LineColor(rt.kRed), rf.Name("incpdf_full"), rf.LineStyle(rt.kDashed))
+    incpdf.plotOn(frame, rf.Range("fitran"), rf.LineColor(rt.kRed), rf.Name("incpdf"), rf.LineWidth(2))
+    incpdf.plotOn(frame, rf.Range("plotran"), rf.LineColor(rt.kRed), rf.Name("incpdf_full"), rf.LineStyle(rt.kDashed), rf.LineWidth(2))
 
     frame.Draw()
 
@@ -133,7 +134,7 @@ def fit():
     hGG.Draw("same")
 
     #add psi'
-    hPsiP.Draw("same")
+    #hPsiP.Draw("same")
 
     #plot pT^2 on the right
 
@@ -148,15 +149,18 @@ def fit():
     #make the pT^2 plot
     can.cd(2)
     gPad.SetLogy()
+    #gPad.SetLineWidth(3)
+    #gPad.SetFrameLineWidth(1)
     ut.set_margin_lbtr(gPad, 0, 0.1, 0.01, 0.15)
 
     ptsq_frame = ptsq.frame(rf.Bins(ptsq_nbins), rf.Title(""))
+
     ptsq_frame.SetTitle("")
 
     ptsq_frame.SetXTitle("#it{p}_{T}^{2} (GeV^{2})")
     ptsq_frame.GetXaxis().SetTitleOffset(1.2)
 
-    data.plotOn(ptsq_frame, rf.Name("data"))
+    data.plotOn(ptsq_frame, rf.Name("data"), rf.LineWidth(2))
 
     ptsq_frame.SetMaximum(600)
     ptsq_frame.SetMinimum(0.8) # 0.101
@@ -173,7 +177,7 @@ def fit():
     hGG_ptsq.Draw("same")
 
     #add psi' in pT^2
-    hPsiP_ptsq.Draw("same")
+    #hPsiP_ptsq.Draw("same")
 
     #redraw the frame
     #ptsq_frame.Draw("same")

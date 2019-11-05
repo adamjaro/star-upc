@@ -1,7 +1,7 @@
 
 import ROOT as rt
 from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
-from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors, TGaxis, TF1
+from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors, TGaxis, TF1, TFrame
 from ROOT.Fit import FitResult
 from ROOT import std, vector
 
@@ -595,6 +595,13 @@ def invert_col(pad, bgcol=rt.kBlack):
             obj.SetLineColor(fgcol)
             obj.SetLabelColor(fgcol)
             obj.SetTitleColor(fgcol)
+
+      #TFrame
+      if obj.InheritsFrom( TFrame.Class() ) == True:
+            if obj.GetLineColor() == rt.kBlack:
+                obj.SetLineColor(fgcol)
+                obj.SetFillColor(bgcol)
+
       #move to next item
       obj = next()
 
