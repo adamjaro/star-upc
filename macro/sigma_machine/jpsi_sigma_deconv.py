@@ -14,7 +14,7 @@ import plot_utils as ut
 from models import *
 
 #_____________________________________________________________________________
-if __name__ == "__main__":
+def main():
 
     gROOT.SetBatch()
 
@@ -105,11 +105,11 @@ if __name__ == "__main__":
     tree_bgen_gen = inp_bgen.Get("jGenTree")
 
     #evaluate binning
-    print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
+    #print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
 
     bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
     #bins = ut.get_bins_vec_3pt(ptshort, ptbin, ptlon, ptmin, ptmax, ptlow, ptmid)
-    print "bins2:", bins.size()-1
+    #print "bins2:", bins.size()-1
 
     #load the data
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
@@ -132,21 +132,21 @@ if __name__ == "__main__":
     hPtIncoh = ut.prepare_TH1D_vec("hPtIncoh", bins)
     ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
 
-    print "Entries before gamma-gamma and incoherent subtraction:", hPt.GetEntries()
+    #print "Entries before gamma-gamma and incoherent subtraction:", hPt.GetEntries()
 
     #subtract gamma-gamma and incoherent components
     hPt.Sumw2()
     hPt.Add(hPtGG, -1)
-    print "Gamma-gamma entries:", hPtGG.Integral()
-    print "Entries after gamma-gamma subtraction:", hPt.Integral()
-    print "Incoherent entries:", hPtIncoh.Integral()
+    #print "Gamma-gamma entries:", hPtGG.Integral()
+    #print "Entries after gamma-gamma subtraction:", hPt.Integral()
+    #print "Incoherent entries:", hPtIncoh.Integral()
     hPt.Add(hPtIncoh, -1)
 
-    print "Entries after all subtraction:", hPt.Integral()
+    #print "Entries after all subtraction:", hPt.Integral()
 
     #scale the luminosity
     lumi_scaled = lumi*ratio_ana*ratio_zdc_vtx
-    print "lumi_scaled:", lumi_scaled
+    #print "lumi_scaled:", lumi_scaled
 
     #denominator for deconvoluted distribution, conversion ub to mb
     den = 0.85*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*1000.*dy
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     err_bemc_eff = 0.03
     #sys_err = rt.TMath.Sqrt(err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff)
     sys_err = err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff
-    print "Total sys err:", sys_err
+    #print "Total sys err:", sys_err
     hSys = ut.prepare_TH1D_vec("hSys", bins)
     hSys.SetOption("E2")
     hSys.SetFillColor(rt.kOrange+1)
@@ -239,6 +239,9 @@ if __name__ == "__main__":
     frame.Draw()
 
     #hSys.Draw("e2same")
+
+    #bin center points from data
+    get_centers(bins)
 
     #hPtSl.Draw("e1same")
     #hPtSart.Draw("e1same")
@@ -295,8 +298,17 @@ if __name__ == "__main__":
     gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
 
 
+#_____________________________________________________________________________
+def get_centers(bins):
 
+    #bin center points according to the data
 
+    print bins
+
+#_____________________________________________________________________________
+if __name__ == "__main__":
+
+    main()
 
 
 
