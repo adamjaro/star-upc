@@ -79,15 +79,29 @@ def fit():
     #print "A =", aval.getVal()
     #print "b =", bval.getVal()
 
+    #incoherent distribution from log_10(pT^2) function for the sum with gamma-gamma
+    hIncPdf = ut.prepare_TH1D_n("hGG", nbins, ptmin, ptmax)
+    func_incoh_logPt2 = TF1("func_incoh_logPt2", "[0]*log(10.)*pow(10.,x)*exp(-[1]*pow(10.,x))", -10., 10.)
+    func_incoh_logPt2.SetNpx(1000)
+    func_incoh_logPt2.SetLineColor(rt.kMagenta)
+    func_incoh_logPt2.SetParameters(aval.getVal(), bval.getVal()) # 4.9 from incoherent mc, 3.3 from data fit
+    ut.fill_h1_tf(hIncPdf, func_incoh_logPt2, rt.kMagenta)
+
     #gamma-gamma contribution
     hGG = ut.prepare_TH1D_n("hGG", nbins, ptmin, ptmax)
     tree_gg.Draw( logPtSq_draw+" >> hGG", strsel )
-    ut.norm_to_num(hGG, ngg, rt.kGreen)
+    ut.norm_to_num(hGG, ngg, rt.kGreen+1)
+
+    #sum of incoherent distribution and gamma-gamma
+    hSumIncGG = ut.prepare_TH1D_n("hSumIncGG", nbins, ptmin, ptmax)
+    hSumIncGG.Add(hIncPdf)
+    hSumIncGG.Add(hGG)
+    ut.line_h1(hSumIncGG, rt.kMagenta)
 
     #gamma-gamma in pT^2
     hGG_ptsq = ut.prepare_TH1D_n("hGG_ptsq", ptsq_nbins, ptsq_min, ptsq_max)
     tree_gg.Draw( ptsq_draw+" >> hGG_ptsq", strsel )
-    ut.norm_to_num(hGG_ptsq, ngg, rt.kGreen)
+    ut.norm_to_num(hGG_ptsq, ngg, rt.kGreen+1)
 
     #psi' contribution
     psiP_file = TFile.Open(basedir_mc+"/ana_slight14e4x1_s6_sel5z.root")
@@ -133,10 +147,31 @@ def fit():
     #add gamma-gamma contribution
     hGG.Draw("same")
 
+    #sum of incoherent distribution and gamma-gamma
+    #hSumIncGG.Draw("same")
+
     #add psi'
     #hPsiP.Draw("same")
 
-    #plot pT^2 on the right
+    #legend for input data
+    dleg = ut.prepare_leg(0.12, 0.79, 0.14, 0.18, 0.035)
+    dleg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    ut.add_leg_mass(dleg, mmin, mmax)
+    dleg.AddEntry(None, "AuAu@200 GeV", "")
+    dleg.AddEntry(None, "UPC sample", "")
+    dleg.Draw("same")
+
+    #legend for log_10(pT^2)
+    leg = ut.prepare_leg(0.56, 0.8, 0.14, 0.15, 0.035)
+    hxl = ut.prepare_TH1D("hxl", 1, 0, 1)
+    hxl.Draw("same")
+    leg.AddEntry(hxl, "Data", "lp")
+    ilin = ut.col_lin(rt.kRed, 2)
+    leg.AddEntry(ilin, "Incoherent parametrization", "l")
+    leg.AddEntry(hGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
+    leg.Draw("same")
+
+    #----- plot pT^2 on the right -----
 
     #pT^2 variable from pT
     ptsq_form = RooFormulaVar("ptsq", "ptsq", ptsq_draw, RooArgList(pT))
@@ -162,8 +197,8 @@ def fit():
 
     data.plotOn(ptsq_frame, rf.Name("data"), rf.LineWidth(2))
 
-    ptsq_frame.SetMaximum(600)
-    ptsq_frame.SetMinimum(0.8) # 0.101
+    ptsq_frame.SetMaximum(9e2)
+    ptsq_frame.SetMinimum(0.9) # 0.101
 
     ptsq_frame.Draw()
 
@@ -195,6 +230,16 @@ def fit():
     ptsq_axis.SetTitleOffset(2.2)
 
     ptsq_axis.Draw()
+
+    #legend for pT^2
+    #pleg = ut.prepare_leg(0.37, 0.65, 0.14, 0.3, 0.035)
+    pleg = ut.prepare_leg(0.4, 0.8, 0.14, 0.15, 0.035)
+    hx = ut.prepare_TH1D("hx", 1, 0, 1)
+    hx.Draw("same")
+    pleg.AddEntry(hx, "Data", "lp")
+    pleg.AddEntry(inc_ptsq, "Incoherent parametrization", "l")
+    pleg.AddEntry(hGG_ptsq, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
+    pleg.Draw("same")
 
     ut.invert_col_can(can)
     can.SaveAs("01fig.pdf")
