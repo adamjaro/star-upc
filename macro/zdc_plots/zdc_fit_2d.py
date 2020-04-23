@@ -30,6 +30,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     plot_east = frame2.Clone("plot_east")
     plot_east.SetMarkerStyle(22)
     plot_east.SetMarkerSize(1.4)
+    ut.set_H1D_col(plot_east, rt.kBlue)
     for ibin in xrange(hEast.GetN()):
         hEast.GetPoint(ibin, xp, yp)
         plot_east.SetBinContent(ibin+1, yp)
@@ -41,6 +42,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     hWest = frame_west.getHist("data")
     plot_west = frame2.Clone("plot_west")
     plot_west.SetMarkerStyle(21)
+    ut.set_H1D_col(plot_west, rt.kRed)
     for i in xrange(hWest.GetN()):
         hWest.GetPoint(i, xp, yp)
         ibin = frame2.GetNbinsX()-i
@@ -54,9 +56,10 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
         cEast.GetPoint(i, xp, yp)
         gEast.SetPoint(i, xp, yp)
 
-    gEast.SetLineColor(rt.kRed)
+    gEast.SetLineColor(rt.kBlue)
     gEast.SetLineWidth(3)
-    #gEast.SetLineStyle(rt.kDashed)
+    gEast.SetLineStyle(rt.kDashed)
+    #gEast.SetLineStyle(rt.kDashDotted)
 
     #west fit on the left
     cWest = frame_west.getCurve("model")
@@ -67,8 +70,10 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
         xplot = xmax - xp
         gWest.SetPoint(i, xplot, yp)
 
-    gWest.SetLineColor(rt.kBlue)
+    gWest.SetLineColor(rt.kRed)
     gWest.SetLineWidth(3)
+    #gWest.SetLineStyle(rt.kDashDotted)
+    #gWest.SetLineStyle(rt.kDashed)
 
     #horizontal axis
     frame2.SetMinimum(0)
@@ -83,7 +88,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     xpos = frame2.GetXaxis().GetXmax()
     axisW = TGaxis(xpos, ypos, xpos-adc_max, ypos, adc_min, adc_max, 510, "-")
     ut.set_axis(axisW)
-    axisW.SetLabelOffset(-0.025)
+    axisW.SetLabelOffset(-0.024)
     axisW.SetTitle("ZDC West")
     axisW.SetTitleOffset(1.1)
 
@@ -134,7 +139,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     pleg.AddEntry(gWest, "Fit projection to west", "l")
     pleg.Draw("same")
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #end of plot_proj_both
@@ -188,7 +193,7 @@ def make_fit():
 
     #east/west projections and 2D plot
     ew = 1
-    p2d = 1
+    p2d = 2 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
 
     #plot colors
     model_col = rt.kMagenta
