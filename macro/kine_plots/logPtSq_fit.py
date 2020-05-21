@@ -19,7 +19,7 @@ def fit():
     #range in log_10(pT^2)
     ptbin = 0.12
     ptmin = -5.
-    ptmax = 1.01
+    ptmax = 0.99  # 1.01
 
     #range in pT^2
     ptsq_bin = 0.03
@@ -127,7 +127,7 @@ def fit():
 
     frame = logPtSq.frame(rf.Bins(nbins))
     frame.SetTitle("")
-    frame.SetMaximum(75)
+    frame.SetMaximum(80)
 
     frame.SetYTitle("Events / ({0:.3f}".format(ptbin)+" GeV^{2})")
     frame.SetXTitle("log_{10}( #it{p}_{T}^{2} ) (GeV^{2})")
@@ -153,22 +153,18 @@ def fit():
     #add psi'
     #hPsiP.Draw("same")
 
-    #legend for input data
-    dleg = ut.prepare_leg(0.12, 0.79, 0.14, 0.18, 0.035)
-    dleg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
-    ut.add_leg_mass(dleg, mmin, mmax)
-    dleg.AddEntry(None, "AuAu@200 GeV", "")
-    dleg.AddEntry(None, "UPC sample", "")
-    dleg.Draw("same")
-
     #legend for log_10(pT^2)
-    leg = ut.prepare_leg(0.56, 0.8, 0.14, 0.15, 0.035)
+    leg = ut.prepare_leg(0.15, 0.77, 0.28, 0.19, 0.035)
     hxl = ut.prepare_TH1D("hxl", 1, 0, 1)
     hxl.Draw("same")
-    leg.AddEntry(hxl, "Data", "lp")
     ilin = ut.col_lin(rt.kRed, 2)
-    leg.AddEntry(ilin, "Incoherent parametrization", "l")
+    ilin2 = ut.col_lin(rt.kRed, 2)
+    ilin2.SetLineStyle(rt.kDashed)
+    leg.AddEntry(ilin, "Incoherent parametrization, fit region", "l")
+    leg.AddEntry(ilin2, "Incoherent parametrization, extrapolation region", "l")
     leg.AddEntry(hGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
+    #leg.AddEntry(hxl, "Data", "lp")
+    leg.AddEntry(hxl, "Data, log_{10}( #it{p}_{T}^{2} )", "lp")
     leg.Draw("same")
 
     #----- plot pT^2 on the right -----
@@ -190,6 +186,8 @@ def fit():
 
     ptsq_frame = ptsq.frame(rf.Bins(ptsq_nbins), rf.Title(""))
 
+    #print type(ptsq_frame), type(ptsq)
+
     ptsq_frame.SetTitle("")
 
     ptsq_frame.SetXTitle("#it{p}_{T}^{2} (GeV^{2})")
@@ -198,15 +196,25 @@ def fit():
     data.plotOn(ptsq_frame, rf.Name("data"), rf.LineWidth(2))
 
     ptsq_frame.SetMaximum(9e2)
-    ptsq_frame.SetMinimum(0.9) # 0.101
+    ptsq_frame.SetMinimum(0.8) # 0.101
 
     ptsq_frame.Draw()
 
-    #incoherent parametrization in pT^2, scaled to the plot
-    inc_ptsq = TF1("inc_ptsq", "[0]*exp(-[1]*x)", 0., 10.)
+    #incoherent parametrization in pT^2 over the fit region, scaled to the plot
+    inc_ptsq = TF1("inc_ptsq", "[0]*exp(-[1]*x)", 10**fitran[0], 10**fitran[1])
     inc_ptsq.SetParameters(aval.getVal()*ptsq_bin, bval.getVal())
 
+    #incoherent parametrization in the extrapolation region, below and above the fit region
+    inc_ptsq_ext1 = TF1("inc_ptsq_ext1", "[0]*exp(-[1]*x)", 0., 10**fitran[0])
+    inc_ptsq_ext2 = TF1("inc_ptsq_ext2", "[0]*exp(-[1]*x)", 10**fitran[1], 10)
+    inc_ptsq_ext1.SetParameters(aval.getVal()*ptsq_bin, bval.getVal())
+    inc_ptsq_ext1.SetLineStyle(rt.kDashed)
+    inc_ptsq_ext2.SetParameters(aval.getVal()*ptsq_bin, bval.getVal())
+    inc_ptsq_ext2.SetLineStyle(rt.kDashed)
+
     inc_ptsq.Draw("same")
+    inc_ptsq_ext1.Draw("same")
+    inc_ptsq_ext2.Draw("same")
 
     #add gamma-gamma in pT^2
     hGG_ptsq.Draw("same")
@@ -216,6 +224,8 @@ def fit():
 
     #redraw the frame
     #ptsq_frame.Draw("same")
+
+    ptsq_frame.GetXaxis().SetLimits(-9e-3, ptsq_frame.GetXaxis().GetXmax())
 
     #vertical axis for pT^2 plot
     xpos = ptsq_frame.GetXaxis().GetXmax()
@@ -231,15 +241,15 @@ def fit():
 
     ptsq_axis.Draw()
 
-    #legend for pT^2
-    #pleg = ut.prepare_leg(0.37, 0.65, 0.14, 0.3, 0.035)
-    pleg = ut.prepare_leg(0.4, 0.8, 0.14, 0.15, 0.035)
-    hx = ut.prepare_TH1D("hx", 1, 0, 1)
-    hx.Draw("same")
-    pleg.AddEntry(hx, "Data", "lp")
-    pleg.AddEntry(inc_ptsq, "Incoherent parametrization", "l")
-    pleg.AddEntry(hGG_ptsq, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
-    pleg.Draw("same")
+    #legend for input data
+    #dleg = ut.prepare_leg(0.4, 0.77, 0.14, 0.18, 0.035)
+    dleg = ut.prepare_leg(0.4, 0.71, 0.16, 0.24, 0.035)
+    dleg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    ut.add_leg_mass(dleg, mmin, mmax)
+    dleg.AddEntry(None, "AuAu@200 GeV", "")
+    dleg.AddEntry(None, "UPC sample", "")
+    dleg.AddEntry(hxl, "Data, #it{p}_{T}^{2}", "lp")
+    dleg.Draw("same")
 
     ut.invert_col_can(can)
     can.SaveAs("01fig.pdf")
