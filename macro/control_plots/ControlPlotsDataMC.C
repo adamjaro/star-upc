@@ -41,8 +41,8 @@ void ControlPlotsDataMC() {
 
   Init();
 
-  Int_t set   = 0;
-  Int_t iplot = 0;
+  Int_t set   = 1;
+  Int_t iplot = 4;
 
   Int_t trkCharge = 0; // track charge to plot, 0 = both, -1 = negative, 1 = positive
 
@@ -79,17 +79,38 @@ void ControlPlotsDataMC() {
 
   if(set == 1) {
   // set 1
-  // iplot                      0           1         2            3
-  //                        BEMC energy  trk pT   trk energy   pT at BEMC
-  static string lrec[] = {  "jT0bemcE",  "jT0pT",  "jT0eng",  "jT0pTBemc" };
-  static Double_t xbin[] = {   0.05,       0.07,      0.09,       0.03 };
-  static Double_t xmin[] = {   0.,         0.4,       1.3,        0. };
-  static Double_t xmax[] = {   5.,         2.6,       3.2,        4.5 };
+  // iplot                      0           1         2            3            4          5             6
+  //                        BEMC energy  trk pT   trk energy   pT at BEMC   trk chi^2   trk nhits   trk hits fit
+  static string lrec[] = {  "jT0bemcE",  "jT0pT",  "jT0eng",  "jT0pTBemc",  "jT0chi2", "jT0nHits", "jT0nHitsFit" };
+  static Double_t xbin[] = {   0.05,       0.07,      0.09,       0.03,        0.1,         1,           1 };
+  static Double_t xmin[] = {   0.,         0.4,       1.3,        0.,          0,           0,           0 };
+  static Double_t xmax[] = {   5.,         2.6,       3.2,        4.5,         4,          50,          50 };
   static string xtit[] = {
     "Energy in BEMC",
     "Tracks #it{p}_{T} (GeV)",
     "Tracks energy (GeV)",
-    "Track #it{p}_{T} at BEMC (GeV)"
+    "Track #it{p}_{T} at BEMC (GeV)",
+    "Track #chi^{2}",
+    "Track number of hits",
+    "Track number of hits for fit"
+  };
+    glrec=lrec; gxbin=xbin; gxmin=xmin; gxmax=xmax; gxtit=xtit;
+  }
+
+  if(set == 2) {
+  // set 2
+  // iplot                      0           1           2               3            4
+  //                         dca in z   dca in xy  en at bemc proj   n sig el   sig for dEdx 
+  static string lrec[] = {  "jT0dcaZ", "jT0dcaXY", "jT0EnAtBemc",   "jT0sigEl", "jT0dEdxSig" };
+  static Double_t xbin[] = {   0.01,      0.01,         0.1,            0.1,         1e-7 };
+  static Double_t xmin[] = {   -2,         0,           0.5,            -4,         0 };
+  static Double_t xmax[] = {   2,          4,           4,              4,           1e-5 };
+  static string xtit[] = {
+    "DCA along #it{z}",
+    "DCA in #it{xy} plane",
+    "Track energy at BEMC projection",
+    "N sigma electron",
+    "dE/dx signal"
   };
     glrec=lrec; gxbin=xbin; gxmin=xmin; gxmax=xmax; gxtit=xtit;
   }
