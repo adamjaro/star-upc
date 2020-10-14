@@ -330,9 +330,10 @@ def plot_zdc_2d():
 
     #ZDC ADC counts east vs. west 2D
 
-    zbin = 18.
-    zmin = 0.
-    zmax = 700.
+    zbin = 3
+    zmin = 1
+    zmax = 1400
+    #zmax = 100
 
     ptmax = 0.17
     mmin = 1.5
@@ -349,31 +350,42 @@ def plot_zdc_2d():
     #return
 
     hZdc = ut.prepare_TH2D("hZdc", zbin, zmin, zmax, zbin, zmin, zmax)
-    tree.Draw(znam[1]+":"+znam[0]+" >> hZdc", strsel) # y:x
-    #treeAll = inp.Get("jAllTree")
-    #treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc") # y:x
-    hZdc.SetXTitle(xtit[0])
-    hZdc.SetYTitle(xtit[1])
-    hZdc.SetZTitle("Events / {0:.1f}".format(zbin))
 
-    hZdc.SetTitleOffset(2., "X")
-    hZdc.SetTitleOffset(1.7, "Y")
-    hZdc.SetTitleOffset(1.4, "Z")
+    #tree.Draw(znam[1]+":"+znam[0]+" >> hZdc", strsel) # y:x
+    treeAll = inp.Get("jAllTree")
+    #treeAll.Print()
+    treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc") # y:x
+    #hZdc.SetXTitle(xtit[0])
+    #hZdc.SetYTitle(xtit[1])
+    #hZdc.SetZTitle("Events / {0:.1f}".format(zbin))
 
-    gPad.SetTopMargin(0.01)
-    gPad.SetRightMargin(0.05)
+    #hZdc.SetTitleOffset(2., "X")
+    #hZdc.SetTitleOffset(1.7, "Y")
+    #hZdc.SetTitleOffset(1.4, "Z")
+
+    ut.put_yx_tit(hZdc, xtit[1], xtit[0], 1.7, 1.2)
+
+    #gPad.SetTopMargin(0.01)
+    #gPad.SetRightMargin(0.05)
     #gPad.SetBottomMargin(0.08)
     #gPad.SetLeftMargin(0.1)
+    ut.set_margin_lbtr(gPad, 0.12, 0.09, 0.02, 0.11)
 
-    hZdc.SetOption("lego2")
+    #hZdc.SetOption("lego2")
     #hZdc.SetOption("colz")
+
+    hZdc.SetMinimum(0.98)
+    hZdc.SetContour(300)
 
     hZdc.Draw()
 
+    gPad.SetGrid()
+    gPad.SetLogz()
+
     #gPad.SetTheta(30.)
-    gPad.SetPhi(-125.)  # -125  -135
+    #gPad.SetPhi(-125.)  # -125  -135
     #gPad.SetPhi(-160.)
-    gPad.Update()
+    #gPad.Update()
 
     leg = ut.prepare_leg(0., 0.9, 0.29, 0.1, 0.03)
     leg.SetMargin(0.05)
@@ -381,9 +393,9 @@ def plot_zdc_2d():
     mmin_fmt = "{0:.1f}".format(mmin)
     mmax_fmt = "{0:.1f}".format(mmax)
     leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
-    leg.Draw("same")
+    #leg.Draw("same")
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     if interactive == True: start_interactive()
@@ -453,10 +465,10 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
     #infile = "ana_muDst_run1_all_sel5.root"
     #infile = "ana_muDst_run1_all_sel5z.root"
-    #infile = "ana_muDst_run1a_all_sel5_tof.root"
+    infile = "ana_muDst_run1a_all_sel5_tof.root"
 
     #basedir = "../../../star-upc-data/ana/muDst/muDst_run2a/gg0"
     #infile = "ana_muDst_run2a_all_gg0_v2.root"
@@ -467,8 +479,8 @@ if __name__ == "__main__":
     #basedir = "../../../star-upc-data/ana/muDst/muDst_VPDZDCmon1/sel5"
     #infile = "ana_VPDZDCmon1_sel5z.root"
 
-    basedir = "../../../star-upcDst-data"
-    infile = "output.root"
+    #basedir = "../../../star-upcDst-data"
+    #infile = "output.root"
 
     interactive = False
 
@@ -476,7 +488,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 6
+    iplot = 1
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1

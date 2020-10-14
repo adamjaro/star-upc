@@ -19,7 +19,7 @@ def main():
 
     in_sl = "/home/jaroslav/sim/noon-master/SLoutput_100k.root"
 
-    iplot = 7
+    iplot = 8
     funclist = []
     funclist.append( gen_y ) # 0
     funclist.append( gen_phot_k ) # 1
@@ -29,6 +29,7 @@ def main():
     funclist.append( neut_en ) # 5
     funclist.append( neut_eta ) # 6
     funclist.append( neut_abs_eta ) # 7
+    funclist.append( neut_en_pn ) # 8
 
     inp = TFile.Open(infile)
     inp_sl = TFile.Open(in_sl)
@@ -212,7 +213,8 @@ def neut_en():
 
     ebin = 0.5
     emin = 50
-    emax = 200
+    #emax = 200
+    emax = 1000
     #ebin = 10
     #emin = 500
     #emax = 3000
@@ -229,16 +231,16 @@ def neut_en():
     for iev in xrange(nev):
         tree.GetEntry(iev)
 
-        #print iev
+        esum = 0.
 
         for imc in xrange(particles.GetEntriesFast()):
 
             part = particles.At(imc)
             if part.GetPdgCode() != 2112: continue
 
-            #print " ", imc, part.GetPdgCode(), part.Energy()
+            esum += part.Energy()
 
-            hE.Fill( part.Energy() )
+        hE.Fill( esum )
 
     ut.put_yx_tit(hE, "Events", "E (GeV)", 1.4, 1.2)
 
@@ -334,6 +336,85 @@ def neut_abs_eta():
     can.SaveAs("01fig.pdf")
 
 #neut_abs_eta
+
+#_____________________________________________________________________________
+def neut_en_pn():
+
+    #neutron energy and positive and negative rapidity
+
+    #plot range
+    ebin = 3
+    emin = 1
+    emax = 1400
+
+    #analysis cuts
+    eta_max = 6.6 # absolute eta
+    en_max = 1250 # energy
+    en_min = 20
+
+    hE = ut.prepare_TH2D("hE", ebin, emin, emax, ebin, emin, emax)
+
+    can = ut.box_canvas()
+
+    particles = TClonesArray("TParticle", 200)
+    tree.SetBranchAddress("particles", particles)
+
+    nev = tree.GetEntriesFast()
+    #nev = int(1e4)
+
+    nall = 0.
+    nsel = 0.
+
+    for iev in xrange(nev):
+        tree.GetEntry(iev)
+
+        epos = 0.
+        eneg = 0.
+
+        for imc in xrange(particles.GetEntriesFast()):
+
+            part = particles.At(imc)
+            if part.GetPdgCode() != 2112: continue
+
+            #ZDC eta
+            if abs(part.Eta()) < eta_max: continue
+
+            if part.Eta() > 0:
+                epos += part.Energy()
+            else:
+                eneg += part.Energy()
+
+        if epos < en_min or eneg < en_min: continue
+
+        nall += 1.
+
+        if epos > en_max or eneg > en_max: continue
+
+        #if epos < en_min or epos > en_max: continue
+        #if eneg < en_min or eneg > en_max: continue
+
+        nsel += 1.
+
+        hE.Fill(eneg, epos)
+
+    print nall, nsel, nsel/nall
+
+    ut.put_yx_tit(hE, "E (GeV), #eta > 0", "E (GeV), #eta < 0", 1.7, 1.2)
+    ut.set_margin_lbtr(gPad, 0.12, 0.09, 0.02, 0.11)
+
+    hE.SetMinimum(0.98)
+    hE.SetContour(300)
+
+    hE.Draw()
+
+    gPad.SetGrid()
+
+    gPad.SetLogz()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#neut_en_pn
 
 #_____________________________________________________________________________
 if __name__ == "__main__":

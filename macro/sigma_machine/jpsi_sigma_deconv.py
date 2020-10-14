@@ -288,7 +288,7 @@ def main():
     dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
     #dleg.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
