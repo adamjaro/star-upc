@@ -2,7 +2,7 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TClonesArray
+from ROOT import TClonesArray, TMath
 
 import sys
 sys.path.append('../')
@@ -11,19 +11,24 @@ import plot_utils as ut
 #_____________________________________________________________________________
 def main():
 
-    #infile = "/home/jaroslav/sim/starlight_data/slight_Jpsi_PbPb_coh.root"
-    infile = "/home/jaroslav/sim/starlight_nOOn/build/slight.root"
-    #infile = "/home/jaroslav/sim/starlight_nOOn_data/run1/slight_PbPb_seed1_100kevt.root"
+    #infile = "/home/jaroslav/sim/starlight_nOOn_data/run2/slight_PbPb_Pb208_100kevt.root"
+    #infile = "/home/jaroslav/sim/starlight_nOOn_data/run2/slight_PbPb_100kevt.root"
+    #infile = "/home/jaroslav/sim/starlight_nOOn_data/run2/slight_AuAu_100kevt.root"
+    #infile = "/home/jaroslav/sim/starlight_nOOn_data/run2/slight_AuAu_Glauber_100kevt.root"
+    infile = "/home/jaroslav/sim/starlight_nOOn_data/run2/slight_AuAu_XnXn_Glauber_100kevt.root"
 
     in_sl = "/home/jaroslav/sim/noon-master/SLoutput_100k.root"
 
-    iplot = 4
+    iplot = 7
     funclist = []
     funclist.append( gen_y ) # 0
     funclist.append( gen_phot_k ) # 1
     funclist.append( gen_ay ) # 2
     funclist.append( gen_nmult ) # 3
     funclist.append( read_particles ) # 4
+    funclist.append( neut_en ) # 5
+    funclist.append( neut_eta ) # 6
+    funclist.append( neut_abs_eta ) # 7
 
     inp = TFile.Open(infile)
     inp_sl = TFile.Open(in_sl)
@@ -73,7 +78,8 @@ def gen_phot_k():
 
     #energy range
     kmin = 0
-    kmax = 150
+    kmax = 10
+    #kmax = 150
 
     #bins
     nbin = 100
@@ -94,13 +100,13 @@ def gen_phot_k():
 
     tree.Draw(form+" >> hK", "", "", 100000)
     #tree_sl.Draw("photK_from_y >> hKsl", "", "", 100000)
-    tree_sl.Draw("photonK >> hKsl", "", "", 100000)
+    #tree_sl.Draw("photonK >> hKsl", "", "", 100000)
     ut.line_h1(hKsl)
 
     ut.put_yx_tit(hK, "Events", "k", 1.4, 1.2)
 
     hK.Draw()
-    hKsl.Draw("same")
+    #hKsl.Draw("same")
 
     #photons directly from Starlight
     #sl = TFile.Open("/home/jaroslav/sim/noon-master/SLoutput.root")
@@ -182,8 +188,8 @@ def read_particles():
     particles = TClonesArray("TParticle", 200)
     tree.SetBranchAddress("particles", particles)
 
-    nev = tree.GetEntriesFast()
-    #nev = 3
+    #nev = tree.GetEntriesFast()
+    nev = 12
     for iev in xrange(nev):
         tree.GetEntry(iev)
 
@@ -198,6 +204,136 @@ def read_particles():
             print " ", imc, part.GetPdgCode(), part.Px(), part.Py(), part.Pz(), part.Energy()
 
 #read_particles
+
+#_____________________________________________________________________________
+def neut_en():
+
+    #neutron energy
+
+    ebin = 0.5
+    emin = 50
+    emax = 200
+    #ebin = 10
+    #emin = 500
+    #emax = 3000
+
+    hE = ut.prepare_TH1D("hE", ebin, emin, emax)
+
+    can = ut.box_canvas()
+
+    particles = TClonesArray("TParticle", 200)
+    tree.SetBranchAddress("particles", particles)
+
+    nev = tree.GetEntriesFast()
+    #nev = 24
+    for iev in xrange(nev):
+        tree.GetEntry(iev)
+
+        #print iev
+
+        for imc in xrange(particles.GetEntriesFast()):
+
+            part = particles.At(imc)
+            if part.GetPdgCode() != 2112: continue
+
+            #print " ", imc, part.GetPdgCode(), part.Energy()
+
+            hE.Fill( part.Energy() )
+
+    ut.put_yx_tit(hE, "Events", "E (GeV)", 1.4, 1.2)
+
+    hE.Draw()
+
+    gPad.SetGrid()
+
+    gPad.SetLogy()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#neut_en
+
+#_____________________________________________________________________________
+def neut_eta():
+
+    #neutron pseudorapidity
+
+    etabin = 0.05
+    etamin = -20
+    etamax = 20
+
+    hEta = ut.prepare_TH1D("hEta", etabin, etamin, etamax)
+
+    can = ut.box_canvas()
+
+    particles = TClonesArray("TParticle", 200)
+    tree.SetBranchAddress("particles", particles)
+
+    nev = tree.GetEntriesFast()
+    #nev = 24
+    for iev in xrange(nev):
+        tree.GetEntry(iev)
+        for imc in xrange(particles.GetEntriesFast()):
+            part = particles.At(imc)
+            if part.GetPdgCode() != 2112: continue
+            hEta.Fill( part.Eta() )
+
+    ut.put_yx_tit(hEta, "Events", "#eta", 1.4, 1.2)
+
+    hEta.Draw()
+
+    gPad.SetGrid()
+
+    gPad.SetLogy()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#neut_eta
+
+#_____________________________________________________________________________
+def neut_abs_eta():
+
+    #neutron absolute pseudorapidity
+
+    etabin = 0.05
+    etamin = 5
+    etamax = 20
+
+    hEta = ut.prepare_TH1D("hEta", etabin, etamin, etamax)
+
+    can = ut.box_canvas()
+
+    particles = TClonesArray("TParticle", 200)
+    tree.SetBranchAddress("particles", particles)
+
+    nev = tree.GetEntriesFast()
+    #nev = 24
+    for iev in xrange(nev):
+        tree.GetEntry(iev)
+        for imc in xrange(particles.GetEntriesFast()):
+            part = particles.At(imc)
+            if part.GetPdgCode() != 2112: continue
+            #hEta.Fill( TMath.Abs(part.Eta()) )
+            hEta.Fill( abs(part.Eta()) )
+
+    ytit = "Events / {0:.2f}".format(etabin)
+    ut.put_yx_tit(hEta, ytit, "Neutron |#kern[0.3]{#eta}|", 1.4, 1.2)
+
+    ut.set_H1D_col(hEta, rt.kRed)
+
+    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.01, 0.02)
+
+    hEta.Draw()
+
+    gPad.SetGrid()
+
+    gPad.SetLogy()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#neut_abs_eta
 
 #_____________________________________________________________________________
 if __name__ == "__main__":

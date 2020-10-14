@@ -394,6 +394,36 @@ def log_tfit_result(r1, lmg=6):
     return insert_left_margin(result, lmg)
 
 #_____________________________________________________________________________
+def show_tfit_result(res):
+
+    print "--- show_tfit_result ---"
+
+    s1 = std.stringstream()
+    s2 = std.stringstream()
+
+    #s1, s2 = std.stringstream(), std.stringstream()
+
+    #a1, a2 = (std.stringstream(),)*2
+    #print a1
+    #print a2
+
+    from ROOT import Fit
+
+    #call to base class FitResult::Print
+    Fit.FitResult.Print(res, s1, True)
+
+    from ROOT import TObject
+    #proxy to Fit.FitResult (beyond TObject)
+    #skip beyond TObject to Fit::FitResult
+    fit_res = super(TObject, res)
+    fit_res.Print(s2, True)
+
+    print s1.str()
+    print s2.str()
+
+    print "--- show_tfit_result ---"
+
+#_____________________________________________________________________________
 def insert_left_margin(res, lmg):
 
     #put left margin

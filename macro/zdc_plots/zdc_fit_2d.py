@@ -193,7 +193,7 @@ def make_fit():
 
     #east/west projections and 2D plot
     ew = 1
-    p2d = 2 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
+    p2d = 1 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
 
     #plot colors
     model_col = rt.kMagenta
@@ -301,7 +301,8 @@ def make_fit():
     ut.log_results(out, "Ratio 1n1n / all: "+str(ratio_1n1n), lmg)
 
     if p2d != 2:
-        #ut.invert_col(gPad)
+        #ut.print_pad(gPad)
+        ut.invert_col(gPad)
         can.SaveAs("01fig.pdf")
 
     if interactive == True: start_interactive()

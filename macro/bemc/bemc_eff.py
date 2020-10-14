@@ -145,6 +145,11 @@ if __name__ == "__main__":
     r1 = ( hEff.Fit(fitFunc, "RS") ).Get()
     out.write(ut.log_tfit_result(r1))
 
+    #test for cast in fit result
+    #gROOT.LoadMacro("../plot_utils.h")
+    #rt.FitResultShow(r1)
+    ut.show_tfit_result(r1)
+
     #log fit parameters in 3-digit precision
     ut.log_results(out, "Fit parameters in 3-digit precision:")
     chistr = "chi2/ndf: {0:.3f}".format(r1.Chi2()/r1.Ndf())
@@ -202,7 +207,7 @@ if __name__ == "__main__":
     desc.draw()
     leg.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
