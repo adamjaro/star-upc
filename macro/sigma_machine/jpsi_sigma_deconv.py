@@ -2,7 +2,7 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TF1, vector, TMath
+from ROOT import TF1, vector, TMath, TGraphAsymmErrors
 
 gSystem.Load("/home/jaroslav/root/RooUnfold_Rev360/libRooUnfold")
 from ROOT import RooUnfoldResponse, RooUnfoldBayes, RooUnfoldSvd
@@ -12,6 +12,7 @@ sys.path.append('../')
 import plot_utils as ut
 
 from models import *
+from get_centers import get_centers_from_toyMC
 
 #_____________________________________________________________________________
 def main():
@@ -116,6 +117,9 @@ def main():
 
     hPt = ut.prepare_TH1D_vec("hPt", bins)
     tree.Draw("jRecPt*jRecPt >> hPt" , strsel)
+
+    #distribution for bin centers
+    hPtCen = hPt.Clone("hPtCen")
 
     #gamma-gamma component
     hPtGG = ut.prepare_TH1D_vec("hPtGG", bins)
@@ -226,7 +230,7 @@ def main():
 
     can = ut.box_canvas()
     #ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.03, 0.03)
-    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.03)
+    ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.01)
 
     ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/(GeV/c)^{2})"
     xtit = "|#kern[0.3]{#it{t}}| ((GeV/c)^{2})"
@@ -241,11 +245,12 @@ def main():
     #hSys.Draw("e2same")
 
     #bin center points from data
-    get_centers(bins)
+    gSig = apply_centers(hPtFlat, hPtCen)
+    ut.set_graph(gSig)
 
     #hPtSl.Draw("e1same")
     #hPtSart.Draw("e1same")
-    hPtFlat.Draw("e1same")
+    #hPtFlat.Draw("e1same")
 
     #put model predictions
     #gSartre.Draw("lsame")
@@ -253,6 +258,8 @@ def main():
     gMS.Draw("lsame")
     gCCK.Draw("lsame")
     gSlight.Draw("lsame")
+
+    gSig.Draw("P")
 
     frame.Draw("same")
 
@@ -288,7 +295,7 @@ def main():
     dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
     #dleg.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
@@ -297,6 +304,34 @@ def main():
     #beep when finished
     gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
 
+
+#_____________________________________________________________________________
+def apply_centers(hPt, hCen):
+
+    #bin center points according to the data
+
+    cen = get_centers_from_toyMC(hCen)
+
+    gSig = TGraphAsymmErrors(hPt.GetNbinsX())
+
+    for i in xrange(hPt.GetNbinsX()):
+
+        #center point
+        #xcen = hPt.GetBinCenter(i+1)
+        xcen = cen[i]["val"]
+
+        #cross section value
+        gSig.SetPoint(i, xcen, hPt.GetBinContent(i+1))
+
+        #vertical error
+        gSig.SetPointEYlow(i, hPt.GetBinErrorLow(i+1))
+        gSig.SetPointEYhigh(i, hPt.GetBinErrorUp(i+1))
+
+        #horizontal error
+        gSig.SetPointEXlow(i, cen[i]["err"])
+        gSig.SetPointEXhigh(i, cen[i]["err"])
+
+    return gSig
 
 #_____________________________________________________________________________
 def get_centers(bins):

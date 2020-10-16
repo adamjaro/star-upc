@@ -344,8 +344,10 @@ def neut_en_pn():
 
     #plot range
     ebin = 3
-    emin = 1
-    emax = 1400
+    #emin = 1
+    emin = 30
+    #emax = 1400
+    emax = 710
 
     #analysis cuts
     eta_max = 6.6 # absolute eta
@@ -399,7 +401,7 @@ def neut_en_pn():
 
     print nall, nsel, nsel/nall
 
-    ut.put_yx_tit(hE, "E (GeV), #eta > 0", "E (GeV), #eta < 0", 1.7, 1.2)
+    ut.put_yx_tit(hE, "#it{E}_{#it{n}} (GeV),  #it{#eta} > 0", "#it{E}_{#it{n}} (GeV), #it{#eta} < 0", 1.7, 1.2)
     ut.set_margin_lbtr(gPad, 0.12, 0.09, 0.02, 0.11)
 
     hE.SetMinimum(0.98)
@@ -411,7 +413,7 @@ def neut_en_pn():
 
     gPad.SetLogz()
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #neut_en_pn

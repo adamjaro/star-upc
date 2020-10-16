@@ -251,7 +251,7 @@ def fit():
     dleg.AddEntry(hxl, "Data, #it{p}_{T}^{2}", "lp")
     dleg.Draw("same")
 
-    ut.invert_col_can(can)
+    #ut.invert_col_can(can)
     can.SaveAs("01fig.pdf")
 
 

@@ -139,7 +139,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     pleg.AddEntry(gWest, "Fit projection to west", "l")
     pleg.Draw("same")
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #end of plot_proj_both
@@ -193,7 +193,7 @@ def make_fit():
 
     #east/west projections and 2D plot
     ew = 1
-    p2d = 1 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
+    p2d = 2 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
 
     #plot colors
     model_col = rt.kMagenta
