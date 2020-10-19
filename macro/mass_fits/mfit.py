@@ -41,8 +41,10 @@ if __name__ == "__main__":
 
     #alphafix = 0.694
     #nfix = 3.743
-    alphafix = 0.381
-    nfix = 15.570
+    #alphafix = 0.381
+    #nfix = 15.570
+    alphafix = 0.419
+    nfix = 9.450
 
     fitran = [1.45, mmax]
 
@@ -50,8 +52,8 @@ if __name__ == "__main__":
 
     #integration range
     #intran = [2.1, 2.6]
-    #intran = [3.4, 4.6]
-    intran = [2.8, 3.2]
+    intran = [3.4, 4.6]
+    #intran = [2.8, 3.2]
 
     #cmodel = rt.kMagenta
     cmodel = rt.kBlue
@@ -134,7 +136,7 @@ if __name__ == "__main__":
 
     ut.log_results(out, "Integration range: ["+str(intran[0])+", "+str(intran[1])+"]")
     ut.log_results(out, "CrystalBall integral: {0:.0f} +/- {1:.0f}".format(intCB.getVal(), intCB.getError()))
-    ut.log_results(out, "Background integral: {0:.0f} +/- {1:.0f}".format(intBkg.getVal(), intBkg.getError()))
+    ut.log_results(out, "gg->e+e- integral: {0:.0f} +/- {1:.0f}".format(intBkg.getVal(), intBkg.getError()))
 
     #create the plot
     gStyle.SetPadTickX(1)
@@ -178,7 +180,8 @@ if __name__ == "__main__":
     lb = ut.col_lin(cbkg, 3, rt.kDashed)
     leg.AddEntry(lm, "Fit model", "l")
     leg.AddEntry(lc, "Crystal Ball", "l")
-    leg.AddEntry(lb, "Background", "l")
+    #leg.AddEntry(lb, "Background", "l")
+    leg.AddEntry(lb, "#it{f}_{#gamma#gamma}", "l")
     leg.Draw("same")
 
     #legend for data and kinematics interval
@@ -200,7 +203,8 @@ if __name__ == "__main__":
     desc.itemD("#chi^{2}/ndf", frame.chiSquare("Model", "data", 7), -1, cmodel)
     desc.prec = 0
     desc.itemR("#it{N}_{CB}", ncb, ccb)
-    desc.itemR("#it{N}_{bkg}", nbkg, cbkg)
+    #desc.itemR("#it{N}_{bkg}", nbkg, cbkg)
+    desc.itemR("#it{N}_{#gamma#gamma}", nbkg, cbkg)
     desc.prec = 3
     desc.itemR("#it{m}_{0}", m0, ccb)
     desc.itemR("#sigma", sig, ccb)
@@ -220,14 +224,17 @@ if __name__ == "__main__":
     #integration range
     lin_lo = ut.cut_line(intran[0], 0.33, frame)
     lin_hi = ut.cut_line(intran[1], 0.33, frame)
-    lin_lo.Draw("same")
-    lin_hi.Draw("same")
+    #lin_lo.Draw("same")
+    #lin_hi.Draw("same")
 
     #integration result
-    desc2 = pdesc(frame, 0.77, 0.6, 0.045)
+    desc2 = pdesc(frame, 0.8, 0.6, 0.045)
     desc2.prec = 0
-    desc2.itemD("#int_{%.1f}^{%.1f}#it{#gamma#gamma}" % (intran[0], intran[1]), intBkg.getVal(), intBkg.getError(), cbkg)
-    #desc2.draw()
+    #igg_desc = "#int_{#it{m} = %.1f}^{#it{m} = %.1f}#it{f}_{#gamma#gamma}" % (intran[0], intran[1])
+    igg_desc = "#it{n}_{#gamma#gamma,#it{J}/#psi} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
+    #desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError(), cbkg)
+    desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError())
+    desc2.draw()
 
     #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")

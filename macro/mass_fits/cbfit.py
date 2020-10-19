@@ -19,20 +19,22 @@ if __name__ == "__main__":
 
     #infile = "slight14d/sel5/ana_slight14d1_sel5a.root"
     #infile = "slight14e/sel5/ana_slight14e1x1_sel5z.root"
+    infile = "slight14e/sel5/ana_slight14e1x3_s6_sel5z.root"
     #infile = "sartre14a/sel5/ana_sartre14a1_sel5z.root"
-    infile = "sartre14a/sel5/ana_sartre14a1_sel5z_s6.root"
+    #infile = "sartre14a/sel5/ana_sartre14a1_sel5z_s6.root"
 
     mbin = 0.004
     mmin = 2.
     mmax = 3.6
 
-    #fitran = [2.8, 3.15]
-    fitran = [2.6, 3.2]
+    fitran = [2.2, 3.25]
+    #fitran = [2.6, 3.2]
+    #fitran = [2.0, 3.22]
 
     ymin = -1.
     ymax = 1.
 
-    ptmax = 0.18; # 0.17
+    ptmax = 0.18; # 0.17  0.18
 
     binned = False
 
@@ -40,8 +42,8 @@ if __name__ == "__main__":
     ccb = rt.kBlue
     lmg = 4; # left margin in text output
 
-    #strdat = "MC coherent #it{J}/#it{#psi}#rightarrow e^{+}e^{-}"
-    strdat = "Embedding MC coherent #it{J}/#it{#psi}, Sartre"
+    strdat = "MC coherent #it{J}/#it{#psi}#rightarrow e^{+}e^{-}"
+    #strdat = "Embedding MC coherent #it{J}/#it{#psi}, Sartre"
 
     #-- end of config --
 
@@ -128,7 +130,9 @@ if __name__ == "__main__":
     leg.SetMargin(0.14)
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
     hx.Draw("same")
+    lc = ut.col_lin(ccb, 3)
     leg.AddEntry(hx, strdat)
+    leg.AddEntry(lc, "Crystal Ball", "l")
     leg.Draw("same")
 
     leg2 = ut.prepare_leg(0.75, 0.8, 0.21, 0.12, 0.03) # x, y, dx, dy, tsiz

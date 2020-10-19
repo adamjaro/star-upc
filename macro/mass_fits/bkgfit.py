@@ -22,6 +22,7 @@ if __name__ == "__main__":
     #infile = "slight14d/sel3/ana_slight14d2_sel3.root"
     #infile = "slight14d/sel3/ana_slight14d2_sel3b.root"
     infile = "slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root"
+    #infile = "slight14e/sel5/ana_slight14e2x1_s6_sel5z.root"
 
     mbin = 0.08
     mmin = 0.9
@@ -32,7 +33,7 @@ if __name__ == "__main__":
     ymin = -1.
     ymax = 1.
 
-    ptmax = 0.17
+    ptmax = 0.18
 
     binned = False
 
@@ -106,12 +107,12 @@ if __name__ == "__main__":
     bkgd.plotOn(frame, rf.Range("fitran"), rf.LineColor(cbkg), rf.Name("Background"))
 
     #background function from the data
-    lamF.setVal(-1.055)
-    c1f.setVal(1.338)
-    c2f.setVal(0.172)
-    #lamF.setVal(-0.827)
-    #c1f.setVal(1.881)
-    #c2f.setVal(0.121)
+    #lamF.setVal(-1.055)
+    #c1f.setVal(1.338)
+    #c2f.setVal(0.172)
+    lamF.setVal(-1.0517)
+    c1f.setVal(1.3399)
+    c2f.setVal(0.16973)
     bkgd_f.plotOn(frame, rf.Range("fitran"), rf.LineColor(rt.kRed), rf.Name("Background_f"))
 
     frame.Draw()
@@ -134,8 +135,8 @@ if __name__ == "__main__":
     lx = ut.col_lin(cbkg)
     leg = ut.prepare_leg(0.58, 0.82, 0.39, 0.1, 0.029) # x, y, dx, dy, tsiz
     leg.SetMargin(0.1)
-    leg.AddEntry(hx, "Embedding MC #gamma#gamma#rightarrow e^{+}e^{-}") # , "lp"
-    leg.AddEntry(lx, "#it{f}_{bkg}(#it{m}) = "+bkgfunc, "l")
+    leg.AddEntry(hx, "MC #gamma#gamma#rightarrow e^{+}e^{-}") # , "lp"
+    leg.AddEntry(lx, "#it{f}_{#gamma#gamma}(#it{m}) = "+bkgfunc, "l")
     leg.Draw("same")
 
     #legend for shape from the data

@@ -12,19 +12,19 @@ if __name__ == "__main__":
     ymax = 1.
 
     #mass
-    mmin = 2.1
-    mmax = 2.6
-    #mmin = 3.4
-    #mmax = 4.6
+    #mmin = 2.1
+    #mmax = 2.6
+    mmin = 3.4
+    mmax = 4.6
 
     #pT
-    ptmax = 0.17
+    ptmax = 0.18
 
     #number of gamma-gamma from mass fit
-    Ngg = 324
-    nggerr = 11
-    #Ngg = 88
-    #nggerr = 3
+    #Ngg = 332
+    #nggerr = 11
+    Ngg = 89
+    nggerr = 3
 
     #fraction of 1n1n events
     ratio_1n1n = 0.136
@@ -55,6 +55,7 @@ if __name__ == "__main__":
     #gamma-gamma mc
     basedir = "../../../star-upc-data/ana/starsim/"
     mctree = basedir + "slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root"
+    #mctree = basedir + "slight14e/sel5/ana_slight14e2x1_s6_sel5z.root"
 
     #starlight total cross section of gamma-gamma -> e+e- and corresponding file
     sigma_starlight = 2.063
