@@ -1,15 +1,16 @@
 
 #input and output
-#basedir_in      /home/tmp/jaroslav                        #input directory
-basedir_in      /star/u/jaroslav/star-upc-data
-in_name         trees/starsim/StUPC_bgen14a2.root     #input file
-#in_name         StUPC_muDst_run4_all.root
+basedir_in      /home/tmp/jaroslav                        #input directory
+#basedir_in      /star/u/jaroslav/star-upc-data
+#in_name         trees/starsim/StUPC_bgen14a2.root     #input file
+#in_name         StUPC_slight14e1x3.root
+in_name         StUPC_slight14e2x1.root
 #in_name         StUPC_muDst_VPDZDCmon1.list
 
 basedir_out     /star/u/jaroslav/star-upc/build           #output directory
-#basedir_out     /star/u/jaroslav/star-upc-data
+#basedir_out     /gpfs01/star/pwg/jaroslav/star-upc-data
 out_name        output.root                               #output file
-#out_name        ana/starsim/slight14e/sel5/ana_slight14e3x1_s6_sel5z.root
+#out_name        ana/starsim/slight14e/sel5/ana_slight14e2x1_s6_sel5z.root
 #out_name        ana/starsim/bgen14a/sel5/ana_bgen14a2_sel5z_s6.root
 #out_name        ana/muDst/muDst_run1/sel5/ana_muDst_run1_all_sel5z_nDphi.root
 
@@ -39,6 +40,7 @@ matchTof    1
 matchBemc   0
 useBemcEff  1
 #maxAbsEta   9.e9
+#putTrackPtSmear  0
 
 #bemc efficiency
 #conv/sel0, run3, ptot

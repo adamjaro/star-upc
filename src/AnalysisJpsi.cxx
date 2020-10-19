@@ -80,6 +80,7 @@ enum {kV0=0, kV1};
 Int_t pairSel=kV0;
 Int_t trgProfile=0;
 Double_t epar0=0., epar1=0., epar2=0., epar3=0.;
+Bool_t putTrackPtSmear=1;
 
 //trigger IDs, same as in StUPCFilterMaker.h
 enum {kUPCJpsiB_1=0, kUPCJpsiB_2, kUPCmain_1, kUPCmain_2, kZero_bias, kMain10_1, kMain10_2, kMain11_1, kMain11_2, kMain11_3};
@@ -150,6 +151,7 @@ int main(int argc, char* argv[]) {
   parser.AddDouble("epar2", &epar2);
   parser.AddDouble("epar3", &epar3);
   parser.AddBool("makeAllTree", &makeAllTree);
+  parser.AddBool("putTrackPtSmear", &putTrackPtSmear);
 
   string basedir_in, in_name, basedir_out, out_name;
   parser.AddString("basedir_in", &basedir_in);
@@ -218,7 +220,7 @@ int main(int argc, char* argv[]) {
       continue;
     }
     //introduce additional smearing in track pT
-    if(isMC) {
+    if(isMC && putTrackPtSmear) {
       PutTrackPtSmear(pair[0]);
       PutTrackPtSmear(pair[1]);
     }
