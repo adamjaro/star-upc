@@ -330,12 +330,15 @@ def plot_zdc_2d():
 
     #ZDC ADC counts east vs. west 2D
 
-    zbin = 3
-    zmin = 1
-    zmax = 1400
+    #zbin = 3
+    #zmin = 1
+    zbin = 18
+    zmin = 10
+    #zmax = 1400
     #zmax = 100
+    zmax = 700
 
-    ptmax = 0.17
+    ptmax = 0.18
     mmin = 1.5
     mmax = 5.
 
@@ -354,10 +357,12 @@ def plot_zdc_2d():
     #tree.Draw(znam[1]+":"+znam[0]+" >> hZdc", strsel) # y:x
     treeAll = inp.Get("jAllTree")
     #treeAll.Print()
-    treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc") # y:x
+    treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc", "", "", 10000) # y:x
     #hZdc.SetXTitle(xtit[0])
     #hZdc.SetYTitle(xtit[1])
     #hZdc.SetZTitle("Events / {0:.1f}".format(zbin))
+
+    print "Entries:", hZdc.GetEntries()
 
     #hZdc.SetTitleOffset(2., "X")
     #hZdc.SetTitleOffset(1.7, "Y")

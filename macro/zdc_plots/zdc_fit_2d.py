@@ -139,7 +139,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     pleg.AddEntry(gWest, "Fit projection to west", "l")
     pleg.Draw("same")
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #end of plot_proj_both
@@ -190,6 +190,8 @@ def make_fit():
     #mmax = 2.6
     mmin = 1.5
     mmax = 5.
+    #mmin = 2.8
+    #mmax = 3.2
 
     #east/west projections and 2D plot
     ew = 1
@@ -321,9 +323,11 @@ if __name__ == "__main__":
     #basedir = "../../ana/muDst/muDst_run1/sel3"
     #infile = "ana_muDst_run1_all_sel3z.root"
 
-    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
-    infile = "ana_muDst_run1_all_sel5z.root"
-    #infile = "ana_muDst_run1_all_sel5.root"
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    #infile = "ana_muDst_run1_all_sel5z.root"
+
+    basedir = "../FastZDC"
+    infile = "FastZDC.root"
 
     interactive = False
 

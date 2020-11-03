@@ -12,22 +12,23 @@ if __name__ == "__main__":
     ymax = 1.
 
     #mass
-    #mmin = 2.1
-    #mmax = 2.6
-    mmin = 3.4
-    mmax = 4.6
+    mmin = 2.1
+    mmax = 2.6
+    #mmin = 3.4
+    #mmax = 4.6
 
     #pT
     ptmax = 0.18
 
     #number of gamma-gamma from mass fit
-    #Ngg = 332
-    #nggerr = 11
-    Ngg = 89
-    nggerr = 3
+    Ngg = 332
+    nggerr = 11
+    #Ngg = 89
+    #nggerr = 3
 
     #fraction of 1n1n events
-    ratio_1n1n = 0.136
+    #ratio_1n1n = 0.136
+    ratio_1n1n = 0.135
     #ratio_1n1n = 1.
 
     #lumi in inv. ub

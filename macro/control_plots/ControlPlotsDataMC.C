@@ -37,12 +37,12 @@ void ControlPlotsDataMC() {
   //mmin = 2.8; mmax = 3.2;
   mmin = 1.5; mmax = 5.;
 
-  ptmax = 0.17;
+  ptmax = 0.18;
 
   Init();
 
-  Int_t set   = 1;
-  Int_t iplot = 4;
+  Int_t set   = 0;
+  Int_t iplot = 7;
 
   Int_t trkCharge = 0; // track charge to plot, 0 = both, -1 = negative, 1 = positive
 
@@ -54,7 +54,8 @@ void ControlPlotsDataMC() {
   yspace = 1.2; // 1.2  30  1.4
 
   string datalabel = "Data";
-  string mclabel = "MC rec";
+  //string mclabel = "MC rec";
+  string mclabel = "MC";
 
   if(set == 0) {
   // set 0, z of PV, deltaPhi
