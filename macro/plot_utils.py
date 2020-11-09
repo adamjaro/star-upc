@@ -1,7 +1,7 @@
 
 import ROOT as rt
 from ROOT import TMath, TH1D, TCanvas, TLegend, TLine, TIter, TH1, TH2D, TH2, TF2, TGraph
-from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors, TGaxis, TF1, TFrame
+from ROOT import RooHist, TLatex, gROOT, TIter, TGraphErrors, TGaxis, TF1, TFrame, TH1I
 from ROOT.Fit import FitResult
 from ROOT import std, vector
 
@@ -99,6 +99,32 @@ def set_H1D_col(hx, col):
 
     hx.SetMarkerColor(col)
     hx.SetLineColor(col);
+
+#_____________________________________________________________________________
+def prepare_TH1I(name, binsiz, xmin, xmax):
+
+    nbins, xmax = get_nbins(binsiz, xmin, xmax)
+
+    hx = TH1I(name, name, nbins, xmin, xmax)
+
+    return hx
+
+#_____________________________________________________________________________
+def set_H1I(hx):
+
+    hx.SetLineColor(rt.kBlue)
+    hx.SetMarkerColor(rt.kBlue)
+    hx.SetMarkerSize(0.)
+    hx.SetLineWidth(2)
+    #hx.SetOption("E1")
+
+    hx.SetYTitle("Counts");
+    siz = 0.035;
+    hx.SetTitleSize(siz)
+    hx.SetLabelSize(siz)
+    hx.SetTitleSize(siz, "Y")
+    hx.SetLabelSize(siz, "Y")
+    hx.SetTitle("")
 
 #_____________________________________________________________________________
 def set_axis(axis):

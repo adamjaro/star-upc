@@ -1,10 +1,16 @@
 #!/usr/bin/python
 
+import sys
+sys.path.append("./models")
+
 import ROOT as rt
-from ROOT import gPad, gROOT, gStyle, TFile, TTree, AddressOf
+from ROOT import gPad, gROOT, gSystem, gStyle, TFile, TTree, AddressOf
 from ROOT import TMath, TRandom3
 
 from STnOOnRead import STnOOnRead
+
+from Linear import Linear
+from Quad import Quad
 
 #_____________________________________________________________________________
 def main():
@@ -19,21 +25,12 @@ def main():
     #output file
     outfile = "FastZDC.root"
 
-    #resolution sigma_E/E, east and west
-    sigE = 0.217
-    sigW = 0.306
+    #ZDC model
+    #mod = Linear()
+    mod = Quad()
 
-    s2E = 0.1
-    s2W = 0.005
-
-    #difference in mean for ADC, east and west
-    deltE = 25.2
-    deltW = 11.5
-
-    #simulation Gaussian
-    #gsig = TF1("FastZDC", "gaus", -12*sigE, 12*sigE)
-    #gsig.SetParameters(1, 0, sigE)
-    rnd = TRandom3()
+    #trigger limit on ACD
+    adc_trg_max = 1200.
 
     #create the output
     out = TFile.Open(outfile, "recreate")
@@ -58,6 +55,7 @@ def main():
     tree_out.Branch("jRecY", AddressOf(jRecY, "v"), "jRecY/D")
     tree_out.Branch("jRecPt", AddressOf(jRecPt, "v"), "jRecPt/D")
 
+    #implicit J/psi kinematics
     jRecM.v = 3.
     jRecY.v = 0.
     jRecPt.v = 0.1
@@ -65,6 +63,7 @@ def main():
     #input loop
     iev = 0
     nXX = 0
+    nTrig = 0
     while True:
 
         #load the event
@@ -75,74 +74,40 @@ def main():
         if not inp.is_XnXn: continue
         nXX += 1
 
+        #ADC from energy by the model
+        adcE.v, adcW.v = mod(inp.eneg, inp.epos)
+
+        #trigger condition on ADC
+        if adcE.v > adc_trg_max or adcW.v > adc_trg_max:
+            continue
+
+        #accepted by the trigger
+        nTrig += 1
+
         #generated energy and multiplicity
         epos.v = inp.epos
         eneg.v = inp.eneg
         npos.v = inp.npos
         nneg.v = inp.nneg
 
-        #energy resolution
-
-        #adcE.v = inp.eneg + rnd.Gaus(0, 0.2*inp.eneg)
-        #adcW.v = inp.epos + rnd.Gaus(0, 0.2*inp.epos)
-
-        #adcE.v = get_adc(inp.eneg, sigE, deltE, rnd)
-        #adcW.v = get_adc(inp.epos, sigW, deltW, rnd)
-
-        adcE.v = get_adc(inp.eneg, sigE, s2E, deltE, rnd)
-        adcW.v = get_adc(inp.epos, sigW, s2W, deltW, rnd)
-
-        #print get_adc(inp.eneg, 0.2, 0, rnd)
-
-        #print gsig.GetRandom()
-        #print rnd.Gaus(0, sigE)
-        #print
-
+        #fill the output
         tree_out.Fill()
 
         #target XnXn reached
-        if nXX >= nev: break
+        if nTrig >= nev: break
 
     #input loop
 
 
     print "Events read:", iev
     print "XnXn events:", nXX
+    print "Trig events:", nTrig
+    print "Trig/XnXn  :", float(nTrig)/nXX
 
     tree_out.Write()
     out.Close()
 
 #main
-
-#_____________________________________________________________________________
-def get_adc(en, sig, s2, delt, rnd):
-
-    #convert energy to ADC
-
-    #sigma = en*TMath.Sqrt( ((0.05**2)/en) + 0.2**2 )
-    #sigma = en*TMath.Sqrt( ((0.01**2)/en) + sig**2 )
-    #sigma = en*TMath.Sqrt( (0.1/en)**2 + sig**2 )
-    #sigma = en*sig
-    #sigma = 100.*sig
-    #sigma = en*TMath.Sqrt( (sig**2) )
-    #sigma = 100*sig + 0.1*(en-100) # works for east
-    #sigma = 100*sig + 0.005*(en-100) # works for west
-
-    sigma = 100*sig + s2*(en-100)
-
-    adc = -1.
-
-    while adc < 0.:
-        #adc = en + rnd.Gaus(0, sig*en)
-        #adc = en + rnd.Gaus(0, sig*100.)
-        adc = en + rnd.Gaus(0, sigma)
-        adc -= delt
-
-    #if adc<0.: print adc
-
-    return adc
-
-#get_adc
 
 #_____________________________________________________________________________
 if __name__ == "__main__":
@@ -153,7 +118,8 @@ if __name__ == "__main__":
 
     main()
 
-
+    #beep when finished
+    gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
 
 
 

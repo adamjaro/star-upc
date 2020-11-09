@@ -12,11 +12,13 @@ def main():
 
     infile = "FastZDC.root"
 
-    iplot = 2
+    iplot = 4
     funclist = []
     funclist.append( neut_en_pn ) # 0
     funclist.append( plot_zdc_2d ) # 1
     funclist.append( acc_XnXn ) # 2
+    funclist.append( neut_en ) # 3
+    funclist.append( neut_mult ) # 4
 
     inp = TFile.Open(infile)
     global tree
@@ -119,6 +121,58 @@ def acc_XnXn():
     print nall, nsel, nsel/nall
 
 #acc_XnXn
+
+#_____________________________________________________________________________
+def neut_en():
+
+    #neutron generated energy, both positive and negative rapidity
+
+    ebin = 5
+    emin = 0
+    emax = 2500
+
+    can = ut.box_canvas()
+
+    hE = ut.prepare_TH1D("hE", ebin, emin, emax)
+
+    tree.Draw("epos >> hE")
+    tree.Draw("eneg >>+ hE")
+
+    gPad.SetGrid()
+    gPad.SetLogy()
+
+    hE.Draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#neut_en
+
+#_____________________________________________________________________________
+def neut_mult():
+
+    #neutron multiplicity, both positive and negative rapidity
+
+    nbin = 1
+    nmin = 0
+    nmax = 40
+
+    can = ut.box_canvas()
+
+    hN = ut.prepare_TH1I("hN", nbin, nmin, nmax)
+
+    tree.Draw("npos >> hN")
+    tree.Draw("nneg >>+ hN")
+
+    gPad.SetGrid()
+    gPad.SetLogy()
+
+    hN.Draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#neut_mult
 
 #_____________________________________________________________________________
 if __name__ == "__main__":
