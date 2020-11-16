@@ -36,7 +36,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
         plot_east.SetBinContent(ibin+1, yp)
         plot_east.SetBinError(ibin+1, hEast.GetErrorY(ibin))
 
-    frame2.SetMaximum(1.15*plot_east.GetMaximum())
+    frame2.SetMaximum(1.2*plot_east.GetMaximum()) # 1.15
 
     #west data on the right
     hWest = frame_west.getHist("data")
@@ -64,7 +64,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     #west fit on the left
     cWest = frame_west.getCurve("model")
     gWest = TGraph(cWest.GetN()-1)
-    xmax = frame2.GetBinCenter(frame2.GetNbinsX())+frame2.GetBinWidth(frame2.GetNbinsX())
+    xmax = frame2.GetBinCenter(frame2.GetNbinsX()) + frame2.GetBinWidth(frame2.GetNbinsX())/2.
     for i in xrange(cWest.GetN()-1):
         cWest.GetPoint(i, xp, yp)
         xplot = xmax - xp
@@ -82,14 +82,18 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     ypos = frame2.GetYaxis().GetXmin()
     axisE = TGaxis(adc_min, ypos, adc_max, ypos, adc_min, adc_max)
     ut.set_axis(axisE)
-    axisE.SetTitle("ZDC East")
+    axisE.SetWmin( axisE.GetWmin()*0.01 )
+    axisE.SetWmax( axisE.GetWmax()*0.01 )
+    axisE.SetTitle("ZDC East #times100")
     axisE.SetTitleOffset(1.1)
     #west axis
     xpos = frame2.GetXaxis().GetXmax()
     axisW = TGaxis(xpos, ypos, xpos-adc_max, ypos, adc_min, adc_max, 510, "-")
     ut.set_axis(axisW)
+    axisW.SetWmin( axisW.GetWmin()*0.01 )
+    axisW.SetWmax( axisW.GetWmax()*0.01 )
     axisW.SetLabelOffset(-0.024)
-    axisW.SetTitle("ZDC West")
+    axisW.SetTitle("ZDC West #times100")
     axisW.SetTitleOffset(1.1)
 
     #vertical axis
@@ -181,21 +185,22 @@ def plot_2d(plot_pdf):
 #_____________________________________________________________________________
 def make_fit():
 
-    adc_bin = 18  #18 for low-m gg, 20 for jpsi
-    adc_min = 10.  #10
-    adc_max = 700.
+    adc_bin = 24  #18 for low-m gg, 24 for jpsi
+    adc_min = 0.  #10.
+    #adc_max = 700.
+    adc_max = 1200
 
     ptmax = 0.18
     #mmin = 1.6
     #mmax = 2.6
-    mmin = 1.5
-    mmax = 5.
-    #mmin = 2.8
-    #mmax = 3.2
+    #mmin = 1.5
+    #mmax = 5.
+    mmin = 2.8
+    mmax = 3.2
 
     #east/west projections and 2D plot
     ew = 1
-    p2d = 2 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
+    p2d = 1 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
 
     #plot colors
     model_col = rt.kMagenta
@@ -246,6 +251,12 @@ def make_fit():
     data.plotOn(frame_west, rf.Name("data"))
     model.model.plotOn(frame_west, rf.Precision(1e-6), rf.Name("model"), rf.LineColor(model_col))
 
+    #reduced chi^2 in east and west projections
+    ut.log_results(out, "chi2/ndf:\n", lmg)
+    ut.log_results(out, "  East chi2/ndf: "+str(frame_east.chiSquare("model", "data", 16)), lmg)
+    ut.log_results(out, "  West chi2/ndf: "+str(frame_west.chiSquare("model", "data", 16)), lmg)
+    ut.log_results(out, "", 0)
+
     ytit = "Events / ({0:.0f} ADC units)".format(adc_bin)
     frame_east.SetYTitle(ytit)
     frame_west.SetYTitle(ytit)
@@ -280,7 +291,7 @@ def make_fit():
     #pleg.AddEntry(None, "STAR Preliminary", "")
     pleg.AddEntry(None, "AuAu@200 GeV", "")
     pleg.AddEntry(None, "UPC sample", "")
-    pleg.Draw("same")
+    #pleg.Draw("same")
 
     #ut.print_pad(gPad)
 
@@ -323,11 +334,11 @@ if __name__ == "__main__":
     #basedir = "../../ana/muDst/muDst_run1/sel3"
     #infile = "ana_muDst_run1_all_sel3z.root"
 
-    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
-    #infile = "ana_muDst_run1_all_sel5z.root"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    infile = "ana_muDst_run1_all_sel5z.root"
 
-    basedir = "../FastZDC"
-    infile = "FastZDC.root"
+    #basedir = "../FastZDC"
+    #infile = "FastZDC.root"
 
     interactive = False
 

@@ -23,7 +23,7 @@ class CrystalBall(object):
         #2+n reversed Crystal Ball
         #mean
         mean_nam = "mean_2n_" + name
-        self.mean_2n = RooRealVar(mean_nam, mean_nam, 150., 200.)
+        self.mean_2n = RooRealVar(mean_nam, mean_nam, 150., 250.) # 200.
         #sigma
         sigma_nam = "sigma_2n_" + name
         self.sigma_2n = RooRealVar(sigma_nam, sigma_nam, 0., 100.)
@@ -81,18 +81,19 @@ class Model2D(object):
         self.cb_west.alpha_2xn.setVal(-0.3)
         self.cb_west.n_2xn.setVal(0.8)
         # (g_e + c_e)*(g_w + c_w) = g_e*g_w + c_e*c_w + g_e*c_w + c_e*g_w
+        self.num_max = 3000
         #1n1n 2D Gaussian
         self.pdf_1n1n = RooProdPdf("pdf_1n1n", "pdf_1n1n", RooArgList(self.gauss_east.gauss_1n, self.gauss_west.gauss_1n))
-        self.num_1n1n = RooRealVar("num_1n1n", "num_1n1n", 200, 0, 3000) # 1
+        self.num_1n1n = RooRealVar("num_1n1n", "num_1n1n", 200, 0, self.num_max) # 1
         #1n2xn Gaussian * Crystal Ball
         self.pdf_1n2xn = RooProdPdf("pdf_1n2xn", "pdf_1n2xn", RooArgList(self.gauss_east.gauss_1n, self.cb_west.cb_2xn))
-        self.num_1n2xn = RooRealVar("num_1n2xn", "num_1n2xn", 100, 0, 3000) # 1
+        self.num_1n2xn = RooRealVar("num_1n2xn", "num_1n2xn", 100, 0, self.num_max) # 1
         #2xn1n Crystal Ball * Gaussian
         self.pdf_2xn1n = RooProdPdf("pdf_2xn1n", "pdf_2xn1n", RooArgList(self.cb_east.cb_2xn, self.gauss_west.gauss_1n))
-        self.num_2xn1n = RooRealVar("num_2xn1n", "num_2xn1n", 100, 0, 3000) # 1
+        self.num_2xn1n = RooRealVar("num_2xn1n", "num_2xn1n", 100, 0, self.num_max) # 1
         #2xn2xn 2D Crystal Ball
         self.pdf_2xn2xn = RooProdPdf("pdf_2xn2xn", "pdf_2xn2xn", RooArgList(self.cb_east.cb_2xn, self.cb_west.cb_2xn))
-        self.num_2xn2xn = RooRealVar("num_2xn2xn", "num_2xn2xn", 50, 0, 3000) # 1
+        self.num_2xn2xn = RooRealVar("num_2xn2xn", "num_2xn2xn", 50, 0, self.num_max) # 1
         #fit model
         self.model = RooAddPdf("model", "model", RooArgList(self.pdf_1n1n, self.pdf_1n2xn, self.pdf_2xn1n, self.pdf_2xn2xn),
         RooArgList(self.num_1n1n, self.num_1n2xn, self.num_2xn1n, self.num_2xn2xn))

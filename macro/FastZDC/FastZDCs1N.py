@@ -16,11 +16,13 @@ from Quad import Quad
 def main():
 
     #starlight_nOOn input
-    infile = "/home/jaroslav/sim/starlight_nOOn_data/run2/slight_AuAu_XnXn_Glauber_100kevt.root"
+    #infile = "/home/jaroslav/sim/starlight_nOOn_data/run2/slight_AuAu_XnXn_Glauber_100kevt.root"
+    infile = "/home/jaroslav/sim/starlight_nOOn_data/slight_AuAu_200GeV_XnXn_JpsiCoh_eta1p2_Glauber_1Mevt.root"
     inp = STnOOnRead(infile)
 
-    #target number of XnXn events
+    #target number of XnXn events, negative for all
     nev = 10000
+    #nev = -1
 
     #output file
     outfile = "FastZDC.root"
@@ -94,7 +96,7 @@ def main():
         tree_out.Fill()
 
         #target XnXn reached
-        if nTrig >= nev: break
+        if nev > 0 and nTrig >= nev: break
 
     #input loop
 

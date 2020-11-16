@@ -16,20 +16,26 @@ def main():
     infile = "ana_muDst_run1_all_sel5z.root"
 
     #MC
-    basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
-    infile_coh = "ana_slight14e1x3_s6_sel5z.root"
+    #basedir_coh = "../../../star-upc-data/ana/starsim/slight14e/sel5"
+    #infile_coh = "ana_slight14e1x3_s6_sel5z.root"
+    basedir_coh = "../FastZDC"
+    infile_coh = "FastZDC.root"
 
     ymin = -1
     ymax = 1
 
-    mmin = 1.5
-    mmax = 5
+    #mmin = 1.5
+    #mmax = 5
+    mmin = 2.8
+    mmax = 3.2
 
-    ptmax = 0.17
+    ptmax = 0.18
 
-    iplot = 0
+    iplot = 2
     funclist = []
     funclist.append( tracks_eta ) # 0
+    funclist.append( zdc_east ) # 1
+    funclist.append( zdc_west ) # 2
 
     inp = TFile.Open(basedir+"/"+infile)
     global tree
@@ -78,6 +84,68 @@ def tracks_eta():
 #tracks_eta
 
 #_____________________________________________________________________________
+def zdc_east():
+
+    #bins in eta
+    xbin = 18
+    xmin = 0
+    xmax = 1300
+
+    plot = "jZDCUnAttEast"
+
+    hDat = ut.prepare_TH1D("hDat", xbin, xmin, xmax)
+    hMC = ut.prepare_TH1D("hMC", xbin, xmin, xmax)
+
+    can = ut.box_canvas()
+
+    tree.Draw(plot+" >> hDat", gsel)
+    tree_coh.Draw(plot+" >> hMC", gsel)
+
+    ut.norm_to_data(hMC, hDat)
+
+    #gPad.SetLogy()
+
+    hMC.Draw()
+    hDat.Draw("e1same")
+    hMC.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#zdc_east
+
+#_____________________________________________________________________________
+def zdc_west():
+
+    #bins in eta
+    xbin = 18
+    xmin = 0
+    xmax = 1300
+
+    plot = "jZDCUnAttWest"
+
+    hDat = ut.prepare_TH1D("hDat", xbin, xmin, xmax)
+    hMC = ut.prepare_TH1D("hMC", xbin, xmin, xmax)
+
+    can = ut.box_canvas()
+
+    tree.Draw(plot+" >> hDat", gsel)
+    tree_coh.Draw(plot+" >> hMC", gsel)
+
+    ut.norm_to_data(hMC, hDat)
+
+    #gPad.SetLogy()
+
+    hMC.Draw()
+    hDat.Draw("e1same")
+    hMC.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#zdc_west
+
+#_____________________________________________________________________________
 if __name__ == "__main__":
 
     gROOT.SetBatch()
@@ -85,4 +153,26 @@ if __name__ == "__main__":
     gStyle.SetFrameLineWidth(2)
 
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
