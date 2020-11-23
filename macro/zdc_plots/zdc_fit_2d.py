@@ -4,7 +4,7 @@ import code
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import Double, TGraph, TGaxis
+from ROOT import Double, TGraph, TGaxis, TMath
 from ROOT import RooRealVar, RooDataSet, RooArgSet
 from ROOT import RooDataHist
 from ROOT import TBuffer3D
@@ -77,6 +77,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
 
     #horizontal axis
     frame2.SetMinimum(0)
+    #frame2.SetMinimum(0.98)
     frame2.GetXaxis().SetNdivisions(0, rt.kFALSE)
     #east axis
     ypos = frame2.GetYaxis().GetXmin()
@@ -99,6 +100,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     #vertical axis
     yvpos = 1.*frame2.GetMaximum()
     axisV = TGaxis(xpos, 0, xpos, yvpos, 0, yvpos, 510, "+L")
+    #axisV = TGaxis(xpos, 0, xpos, yvpos, 0.98, yvpos, 510, "+G")
     ut.set_axis(axisV)
 
     frame2.SetYTitle("ZDC East / ({0:.0f} ADC units)".format(adc_bin))
@@ -107,7 +109,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     frame2.GetYaxis().SetTitleOffset(1.5)
     axisV.SetTitleOffset(1.5)
 
-    gPad.SetTopMargin(0.01)
+    gPad.SetTopMargin(0.05) # 0.01
     gPad.SetRightMargin(0.1)
     gPad.SetBottomMargin(0.08)
     gPad.SetLeftMargin(0.1)
@@ -123,7 +125,8 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     axisV.Draw()
 
     #kinematics legend
-    kleg = ut.prepare_leg(0.16, 0.78, 0.32, 0.2, 0.035)
+    #kleg = ut.prepare_leg(0.16, 0.78, 0.32, 0.2, 0.035)
+    kleg = ut.prepare_leg(0.16, 0.73, 0.32, 0.2, 0.035)
     kleg.AddEntry(None, "AuAu@200 GeV", "")
     kleg.AddEntry(None, "UPC sample", "")
     ut.add_leg_pt_mass(kleg, ptmax, mmin, mmax)
@@ -136,14 +139,18 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     #dleg.Draw("same")
 
     #projections legend
-    pleg = ut.prepare_leg(0.24, 0.56, 0.25, 0.2, 0.035)
+    #pleg = ut.prepare_leg(0.24, 0.56, 0.25, 0.2, 0.035)
+    pleg = ut.prepare_leg(0.24, 0.51, 0.25, 0.2, 0.035)
     pleg.AddEntry(plot_east, "ZDC East", "p")
     pleg.AddEntry(plot_west, "ZDC West", "p")
     pleg.AddEntry(gEast, "Fit projection to east", "l")
     pleg.AddEntry(gWest, "Fit projection to west", "l")
     pleg.Draw("same")
 
-    ut.invert_col(gPad)
+    #gPad.SetLogy()
+    #gPad.SetGrid()
+
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #end of plot_proj_both
@@ -200,7 +207,7 @@ def make_fit():
 
     #east/west projections and 2D plot
     ew = 1
-    p2d = 1 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
+    p2d = 2 #  0: single projection by 'ew',  1: 2D plot,  2: both projections
 
     #plot colors
     model_col = rt.kMagenta
@@ -223,7 +230,9 @@ def make_fit():
 
     strsel = "jRecPt<{0:.3f} && jRecM>{1:.3f} && jRecM<{2:.3f}".format(ptmax, mmin, mmax)
     data_all = RooDataSet("data", "data", tree, RooArgSet(adc_east, adc_west, m, y, pT))
+    print "All input:", data_all.numEntries()
     data = data_all.reduce(strsel)
+    print "Sel input:", data.numEntries()
 
     model = Model2D(adc_east, adc_west)
 
@@ -305,13 +314,16 @@ def make_fit():
     #all input data
     nall = float(tree.Draw("", strsel))
     print "All input: ", nall
-    print "1n1n events: ", model.num_1n1n.getVal()
-    ratio_1n1n = float(model.num_1n1n.getVal())/nall
-    print "Ratio 1n1n / all: ", ratio_1n1n
+    n_1n1n = float(model.num_1n1n.getVal())
+    print "1n1n events: ", n_1n1n
+    ratio_1n1n = n_1n1n/nall
+    sigma_ratio_1n1n = ratio_1n1n*TMath.Sqrt( (nall-n_1n1n)/(nall*n_1n1n) )
+    print "Ratio 1n1n / all: ", ratio_1n1n, "+/-", sigma_ratio_1n1n
     ut.log_results(out, "Fraction of 1n1n events:\n", lmg)
     ut.log_results(out, "All input: "+str(nall), lmg)
     ut.log_results(out, "1n1n events: "+str(model.num_1n1n.getVal()), lmg)
-    ut.log_results(out, "Ratio 1n1n / all: "+str(ratio_1n1n), lmg)
+    ratio_str = "Ratio 1n1n / all: "+str(ratio_1n1n)+" +/- "+str(sigma_ratio_1n1n)
+    ut.log_results(out, ratio_str, lmg)
 
     if p2d != 2:
         #ut.print_pad(gPad)
@@ -331,14 +343,15 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    #basedir = "../../ana/muDst/muDst_run1/sel3"
-    #infile = "ana_muDst_run1_all_sel3z.root"
-
-    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
-    infile = "ana_muDst_run1_all_sel5z.root"
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    #infile = "ana_muDst_run1_all_sel5z.root"
 
     #basedir = "../FastZDC"
     #infile = "FastZDC.root"
+
+    basedir = "../../../star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt"
+    #infile = "FastZDC_HCal.root"
+    infile = "FastZDC_Grupen.root"
 
     interactive = False
 

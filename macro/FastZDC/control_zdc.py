@@ -12,13 +12,15 @@ def main():
 
     infile = "FastZDC.root"
 
-    iplot = 4
+    iplot = 6
     funclist = []
     funclist.append( neut_en_pn ) # 0
     funclist.append( plot_zdc_2d ) # 1
     funclist.append( acc_XnXn ) # 2
     funclist.append( neut_en ) # 3
     funclist.append( neut_mult ) # 4
+    funclist.append( en_1n ) # 5
+    funclist.append( en_2n ) # 6
 
     inp = TFile.Open(infile)
     global tree
@@ -173,6 +175,64 @@ def neut_mult():
     can.SaveAs("01fig.pdf")
 
 #neut_mult
+
+#_____________________________________________________________________________
+def en_1n():
+
+    #energy for one neutron in both + and - eta for mean of 1n energy
+
+    ebin = 2
+    emin = 0
+    emax = 200
+
+    can = ut.box_canvas()
+
+    hE = ut.prepare_TH1D("hE", ebin, emin, emax)
+
+    tree.Draw("epos >> hE", "npos == 1")
+    tree.Draw("eneg >>+ hE", "nneg == 1")
+
+    print "UO:", hE.GetBinContent(0), hE.GetBinContent(hE.GetNbinsX()+1)
+    print "Mean:", hE.GetMean(), "+/-", hE.GetMeanError()
+
+    gPad.SetGrid()
+    gPad.SetLogy()
+
+    hE.Draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#en_1n
+
+#_____________________________________________________________________________
+def en_2n():
+
+    #energy for two neutrons in both + and - eta for mean of 2n energy
+
+    ebin = 2
+    emin = 0
+    emax = 500
+
+    can = ut.box_canvas()
+
+    hE = ut.prepare_TH1D("hE", ebin, emin, emax)
+
+    tree.Draw("epos >> hE", "npos == 2")
+    tree.Draw("eneg >>+ hE", "nneg == 2")
+
+    print "UO:", hE.GetBinContent(0), hE.GetBinContent(hE.GetNbinsX()+1)
+    print "Mean:", hE.GetMean(), "+/-", hE.GetMeanError()
+
+    gPad.SetGrid()
+    gPad.SetLogy()
+
+    hE.Draw()
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#en_2n
 
 #_____________________________________________________________________________
 if __name__ == "__main__":

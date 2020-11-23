@@ -1,5 +1,5 @@
 
-from ROOT import TFile, TClonesArray
+from ROOT import TFile, TClonesArray, TMath, TLorentzVector
 
 #_____________________________________________________________________________
 class STnOOnRead:
@@ -16,6 +16,20 @@ class STnOOnRead:
 
         #flag for XnXn event
         self.is_XnXn = False
+
+        #flag for central event
+        self.is_Cen = False
+
+        #J/psi kinematics
+        self.pT = 0.
+        self.y = 0.
+        self.m = 0.
+
+        #absolute eta for electron and positron
+        self.aeta_max = 1.
+
+        #minimal electron and positron for central trigger
+        #self.p_min = 1.014
 
         #open the input
         self.inp = TFile.Open(infile)
@@ -47,10 +61,21 @@ class STnOOnRead:
         self.nneg = 0
 
         self.is_XnXn = False
+        self.is_Cen = True
+
+        vec = TLorentzVector()
 
         #particle loop
         for imc in xrange(self.particles.GetEntriesFast()):
             part = self.particles.At(imc)
+
+            #central electron and positron
+            if TMath.Abs( part.GetPdgCode() ) == 11:
+                if TMath.Abs(part.Eta()) > self.aeta_max: self.is_Cen = False
+                #if part.P() < self.p_min: self.is_Cen = False
+                pv = TLorentzVector()
+                part.Momentum(pv)
+                vec += pv
 
             #select the neutrons
             if part.GetPdgCode() != 2112: continue
@@ -67,6 +92,11 @@ class STnOOnRead:
 
         #flag for XnXn event
         if self.npos > 0 and self.nneg > 0: self.is_XnXn = True
+
+        #J/psi kinematics
+        self.pT = vec.Pt()
+        self.y = vec.Rapidity()
+        self.m = vec.M()
 
         return True
 

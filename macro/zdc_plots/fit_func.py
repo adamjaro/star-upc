@@ -23,7 +23,7 @@ class CrystalBall(object):
         #2+n reversed Crystal Ball
         #mean
         mean_nam = "mean_2n_" + name
-        self.mean_2n = RooRealVar(mean_nam, mean_nam, 150., 250.) # 200.
+        self.mean_2n = RooRealVar(mean_nam, mean_nam, 150., 250.) # 200. 250.
         #sigma
         sigma_nam = "sigma_2n_" + name
         self.sigma_2n = RooRealVar(sigma_nam, sigma_nam, 0., 100.)
@@ -82,6 +82,7 @@ class Model2D(object):
         self.cb_west.n_2xn.setVal(0.8)
         # (g_e + c_e)*(g_w + c_w) = g_e*g_w + c_e*c_w + g_e*c_w + c_e*g_w
         self.num_max = 3000
+        #self.num_max = 300000
         #1n1n 2D Gaussian
         self.pdf_1n1n = RooProdPdf("pdf_1n1n", "pdf_1n1n", RooArgList(self.gauss_east.gauss_1n, self.gauss_west.gauss_1n))
         self.num_1n1n = RooRealVar("num_1n1n", "num_1n1n", 200, 0, self.num_max) # 1

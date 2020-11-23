@@ -11,6 +11,9 @@ from STnOOnRead import STnOOnRead
 
 from Linear import Linear
 from Quad import Quad
+from Poisson import Poisson
+from HCal import HCal
+from Grupen import Grupen
 
 #_____________________________________________________________________________
 def main():
@@ -21,15 +24,20 @@ def main():
     inp = STnOOnRead(infile)
 
     #target number of XnXn events, negative for all
-    nev = 10000
-    #nev = -1
+    #nev = 12
+    nev = -1
 
     #output file
     outfile = "FastZDC.root"
+    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_HCal.root"
+    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_Grupen.root"
 
     #ZDC model
     #mod = Linear()
-    mod = Quad()
+    #mod = Quad()
+    #mod = Poisson()
+    #mod = HCal()
+    mod = Grupen()
 
     #trigger limit on ACD
     adc_trg_max = 1200.
@@ -57,20 +65,20 @@ def main():
     tree_out.Branch("jRecY", AddressOf(jRecY, "v"), "jRecY/D")
     tree_out.Branch("jRecPt", AddressOf(jRecPt, "v"), "jRecPt/D")
 
-    #implicit J/psi kinematics
-    jRecM.v = 3.
-    jRecY.v = 0.
-    jRecPt.v = 0.1
-
     #input loop
     iev = 0
     nXX = 0
+    nCen = 0
     nTrig = 0
     while True:
 
         #load the event
         if not inp.read(iev): break
         iev += 1
+
+        #central trigger
+        if not inp.is_Cen: continue
+        nCen += 1
 
         #select the XnXn
         if not inp.is_XnXn: continue
@@ -92,6 +100,11 @@ def main():
         npos.v = inp.npos
         nneg.v = inp.nneg
 
+        #J/psi kinematics
+        jRecM.v = inp.m
+        jRecY.v = inp.y
+        jRecPt.v = inp.pT
+
         #fill the output
         tree_out.Fill()
 
@@ -100,11 +113,18 @@ def main():
 
     #input loop
 
-
+    #event statistics
     print "Events read:", iev
+    print "Central trg:", nCen
     print "XnXn events:", nXX
     print "Trig events:", nTrig
-    print "Trig/XnXn  :", float(nTrig)/nXX
+
+    #ratio of triggers to all XnXn events
+    xtrig = float(nTrig)
+    xall = float(nXX)
+    rto = xtrig/xall
+    sigma_rto = rto*TMath.Sqrt( (xall-xtrig)/(xall*xtrig) )
+    print "Trig/XnXn  :", rto, "+/-", sigma_rto
 
     tree_out.Write()
     out.Close()
@@ -121,7 +141,8 @@ if __name__ == "__main__":
     main()
 
     #beep when finished
-    gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
+    #gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
+    gSystem.Exec("mplayer ../input_ok_3_clean.mp3 > /dev/null 2>&1")
 
 
 

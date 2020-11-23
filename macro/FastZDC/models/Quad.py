@@ -11,20 +11,28 @@ class Quad:
     def __init__(self):
 
         #constant term
-        self.s0E = 0.
-        self.s0W = 0.
+        #self.s0E = 0.
+        #self.s0W = 0.
+        self.s0E = 0.1
+        self.s0W = 0.3
 
         #linear term in energy
-        self.s1E = 0.4
-        self.s1W = 0.7
+        #self.s1E = 0.4 # all mass
+        #self.s1W = 0.7
+        self.s1E = 1.4
+        self.s1W = 1.
 
         #quadratic in energy
-        self.s2E = 0.2
-        self.s2W = 0.23
+        #self.s2E = 0.2 # all mass
+        #self.s2W = 0.23
+        self.s2E = 0.19
+        self.s2W = 0.3
 
         #difference in mean for ADC, east and west
-        self.deltE = 25.2
-        self.deltW = 11.5
+        #self.deltE = 25.2 # all mass
+        #self.deltW = 11.5
+        self.deltE = 100.9-79.1 # J/psi mass
+        self.deltW = 101.5-94.1
 
         #random generator
         self.rnd = TRandom3()

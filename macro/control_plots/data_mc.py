@@ -31,11 +31,12 @@ def main():
 
     ptmax = 0.18
 
-    iplot = 2
+    iplot = 3
     funclist = []
     funclist.append( tracks_eta ) # 0
     funclist.append( zdc_east ) # 1
     funclist.append( zdc_west ) # 2
+    funclist.append( pT ) # 3
 
     inp = TFile.Open(basedir+"/"+infile)
     global tree
@@ -47,6 +48,9 @@ def main():
 
     global gsel
     gsel = "jRecM>"+str(mmin)+" && jRecM<"+str(mmax)+" && jRecY>"+str(ymin)+" && jRecY<"+str(ymax)+" && jRecPt<"+str(ptmax)
+
+    global gsel_ym
+    gsel_ym = "jRecM>"+str(mmin)+" && jRecM<"+str(mmax)+" && jRecY>"+str(ymin)+" && jRecY<"+str(ymax)
 
     funclist[iplot]()
 
@@ -144,6 +148,38 @@ def zdc_west():
     can.SaveAs("01fig.pdf")
 
 #zdc_west
+
+#_____________________________________________________________________________
+def pT():
+
+    #pT in data and MC
+
+    pbin = 0.015
+    pmin = 0.
+    pmax = 1.
+
+    hPt = ut.prepare_TH1D("hPt", pbin, pmin, pmax)
+    hPtMC = ut.prepare_TH1D("hPtMC", pbin, pmin, pmax)
+
+    can = ut.box_canvas()
+
+    tree.Draw("jRecPt >> hPt", gsel_ym)
+
+    tree_coh.Draw("jRecPt >> hPtMC", gsel_ym)
+    #tree_coh.Draw("jGenPt >> hPtMC", gsel_ym)
+
+    ut.norm_to_data(hPtMC, hPt)
+
+    #gPad.SetLogy()
+
+    hPtMC.Draw()
+    hPt.Draw("e1same")
+    hPtMC.Draw("same")
+
+    ut.invert_col(rt.gPad)
+    can.SaveAs("01fig.pdf")
+
+#pT
 
 #_____________________________________________________________________________
 if __name__ == "__main__":

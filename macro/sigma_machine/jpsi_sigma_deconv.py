@@ -59,7 +59,7 @@ def main():
 
     bbceff = 0.97 # BBC veto inefficiency
 
-    zdc_acc = 0.7 # ZDC acceptance to XnXn
+    zdc_acc = 0.65 # ZDC acceptance to XnXn 0.7
 
     br = 0.05971 # dielectrons branching ratio
 
@@ -295,7 +295,7 @@ def main():
     dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
     #dleg.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
