@@ -10,9 +10,11 @@ import plot_utils as ut
 #_____________________________________________________________________________
 def main():
 
-    infile = "FastZDC.root"
+    #infile = "FastZDC.root"
+    infile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_HCal_allADC.root"
+    #infile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_Grupen_allADC.root"
 
-    iplot = 6
+    iplot = 4
     funclist = []
     funclist.append( neut_en_pn ) # 0
     funclist.append( plot_zdc_2d ) # 1
@@ -157,21 +159,41 @@ def neut_mult():
 
     nbin = 1
     nmin = 0
-    nmax = 40
+    nmax = 55
 
     can = ut.box_canvas()
 
     hN = ut.prepare_TH1I("hN", nbin, nmin, nmax)
+    hS = ut.prepare_TH1I("hS", nbin, nmin, nmax)
+
+    hN.SetLineWidth(3)
+    hS.SetLineWidth(3)
+    hS.SetLineColor(rt.kRed)
 
     tree.Draw("npos >> hN")
     tree.Draw("nneg >>+ hN")
 
+    tree.Draw("npos >> hS", "jZDCUnAttEast<1200 && jZDCUnAttWest<1200")
+    tree.Draw("nneg >>+ hS", "jZDCUnAttEast<1200 && jZDCUnAttWest<1200")
+
     gPad.SetGrid()
     gPad.SetLogy()
 
-    hN.Draw()
+    hN.SetTitle("")
 
-    ut.invert_col(rt.gPad)
+    ut.put_yx_tit(hN, "Counts", "Neutrons in event", 1.4, 1.2)
+
+    ut.set_margin_lbtr(gPad, 0.1, 0.1, 0.03, 0.02)
+
+    hN.Draw()
+    hS.Draw("same")
+
+    leg = ut.prepare_leg(0.5, 0.78, 0.2, 0.1, 0.035)
+    leg.AddEntry(hN, "All central XnXn events", "l")
+    leg.AddEntry(hS, "ADC < 1200", "l")
+    leg.Draw("same")
+
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #neut_mult

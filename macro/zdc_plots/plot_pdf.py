@@ -13,7 +13,7 @@ class PlotPdf(object):
         self.adc_east = adc_east
         self.adc_west = adc_west
         self.adc_min = 10
-        self.adc_max = 700
+        self.adc_max = 400
         #2D pdf
         self.pdf = TF2("pdf", self.pdf_eval2D, self.adc_min, self.adc_max, self.adc_min, self.adc_max)
         self.pdf.SetNpx(100)

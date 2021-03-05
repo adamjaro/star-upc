@@ -23,7 +23,7 @@ class CrystalBall(object):
         #2+n reversed Crystal Ball
         #mean
         mean_nam = "mean_2n_" + name
-        self.mean_2n = RooRealVar(mean_nam, mean_nam, 150., 250.) # 200. 250.
+        self.mean_2n = RooRealVar(mean_nam, mean_nam, 50., 250.) # 200. 250.  min 150
         #sigma
         sigma_nam = "sigma_2n_" + name
         self.sigma_2n = RooRealVar(sigma_nam, sigma_nam, 0., 100.)

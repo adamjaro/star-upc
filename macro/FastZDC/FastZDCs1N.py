@@ -29,8 +29,8 @@ def main():
 
     #output file
     outfile = "FastZDC.root"
-    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_HCal.root"
-    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_Grupen.root"
+    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_HCal_allADC.root"
+    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_Grupen_allADC.root"
 
     #ZDC model
     #mod = Linear()
@@ -40,7 +40,8 @@ def main():
     mod = Grupen()
 
     #trigger limit on ACD
-    adc_trg_max = 1200.
+    #adc_trg_max = 1200.
+    adc_trg_max = 999999.
 
     #create the output
     out = TFile.Open(outfile, "recreate")

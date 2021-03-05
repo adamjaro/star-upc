@@ -331,33 +331,40 @@ def plot_zdc_2d():
     #ZDC ADC counts east vs. west 2D
 
     #zbin = 3
-    #zmin = 1
+    zmin = 0
     zbin = 18
-    zmin = 10
+    #zmin = 10
     #zmax = 1400
     #zmax = 100
-    zmax = 700
+    #zmax = 700
+    #zmax = 4500
+    zmax = 4300
 
     ptmax = 0.18
     mmin = 1.5
     mmax = 5.
 
-    znam = ["jZDCUnAttEast", "jZDCUnAttWest"]
+    #znam = ["jZDCUnAttEast", "jZDCUnAttWest"]
+    znam = ["zdce", "zdcw"]
     xtit = ["ZDC East ADC", "ZDC West ADC"]
 
     can = ut.box_canvas()
 
-    strsel = "jRecPt<{0:.3f}".format(ptmax)
-    strsel += " && jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    #strsel = "jRecPt<{0:.3f}".format(ptmax)
+    #strsel += " && jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    strsel = "ptpair<{0:.3f}".format(ptmax)
+    strsel += " && mee>{0:.3f} && mee<{1:.3f}".format(mmin, mmax)
     #print strsel
     #return
 
     hZdc = ut.prepare_TH2D("hZdc", zbin, zmin, zmax, zbin, zmin, zmax)
 
     #tree.Draw(znam[1]+":"+znam[0]+" >> hZdc", strsel) # y:x
-    treeAll = inp.Get("jAllTree")
+    #treeAll = inp.Get("jAllTree")
+    treeAll = inp.Get("Tp")
     #treeAll.Print()
-    treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc", "", "", 10000) # y:x
+    #treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc", "", "", 10000) # y:x
+    treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc") # y:x
     #hZdc.SetXTitle(xtit[0])
     #hZdc.SetYTitle(xtit[1])
     #hZdc.SetZTitle("Events / {0:.1f}".format(zbin))
@@ -387,6 +394,9 @@ def plot_zdc_2d():
     gPad.SetGrid()
     gPad.SetLogz()
 
+    #gPad.SetLogx()
+    #gPad.SetLogy()
+
     #gPad.SetTheta(30.)
     #gPad.SetPhi(-125.)  # -125  -135
     #gPad.SetPhi(-160.)
@@ -400,7 +410,7 @@ def plot_zdc_2d():
     leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
     #leg.Draw("same")
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     if interactive == True: start_interactive()
@@ -470,10 +480,10 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
     #infile = "ana_muDst_run1_all_sel5.root"
     #infile = "ana_muDst_run1_all_sel5z.root"
-    infile = "ana_muDst_run1a_all_sel5_tof.root"
+    #infile = "ana_muDst_run1a_all_sel5_tof.root"
 
     #basedir = "../../../star-upc-data/ana/muDst/muDst_run2a/gg0"
     #infile = "ana_muDst_run2a_all_gg0_v2.root"
@@ -483,6 +493,9 @@ if __name__ == "__main__":
 
     #basedir = "../../../star-upc-data/ana/muDst/muDst_VPDZDCmon1/sel5"
     #infile = "ana_VPDZDCmon1_sel5z.root"
+
+    basedir = "../../../star-upc-data/ana/uTrees"
+    infile = "xuTp_run16_zdc_us.root"
 
     #basedir = "../../../star-upcDst-data"
     #infile = "output.root"
