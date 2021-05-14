@@ -6,12 +6,12 @@
 def main():
 
     #East ZDC
-    a1_e = 79.1
-    a2_e = 172.3
+    a1_e = 47.969
+    a2_e = 115.040
 
     #West ZDC
-    a1_w = 94.1
-    a2_w = 204.2
+    a1_w = 53.393
+    a2_w = 122.475
 
     #1n and 2n energies
     E1 = 102.02

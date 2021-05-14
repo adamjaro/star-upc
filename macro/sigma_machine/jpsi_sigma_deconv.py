@@ -59,7 +59,7 @@ def main():
 
     bbceff = 0.97 # BBC veto inefficiency
 
-    zdc_acc = 0.65 # ZDC acceptance to XnXn 0.7
+    zdc_acc = 0.49 # ZDC acceptance to XnXn 0.7
 
     br = 0.05971 # dielectrons branching ratio
 
@@ -153,7 +153,7 @@ def main():
     #print "lumi_scaled:", lumi_scaled
 
     #denominator for deconvoluted distribution, conversion ub to mb
-    den = 0.85*Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*1000.*dy
+    den = Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*1000.*dy
 
     #deconvolution
     deconv_min = bins[0]

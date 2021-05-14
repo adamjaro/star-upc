@@ -4,6 +4,7 @@ import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TF1
 from ROOT import TArrow, TLatex, TLine
 from ROOT import TEveManager, gEve, TEveArrow, TGMainFrame
+from ROOT import TMath
 import code
 import math as ma
 
@@ -340,9 +341,15 @@ def plot_zdc_2d():
     #zmax = 4500
     zmax = 4300
 
+    #trigger limits according to run16
+    eastmax = 854.758
+    westmax = 747.1381
+
     ptmax = 0.18
-    mmin = 1.5
-    mmax = 5.
+    #mmin = 1.5
+    #mmax = 5.
+    mmin = 2.8
+    mmax = 3.2
 
     #znam = ["jZDCUnAttEast", "jZDCUnAttWest"]
     znam = ["zdce", "zdcw"]
@@ -354,7 +361,8 @@ def plot_zdc_2d():
     #strsel += " && jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
     strsel = "ptpair<{0:.3f}".format(ptmax)
     strsel += " && mee>{0:.3f} && mee<{1:.3f}".format(mmin, mmax)
-    #print strsel
+    strsel += " && zdce<"+str(eastmax)+" && zdcw<"+str(westmax)
+    print strsel
     #return
 
     hZdc = ut.prepare_TH2D("hZdc", zbin, zmin, zmax, zbin, zmin, zmax)
@@ -364,7 +372,7 @@ def plot_zdc_2d():
     treeAll = inp.Get("Tp")
     #treeAll.Print()
     #treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc", "", "", 10000) # y:x
-    treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc") # y:x
+    treeAll.Draw(znam[1]+":"+znam[0]+" >> hZdc", strsel) # y:x
     #hZdc.SetXTitle(xtit[0])
     #hZdc.SetYTitle(xtit[1])
     #hZdc.SetZTitle("Events / {0:.1f}".format(zbin))
@@ -410,12 +418,54 @@ def plot_zdc_2d():
     leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV}", "")
     #leg.Draw("same")
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     if interactive == True: start_interactive()
 
 #end of plot_zdc_2d
+
+#_____________________________________________________________________________
+def get_zdc_acc():
+
+    #datad-driven acceptance to XnXn from run 16 data
+
+    #864./1789
+
+    #trigger limits in a6 ADC
+    eastmax = 854.758
+    westmax = 747.1381
+
+    #kinematics region
+    ptmax = 0.18
+    #ptmax = 999999.
+    #mmin = 3.
+    #mmax = 3.2
+    mmin = 2.9
+    mmax = 3.2
+
+    hx = ut.prepare_TH1D("hx", 1, 0, 1)
+
+    strsel = "ptpair<{0:.3f}".format(ptmax)
+    strsel += " && mee>{0:.3f} && mee<{1:.3f}".format(mmin, mmax)
+    #print strsel
+
+    treeAll = inp.Get("Tp")
+    nall = float( treeAll.Draw("1>>hx", strsel) ) # non-zero gPad
+
+    strsel += " && zdce<"+str(eastmax)+" && zdcw<"+str(westmax)
+    nsel = float( treeAll.Draw("", strsel) )
+
+    print "nall =", nall
+    print "nsel =", nsel
+
+    acc = nsel/nall
+    sigma_acc = acc*TMath.Sqrt( (nall-nsel)/(nall*nsel) )
+
+    #print "acc = ", acc, "+/-", sigma_acc
+    print "acc = {0:.4f} +/- {1:.4f}".format(acc, sigma_acc)
+
+#get_zdc_acc
 
 #_____________________________________________________________________________
 def plot_zdc():
@@ -506,7 +556,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 1
+    iplot = 7
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1
@@ -515,6 +565,7 @@ if __name__ == "__main__":
     funclist.append(plot_zdc_tpc_vtx_diff) # 4
     funclist.append(plot_zdc_vtx_alltrg) # 5
     funclist.append(plot_zdc_smd) # 6
+    funclist.append(get_zdc_acc) # 7
 
     inp = TFile.Open(basedir+"/"+infile)
     tree = inp.Get("jRecTree")

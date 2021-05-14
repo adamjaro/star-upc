@@ -24,13 +24,15 @@ def main():
     inp = STnOOnRead(infile)
 
     #target number of XnXn events, negative for all
-    #nev = 12
+    #nev = 120000
     nev = -1
 
     #output file
     outfile = "FastZDC.root"
     #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_HCal_allADC.root"
     #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_Grupen_allADC.root"
+    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_HCal_run16.root"
+    #outfile = "/home/jaroslav/analyza/star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt/FastZDC_Grupen_run16.root"
 
     #ZDC model
     #mod = Linear()
@@ -40,8 +42,11 @@ def main():
     mod = Grupen()
 
     #trigger limit on ACD
-    #adc_trg_max = 1200.
-    adc_trg_max = 999999.
+    #adc_trg_max_east = 1200.
+    #adc_trg_max_west = 1200.
+    #adc_trg_max = 999999.
+    adc_trg_max_east = 854.758
+    adc_trg_max_west = 747.1381
 
     #create the output
     out = TFile.Open(outfile, "recreate")
@@ -89,7 +94,7 @@ def main():
         adcE.v, adcW.v = mod(inp.eneg, inp.epos)
 
         #trigger condition on ADC
-        if adcE.v > adc_trg_max or adcW.v > adc_trg_max:
+        if adcE.v > adc_trg_max_east or adcW.v > adc_trg_max_west:
             continue
 
         #accepted by the trigger

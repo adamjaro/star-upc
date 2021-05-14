@@ -40,10 +40,10 @@ class Grupen:
         self.w.l = 0.3
 
         #ADC conversion
-        self.e.k1 = 0.91
-        self.e.k2 = -13.87
-        self.w.k1 = 1.08
-        self.w.k2 = -15.73
+        self.e.k1 = 0.66
+        self.e.k2 = -18.94
+        self.w.k1 = 0.68
+        self.w.k2 = -15.52
 
         #random generator
         self.rnd = TRandom3()

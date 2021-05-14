@@ -150,7 +150,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     #gPad.SetLogy()
     #gPad.SetGrid()
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #end of plot_proj_both
@@ -201,10 +201,10 @@ def make_fit():
     #mmin = 1.6
     #mmin = 2.1
     #mmax = 2.6
-    mmin = 1.5
-    mmax = 5.
-    #mmin = 2.8
-    #mmax = 3.2
+    #mmin = 1.5
+    #mmax = 5.
+    mmin = 2.9
+    mmax = 3.2
     #mmin = 3.4
     #mmax = 4.6
 
@@ -224,23 +224,23 @@ def make_fit():
     ut.log_results(out, strlog, lmg)
 
     #adc distributions
-    #adc_east = RooRealVar("jZDCUnAttEast", "ZDC ADC east", adc_min, adc_max)
-    #adc_west = RooRealVar("jZDCUnAttWest", "ZDC ADC west", adc_min, adc_max)
+    adc_east = RooRealVar("jZDCUnAttEast", "ZDC ADC east", adc_min, adc_max)
+    adc_west = RooRealVar("jZDCUnAttWest", "ZDC ADC west", adc_min, adc_max)
     #kinematics variables
-    #m = RooRealVar("jRecM", "e^{+}e^{-} mass (GeV)", 0., 10.)
-    #y = RooRealVar("jRecY", "rapidity", -1., 1.)
-    #pT = RooRealVar("jRecPt", "pT", 0., 10.)
+    m = RooRealVar("jRecM", "e^{+}e^{-} mass (GeV)", 0., 10.)
+    y = RooRealVar("jRecY", "rapidity", -1., 1.)
+    pT = RooRealVar("jRecPt", "pT", 0., 10.)
 
     #adc distributions
-    adc_east = RooRealVar("zdce", "ZDC ADC east", adc_min, adc_max)
-    adc_west = RooRealVar("zdcw", "ZDC ADC west", adc_min, adc_max)
+    #adc_east = RooRealVar("zdce", "ZDC ADC east", adc_min, adc_max)
+    #adc_west = RooRealVar("zdcw", "ZDC ADC west", adc_min, adc_max)
     #kinematics variables
-    m = RooRealVar("mee", "e^{+}e^{-} mass (GeV)", 0., 10.)
-    y = RooRealVar("rapee", "rapidity", -1., 1.)
-    pT = RooRealVar("ptpair", "pT", 0., 10.)
+    #m = RooRealVar("mee", "e^{+}e^{-} mass (GeV)", 0., 10.)
+    #y = RooRealVar("rapee", "rapidity", -1., 1.)
+    #pT = RooRealVar("ptpair", "pT", 0., 10.)
 
-    #strsel = "jRecPt<{0:.3f} && jRecM>{1:.3f} && jRecM<{2:.3f}".format(ptmax, mmin, mmax)
-    strsel = "ptpair<{0:.3f} && mee>{1:.3f} && mee<{2:.3f}".format(ptmax, mmin, mmax)
+    strsel = "jRecPt<{0:.3f} && jRecM>{1:.3f} && jRecM<{2:.3f}".format(ptmax, mmin, mmax)
+    #strsel = "ptpair<{0:.3f} && mee>{1:.3f} && mee<{2:.3f}".format(ptmax, mmin, mmax)
     data_all = RooDataSet("data", "data", tree, RooArgSet(adc_east, adc_west, m, y, pT))
     print "All input:", data_all.numEntries()
     data = data_all.reduce(strsel)
@@ -361,12 +361,14 @@ if __name__ == "__main__":
     #basedir = "../FastZDC"
     #infile = "FastZDC.root"
 
-    #basedir = "../../../star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt"
+    basedir = "../../../star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt"
     #infile = "FastZDC_HCal.root"
     #infile = "FastZDC_Grupen.root"
+    #infile = "FastZDC_HCal_run16.root"
+    infile = "FastZDC_Grupen_run16.root"
 
-    basedir = "../../../star-upc-data/ana/uTrees"
-    infile = "xuTp_run16_zdc_us.root"
+    #basedir = "../../../star-upc-data/ana/uTrees"
+    #infile = "xuTp_run16_zdc_us.root"
 
     interactive = False
 
@@ -375,8 +377,8 @@ if __name__ == "__main__":
     gStyle.SetFrameLineWidth(2)
 
     inp = TFile.Open(basedir+"/"+infile)
-    #tree = inp.Get("jRecTree")
-    tree = inp.Get("Tp")
+    tree = inp.Get("jRecTree")
+    #tree = inp.Get("Tp")
 
     make_fit()
 
