@@ -38,7 +38,8 @@ def main():
     mmin = 2.8
     mmax = 3.2
 
-    dy = 2. # rapidity interval, for integrated sigma
+    #dy = 2. # rapidity interval, for integrated sigma
+    dy = 1.
 
     ngg = 131  # number of gamma-gamma from mass fit
 
@@ -60,6 +61,7 @@ def main():
     bbceff = 0.97 # BBC veto inefficiency
 
     zdc_acc = 0.49 # ZDC acceptance to XnXn 0.7
+    #zdc_acc = 1.
 
     br = 0.05971 # dielectrons branching ratio
 
@@ -245,7 +247,8 @@ def main():
     #hSys.Draw("e2same")
 
     #bin center points from data
-    gSig = apply_centers(hPtFlat, hPtCen)
+    #gSig = apply_centers(hPtFlat, hPtCen)
+    gSig = fixed_centers(hPtFlat)
     ut.set_graph(gSig)
 
     #hPtSl.Draw("e1same")
@@ -301,9 +304,15 @@ def main():
     #to prevent 'pure virtual method called'
     gPad.Close()
 
+    #save the cross section to output file
+    out = TFile("sigma.root", "recreate")
+    gSig.Write("sigma")
+    out.Close()
+
     #beep when finished
     gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")
 
+#main
 
 #_____________________________________________________________________________
 def apply_centers(hPt, hCen):
@@ -333,12 +342,40 @@ def apply_centers(hPt, hCen):
 
     return gSig
 
+#apply_centers
+
+#_____________________________________________________________________________
+def fixed_centers(hPt):
+
+    #fixed bin centers
+
+    gSig = TGraphAsymmErrors(hPt.GetNbinsX())
+
+    for i in xrange(hPt.GetNbinsX()):
+
+        #cross section value
+        gSig.SetPoint(i, hPt.GetBinCenter(i+1), hPt.GetBinContent(i+1))
+
+        #vertical error
+        gSig.SetPointEYlow(i, hPt.GetBinErrorLow(i+1))
+        gSig.SetPointEYhigh(i, hPt.GetBinErrorUp(i+1))
+
+        #horizontal error
+        gSig.SetPointEXlow(i, hPt.GetBinWidth(i+1)/2.)
+        gSig.SetPointEXhigh(i, hPt.GetBinWidth(i+1)/2.)
+
+    return gSig
+
+#fixed_centers
+
 #_____________________________________________________________________________
 def get_centers(bins):
 
     #bin center points according to the data
 
     print bins
+
+#get_centers
 
 #_____________________________________________________________________________
 if __name__ == "__main__":
