@@ -147,7 +147,7 @@ def set_graph(tx):
 def h1_to_graph(hx):
 
     tx = TGraphErrors(hx.GetNbinsX())
-    for ibin in xrange(1,hx.GetNbinsX()+1):
+    for ibin in range(1,hx.GetNbinsX()+1):
         tx.SetPoint(ibin-1, hx.GetBinCenter(ibin), hx.GetBinContent(ibin))
 
     return tx
@@ -422,7 +422,7 @@ def log_tfit_result(r1, lmg=6):
 #_____________________________________________________________________________
 def show_tfit_result(res):
 
-    print "--- show_tfit_result ---"
+    print("--- show_tfit_result ---")
 
     s1 = std.stringstream()
     s2 = std.stringstream()
@@ -444,10 +444,10 @@ def show_tfit_result(res):
     fit_res = super(TObject, res)
     fit_res.Print(s2, True)
 
-    print s1.str()
-    print s2.str()
+    print(s1.str())
+    print(s2.str())
 
-    print "--- show_tfit_result ---"
+    print("--- show_tfit_result ---")
 
 #_____________________________________________________________________________
 def insert_left_margin(res, lmg):
@@ -550,12 +550,12 @@ def print_pad(pad):
   
   next = TIter(pad.GetListOfPrimitives())
 
-  print "#####################"
+  print("#####################")
   obj = next()
   while obj != None:
-    print obj.GetName(), obj.ClassName()
+    print(obj.GetName(), obj.ClassName())
     obj = next()
-  print "#####################"
+  print("#####################")
 
 #_____________________________________________________________________________
 def invert_col(pad, bgcol=rt.kBlack):

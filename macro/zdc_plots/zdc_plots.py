@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TF1
@@ -77,7 +77,7 @@ def plot_zdc_vtx_alltrg():
 
     #convert to meters for plot
     treeAll = inp.Get("jAllTree")
-    print "Number of all trg events:", treeAll.GetEntries()
+    print("Number of all trg events:", treeAll.GetEntries())
     treeAll.Draw("jZDCVtxZ/100. >> hZdcVtxAll")
 
     hZdcVtx.SetYTitle("Events / {0:.0f} cm".format(vbin*100.))
@@ -171,10 +171,10 @@ def plot_zdc_tpc_vtx_diff():
     ut.log_results(out, "nall: "+str(nall))
     ut.log_results(out, "nsel: "+str(nsel))
     ut.log_results(out, "f_4s: {0:.3f} +/- {1:.3f}".format(fraction, err))
-    print "4sigma interval:", lo, hi
-    print "nall:", nall
-    print "nsel:", nsel
-    print "f_4s: {0:.3f} +/- {1:.3f}".format(fraction, err)
+    print("4sigma interval:", lo, hi)
+    print("nall:", nall)
+    print("nsel:", nsel)
+    print("f_4s: {0:.3f} +/- {1:.3f}".format(fraction, err))
 
 
     hDVtx.SetYTitle("Events / {0:.1f} cm".format(dbin))
@@ -362,7 +362,7 @@ def plot_zdc_2d():
     strsel = "ptpair<{0:.3f}".format(ptmax)
     strsel += " && mee>{0:.3f} && mee<{1:.3f}".format(mmin, mmax)
     strsel += " && zdce<"+str(eastmax)+" && zdcw<"+str(westmax)
-    print strsel
+    print(strsel)
     #return
 
     hZdc = ut.prepare_TH2D("hZdc", zbin, zmin, zmax, zbin, zmin, zmax)
@@ -377,7 +377,7 @@ def plot_zdc_2d():
     #hZdc.SetYTitle(xtit[1])
     #hZdc.SetZTitle("Events / {0:.1f}".format(zbin))
 
-    print "Entries:", hZdc.GetEntries()
+    print("Entries:", hZdc.GetEntries())
 
     #hZdc.SetTitleOffset(2., "X")
     #hZdc.SetTitleOffset(1.7, "Y")
@@ -456,14 +456,14 @@ def get_zdc_acc():
     strsel += " && zdce<"+str(eastmax)+" && zdcw<"+str(westmax)
     nsel = float( treeAll.Draw("", strsel) )
 
-    print "nall =", nall
-    print "nsel =", nsel
+    print("nall =", nall)
+    print("nsel =", nsel)
 
     acc = nsel/nall
     sigma_acc = acc*TMath.Sqrt( (nall-nsel)/(nall*nsel) )
 
     #print "acc = ", acc, "+/-", sigma_acc
-    print "acc = {0:.4f} +/- {1:.4f}".format(acc, sigma_acc)
+    print("acc = {0:.4f} +/- {1:.4f}".format(acc, sigma_acc))
 
 #get_zdc_acc
 
@@ -556,7 +556,7 @@ if __name__ == "__main__":
     gStyle.SetPadTickX(1)
     gStyle.SetFrameLineWidth(2)
 
-    iplot = 7
+    iplot = 1
     funclist = []
     funclist.append(plot_zdc) # 0
     funclist.append(plot_zdc_2d) # 1
