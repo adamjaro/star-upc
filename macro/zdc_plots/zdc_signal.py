@@ -13,7 +13,7 @@ def main():
     basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
     infile = "ana_muDst_run1_all_sel5z.root"
 
-    iplot = 1
+    iplot = 0
     funclist = []
     funclist.append( plot_2d ) # 0
     funclist.append( plot_east ) # 1
@@ -32,7 +32,8 @@ def plot_2d():
 
     zmin = 0
     zbin = 10
-    zmax = 400
+    #zmax = 400
+    zmax = 1300
 
     ptmax = 0.18
     #mmin = 1.5
@@ -40,18 +41,27 @@ def plot_2d():
     mmin = 2.8
     mmax = 3.2
 
+    east_1n = 120.3335
+    west_1n = 138.9685
+
     znam = ["jZDCUnAttEast", "jZDCUnAttWest"]
     xtit = ["ZDC East ADC", "ZDC West ADC"]
 
     can = ut.box_canvas()
 
-    strsel = ""
-    #strsel += "jRecPt<{0:.3f}".format(ptmax)
-    #strsel += " && jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    strsel = "1"
+    strsel += " && jRecPt<{0:.3f}".format(ptmax)
+    strsel += " && (jRecM>{0:.3f} && jRecM<{1:.3f})".format(mmin, mmax)
+    #strsel += " && (jZDCUnAttEast<{0:.3f} && jZDCUnAttWest<{1:.3f})".format(east_1n, west_1n)
+    strsel += " && (jZDCUnAttEast>{0:.3f} && jZDCUnAttWest>{1:.3f})".format(east_1n, west_1n)
+
+    print(strsel)
 
     hZdc = ut.prepare_TH2D("hZdc", zbin, zmin, zmax, zbin, zmin, zmax)
 
     tree.Draw(znam[1]+":"+znam[0]+" >> hZdc", strsel) # y:x
+
+    print("Entries: ", hZdc.GetEntries())
 
     ut.put_yx_tit(hZdc, xtit[1], xtit[0], 1.7, 1.2)
     ut.set_margin_lbtr(gPad, 0.12, 0.09, 0.02, 0.11)
@@ -101,7 +111,7 @@ def plot_east():
     gPad.SetGrid()
     #gPad.SetLogy()
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
 #plot_east
