@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TH1D
@@ -52,8 +52,8 @@ if __name__ == "__main__":
 
     #integration range
     #intran = [2.1, 2.6]
-    intran = [3.4, 4.6]
-    #intran = [2.8, 3.2]
+    #intran = [3.4, 4.6]
+    intran = [2.8, 3.2]
 
     #cmodel = rt.kMagenta
     cmodel = rt.kBlue
@@ -110,8 +110,8 @@ if __name__ == "__main__":
 
     #composite pdf
     nevt = data.numEntries()
-    ncb = RooRealVar("ncb", "ncb", nevt/2, 0, nevt)
-    nbkg = RooRealVar("nbkg", "nbkg", nevt/2, 0, nevt)
+    ncb = RooRealVar("ncb", "ncb", int(nevt/2), 0, nevt) # int() is for compatibility with python2 initial value
+    nbkg = RooRealVar("nbkg", "nbkg", int(nevt/2), 0, nevt)
     model = RooAddPdf("model", "model", RooArgList(cb, bkgd), RooArgList(ncb, nbkg))
 
     #make the fit

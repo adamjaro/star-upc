@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TH1D
@@ -97,14 +97,14 @@ if __name__ == "__main__":
     ut.log_results(out, "nall: "+str(nall))
     ut.log_results(out, "n0: "+str(n0.getVal()))
     ut.log_results(out, "n0/nall: {0:.3f}".format(n0.getVal()/nall))
-    print "nall:", nall
-    print "n0:", n0.getVal()
-    print "n0/nall", n0.getVal()/nall
+    print("nall:", nall)
+    print("n0:", n0.getVal())
+    print("n0/nall", n0.getVal()/nall)
     #range 26 +/- 30: jZDCVtxZ>-4. && jZDCVtxZ<56
     #range 26 +/- 100:  -74., 126.
     n_range = tree.Draw("", "jZDCVtxZ>-74. && jZDCVtxZ<126")
-    print "n_range: ", n_range
-    print "n_range/nall: ", n_range/nall
+    print("n_range: ", n_range)
+    print("n_range/nall: ", n_range/nall)
 
     #make the plot
     gStyle.SetPadTickX(1)
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     frame.SetXTitle("ZDC vertex along #it{z} (cm)")
     frame.SetYTitle("Events / {0:.1f} cm".format(vbin))
 
-    print "chi2/ndf:", frame.chiSquare("Model", "data", 9)
+    print("chi2/ndf:", frame.chiSquare("Model", "data", 9))
 
     frame.Draw()
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     desc2.itemR("#sigma_{hi}", sigR, colLR)
     desc2.draw()
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

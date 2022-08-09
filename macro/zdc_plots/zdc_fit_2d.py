@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import code
 
@@ -31,7 +31,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     plot_east.SetMarkerStyle(22)
     plot_east.SetMarkerSize(1.4)
     ut.set_H1D_col(plot_east, rt.kBlue)
-    for ibin in xrange(hEast.GetN()):
+    for ibin in range(hEast.GetN()):
         hEast.GetPoint(ibin, xp, yp)
         plot_east.SetBinContent(ibin+1, yp)
         plot_east.SetBinError(ibin+1, hEast.GetErrorY(ibin))
@@ -43,7 +43,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     plot_west = frame2.Clone("plot_west")
     plot_west.SetMarkerStyle(21)
     ut.set_H1D_col(plot_west, rt.kRed)
-    for i in xrange(hWest.GetN()):
+    for i in range(hWest.GetN()):
         hWest.GetPoint(i, xp, yp)
         ibin = frame2.GetNbinsX()-i
         plot_west.SetBinContent(ibin, yp)
@@ -52,7 +52,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     #east fit
     cEast = frame_east.getCurve("model")
     gEast = TGraph(cEast.GetN()-1)
-    for i in xrange(cEast.GetN()-1):
+    for i in range(cEast.GetN()-1):
         cEast.GetPoint(i, xp, yp)
         gEast.SetPoint(i, xp, yp)
 
@@ -65,7 +65,7 @@ def plot_proj_both(frame2, frame_east, frame_west, adc_bin, adc_min, adc_max, pt
     cWest = frame_west.getCurve("model")
     gWest = TGraph(cWest.GetN()-1)
     xmax = frame2.GetBinCenter(frame2.GetNbinsX()) + frame2.GetBinWidth(frame2.GetNbinsX())/2.
-    for i in xrange(cWest.GetN()-1):
+    for i in range(cWest.GetN()-1):
         cWest.GetPoint(i, xp, yp)
         xplot = xmax - xp
         gWest.SetPoint(i, xplot, yp)
@@ -192,10 +192,10 @@ def plot_2d(plot_pdf):
 #_____________________________________________________________________________
 def make_fit():
 
-    adc_bin = 12  #18 for low-m gg, 24 for jpsi
+    adc_bin = 24  #18 for low-m gg, 24 for jpsi
     adc_min = 0.  #10.
-    adc_max = 400.
-    #adc_max = 1200
+    #adc_max = 700.
+    adc_max = 1200
 
     ptmax = 0.18
     #mmin = 1.6
@@ -203,7 +203,7 @@ def make_fit():
     #mmax = 2.6
     #mmin = 1.5
     #mmax = 5.
-    mmin = 2.9
+    mmin = 2.8
     mmax = 3.2
     #mmin = 3.4
     #mmax = 4.6
@@ -242,9 +242,9 @@ def make_fit():
     strsel = "jRecPt<{0:.3f} && jRecM>{1:.3f} && jRecM<{2:.3f}".format(ptmax, mmin, mmax)
     #strsel = "ptpair<{0:.3f} && mee>{1:.3f} && mee<{2:.3f}".format(ptmax, mmin, mmax)
     data_all = RooDataSet("data", "data", tree, RooArgSet(adc_east, adc_west, m, y, pT))
-    print "All input:", data_all.numEntries()
+    print("All input:", data_all.numEntries())
     data = data_all.reduce(strsel)
-    print "Sel input:", data.numEntries()
+    print("Sel input:", data.numEntries())
 
     model = Model2D(adc_east, adc_west)
 
@@ -255,7 +255,7 @@ def make_fit():
     out.write(ut.log_fit_parameters(r1, lmg+2)+"\n")
     #out.write(ut.table_fit_parameters(r1))
 
-    #print ut.table_fit_parameters(r1)
+    #print(ut.table_fit_parameters(r1))
 
     #create the plot
     if p2d != 2: can = ut.box_canvas()
@@ -319,18 +319,18 @@ def make_fit():
     #b3d = TBuffer3D(0)
     #b3d = None
     #gPad.GetViewer3D().OpenComposite(b3d)
-    #print b3d
+    #print(b3d)
 
-    #print "All input: ", data.numEntries()
-    #print "All input: 858"
+    #print("All input: ", data.numEntries())
+    #print("All input: 858")
     #all input data
     nall = float(tree.Draw("", strsel))
-    print "All input: ", nall
+    print("All input: ", nall)
     n_1n1n = float(model.num_1n1n.getVal())
-    print "1n1n events: ", n_1n1n
+    print("1n1n events: ", n_1n1n)
     ratio_1n1n = n_1n1n/nall
     sigma_ratio_1n1n = ratio_1n1n*TMath.Sqrt( (nall-n_1n1n)/(nall*n_1n1n) )
-    print "Ratio 1n1n / all: ", ratio_1n1n, "+/-", sigma_ratio_1n1n
+    print("Ratio 1n1n / all: ", ratio_1n1n, "+/-", sigma_ratio_1n1n)
     ut.log_results(out, "Fraction of 1n1n events:\n", lmg)
     ut.log_results(out, "All input: "+str(nall), lmg)
     ut.log_results(out, "1n1n events: "+str(model.num_1n1n.getVal()), lmg)
@@ -355,17 +355,17 @@ def start_interactive():
 #_____________________________________________________________________________
 if __name__ == "__main__":
 
-    #basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
-    #infile = "ana_muDst_run1_all_sel5z.root"
+    basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5"
+    infile = "ana_muDst_run1_all_sel5z.root"
 
     #basedir = "../FastZDC"
     #infile = "FastZDC.root"
 
-    basedir = "../../../star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt"
+    #basedir = "../../../star-upc-data/ana/FastZDC/STnOOn_eta1p2_1Mevt"
     #infile = "FastZDC_HCal.root"
     #infile = "FastZDC_Grupen.root"
     #infile = "FastZDC_HCal_run16.root"
-    infile = "FastZDC_Grupen_run16.root"
+    #infile = "FastZDC_Grupen_run16.root"
 
     #basedir = "../../../star-upc-data/ana/uTrees"
     #infile = "xuTp_run16_zdc_us.root"

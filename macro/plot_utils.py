@@ -537,7 +537,7 @@ def make_log_string(*names):
     #prepare string to log parameter names and values
 
     strlog=""
-    for iset in xrange(len(names)):
+    for iset in range(len(names)):
         for nam, val in names[iset]:
             strlog += nam + " " + str(val) + " "
         if iset < len(names)-1:
