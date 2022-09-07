@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ROOT as rt
 from ROOT import TFile, TTree
@@ -17,10 +17,11 @@ if __name__ == "__main__":
     #vtxsel = "jVtxZ>-30 && jVtxZ<30"
     ptsel = "jRecPt<999"
     vtxsel = "jVtxZ>-100 && jVtxZ<100"
-    runsel = "jRunNum>=15084051 && jRunNum<=15167007"
+    #runsel = "jRunNum>=15084051 && jRunNum<=15167007"
+    runsel = "1"
 
     nall = float( tree.Draw("", ptsel+" && "+vtxsel+" && "+runsel) )
     nsel = float( tree.Draw("", ptsel+" && "+vtxsel+" && "+runsel+" && "+"jInpBemcTopo == 1") )
 
-    print nsel, nall, nsel/nall
+    print(nsel, nall, nsel/nall)
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 #gamma-gamma -> e+e- cross section and starlight prediction
 
@@ -75,24 +75,24 @@ if __name__ == "__main__":
     ana.SetY(ymin, ymax)
     ana.SetPt(ptmax)
 
-    print "Mass: [", mmin, ",", mmax, "]"
-    print "Ngg:", Ngg, "+/-", nggerr
+    print("Mass: [", mmin, ",", mmax, "]")
+    print("Ngg:", Ngg, "+/-", nggerr)
 
-    print "ratio_1n1n:", ratio_1n1n, "+/-", ratio_1n1n_err
+    print("ratio_1n1n:", ratio_1n1n, "+/-", ratio_1n1n_err)
 
     #scale the luminosity, explicit precision
     #lumi_scaled = lumi*ratio_ana*ratio_zdc_vtx
     lumi_scaled = float("{0:.3f}".format(lumi*ratio_ana*ratio_zdc_vtx))
-    print "lumi_scaled:", lumi_scaled
+    print("lumi_scaled:", lumi_scaled)
 
     #get the efficiency
     eff = ana.AnalyzeMC(mctree)
-    print "eff: ", eff[0], "+/-", eff[1]
+    print("eff: ", eff[0], "+/-", eff[1])
 
     #efficiency components
-    print "trg_eff:", trg_eff
-    print "bbceff:", bbceff
-    print "ratio_tof:", ratio_tof
+    print("trg_eff:", trg_eff)
+    print("bbceff:", bbceff)
+    print("ratio_tof:", ratio_tof)
 
     #calculate the cross section, nb
     sigma = float(1e3*Ngg*ratio_1n1n)/(eff[0]*trg_eff*bbceff*ratio_tof*lumi_scaled)
@@ -103,20 +103,20 @@ if __name__ == "__main__":
     #systematic error
     sigma_sys = float(1e3*Ngg*ratio_1n1n_err)/(eff[0]*trg_eff*bbceff*ratio_tof*lumi_scaled)
 
-    print "sigma:", sigma, "+/-", sigma_err, "+/-", sigma_sys
-    print "sigma:", sigma, "+/-", sqrt(sigma_err**2 + sigma_sys**2)
+    print("sigma:", sigma, "+/-", sigma_err, "+/-", sigma_sys)
+    print("sigma:", sigma, "+/-", sqrt(sigma_err**2 + sigma_sys**2))
 
     #Starlight correction R_ym
     Rym = ana.AnalyzeStarlight(starlight, 4)
-    print "R_ym: ", Rym
+    print("R_ym: ", Rym)
 
     #theoretical prediction from Starlight, nb
     sigma_sta = sigma_starlight*Rym*1e3
-    print "sigma_sta: ", sigma_sta
+    print("sigma_sta: ", sigma_sta)
 
     #ratio data/mc
     datamc = sigma/sigma_sta
-    print "data/mc:", datamc
+    print("data/mc:", datamc)
 
 
 

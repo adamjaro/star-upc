@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
@@ -108,11 +108,11 @@ def main():
     tree_bgen_gen = inp_bgen.Get("jGenTree")
 
     #evaluate binning
-    #print "bins:", ut.get_nbins(ptbin, ptmin, ptmax)
+    #print("bins:", ut.get_nbins(ptbin, ptmin, ptmax))
 
     bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
     #bins = ut.get_bins_vec_3pt(ptshort, ptbin, ptlon, ptmin, ptmax, ptlow, ptmid)
-    #print "bins2:", bins.size()-1
+    #print("bins2:", bins.size()-1)
 
     #load the data
     strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
@@ -138,21 +138,21 @@ def main():
     hPtIncoh = ut.prepare_TH1D_vec("hPtIncoh", bins)
     ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
 
-    #print "Entries before gamma-gamma and incoherent subtraction:", hPt.GetEntries()
+    #print("Entries before gamma-gamma and incoherent subtraction:", hPt.GetEntries())
 
     #subtract gamma-gamma and incoherent components
     hPt.Sumw2()
     hPt.Add(hPtGG, -1)
-    #print "Gamma-gamma entries:", hPtGG.Integral()
-    #print "Entries after gamma-gamma subtraction:", hPt.Integral()
-    #print "Incoherent entries:", hPtIncoh.Integral()
+    #print("Gamma-gamma entries:", hPtGG.Integral())
+    #print("Entries after gamma-gamma subtraction:", hPt.Integral())
+    #print("Incoherent entries:", hPtIncoh.Integral())
     hPt.Add(hPtIncoh, -1)
 
-    #print "Entries after all subtraction:", hPt.Integral()
+    #print("Entries after all subtraction:", hPt.Integral())
 
     #scale the luminosity
     lumi_scaled = lumi*ratio_ana*ratio_zdc_vtx
-    #print "lumi_scaled:", lumi_scaled
+    #print("lumi_scaled:", lumi_scaled)
 
     #denominator for deconvoluted distribution, conversion ub to mb
     den = Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled*1000.*dy
@@ -203,17 +203,17 @@ def main():
     err_bemc_eff = 0.03
     #sys_err = rt.TMath.Sqrt(err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff)
     sys_err = err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff
-    #print "Total sys err:", sys_err
+    #print("Total sys err:", sys_err)
     hSys = ut.prepare_TH1D_vec("hSys", bins)
     hSys.SetOption("E2")
     hSys.SetFillColor(rt.kOrange+1)
     hSys.SetLineColor(rt.kOrange)
-    for ibin in xrange(1,hPtFlat.GetNbinsX()+1):
+    for ibin in range(1,hPtFlat.GetNbinsX()+1):
         hSys.SetBinContent(ibin, hPtFlat.GetBinContent(ibin))
         sig_sl = hPtSl.GetBinContent(ibin)
         sig_fl = hPtFlat.GetBinContent(ibin)
         err_deconv = TMath.Abs(sig_fl-sig_sl)/sig_fl
-        #print "err_deconv", err_deconv
+        #print("err_deconv", err_deconv)
         #sys_err += err_deconv*err_deconv
         sys_err_sq = sys_err + err_deconv*err_deconv
         sys_err_bin = TMath.Sqrt(sys_err_sq)
@@ -323,7 +323,7 @@ def apply_centers(hPt, hCen):
 
     gSig = TGraphAsymmErrors(hPt.GetNbinsX())
 
-    for i in xrange(hPt.GetNbinsX()):
+    for i in range(hPt.GetNbinsX()):
 
         #center point
         #xcen = hPt.GetBinCenter(i+1)
@@ -351,7 +351,7 @@ def fixed_centers(hPt):
 
     gSig = TGraphAsymmErrors(hPt.GetNbinsX())
 
-    for i in xrange(hPt.GetNbinsX()):
+    for i in range(hPt.GetNbinsX()):
 
         #cross section value
         gSig.SetPoint(i, hPt.GetBinCenter(i+1), hPt.GetBinContent(i+1))
@@ -373,7 +373,7 @@ def get_centers(bins):
 
     #bin center points according to the data
 
-    print bins
+    print(bins)
 
 #get_centers
 

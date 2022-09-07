@@ -255,7 +255,7 @@ def norm_to_den_w(hx, den):
 
     #divide bins by denominator den and bin width
 
-    for ibin in xrange(hx.GetNbinsX()+1):
+    for ibin in range(hx.GetNbinsX()+1):
         hx.SetBinContent(ibin, hx.GetBinContent(ibin)/(den*hx.GetBinWidth(ibin)))
         hx.SetBinError(ibin, hx.GetBinError(ibin)/(den*hx.GetBinWidth(ibin)))
 
@@ -266,7 +266,7 @@ def fill_h1_tf(hx, func, col=rt.kBlue):
 
     #fill h1 histogram from function
 
-    for ibin in xrange(1,hx.GetNbinsX()+1):
+    for ibin in range(1,hx.GetNbinsX()+1):
         edge = hx.GetBinLowEdge(ibin)
         w = hx.GetBinWidth(ibin)
         hx.SetBinContent(ibin, func.Integral(edge, edge+w))
@@ -280,7 +280,7 @@ def line_h1(hx, col=rt.kBlue):
 
     #set H1 to show as a line of bin content
 
-    for ibin in xrange(1,hx.GetNbinsX()+1):
+    for ibin in range(1,hx.GetNbinsX()+1):
         hx.SetBinError(ibin, 0.)
 
     hx.SetLineColor(col)

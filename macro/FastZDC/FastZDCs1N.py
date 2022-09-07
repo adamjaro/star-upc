@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 sys.path.append("./models")
@@ -24,8 +24,8 @@ def main():
     inp = STnOOnRead(infile)
 
     #target number of XnXn events, negative for all
-    #nev = 120000
-    nev = -1
+    nev = 120000
+    #nev = -1
 
     #output file
     outfile = "FastZDC.root"
@@ -70,6 +70,12 @@ def main():
     tree_out.Branch("jRecM", AddressOf(jRecM, "v"), "jRecM/D")
     tree_out.Branch("jRecY", AddressOf(jRecY, "v"), "jRecY/D")
     tree_out.Branch("jRecPt", AddressOf(jRecPt, "v"), "jRecPt/D")
+
+    #inp.read(0)
+
+    inp.tree.GetEntry(0)
+
+    return
 
     #input loop
     iev = 0
@@ -120,17 +126,17 @@ def main():
     #input loop
 
     #event statistics
-    print "Events read:", iev
-    print "Central trg:", nCen
-    print "XnXn events:", nXX
-    print "Trig events:", nTrig
+    print("Events read:", iev)
+    print("Central trg:", nCen)
+    print("XnXn events:", nXX)
+    print("Trig events:", nTrig)
 
     #ratio of triggers to all XnXn events
     xtrig = float(nTrig)
     xall = float(nXX)
     rto = xtrig/xall
     sigma_rto = rto*TMath.Sqrt( (xall-xtrig)/(xall*xtrig) )
-    print "Trig/XnXn  :", rto, "+/-", sigma_rto
+    print("Trig/XnXn  :", rto, "+/-", sigma_rto)
 
     tree_out.Write()
     out.Close()

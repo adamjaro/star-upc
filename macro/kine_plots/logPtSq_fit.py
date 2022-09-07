@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
@@ -76,8 +76,8 @@ def fit():
     inc_nevt = data.sumEntries("logPtSq", "fitran")
     incpdf.setNormRange("fitran")
     aval = RooRealVar("aval", "aval", inc_nevt/incpdf.getNorm(lset))
-    #print "A =", aval.getVal()
-    #print "b =", bval.getVal()
+    print("A =", aval.getVal())
+    print("b =", bval.getVal(), "+/-", bval.getError())
 
     #incoherent distribution from log_10(pT^2) function for the sum with gamma-gamma
     hIncPdf = ut.prepare_TH1D_n("hGG", nbins, ptmin, ptmax)
@@ -246,12 +246,12 @@ def fit():
     dleg = ut.prepare_leg(0.4, 0.71, 0.16, 0.24, 0.035)
     dleg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     ut.add_leg_mass(dleg, mmin, mmax)
-    dleg.AddEntry(None, "AuAu@200 GeV", "")
+    dleg.AddEntry(None, "AuAu, 200 GeV", "")
     dleg.AddEntry(None, "UPC sample", "")
     dleg.AddEntry(hxl, "Data, #it{p}_{T}^{2}", "lp")
     dleg.Draw("same")
 
-    #ut.invert_col_can(can)
+    ut.invert_col_can(can)
     can.SaveAs("01fig.pdf")
 
 
@@ -287,7 +287,7 @@ def plot():
     #like-sign data
     tree_ls.Draw(draw + " >> hPtLS", strsel_ls)
     ut.set_H1D_col(hPtLS, rt.kRed)
-    print hPtLS.GetEntries()
+    print(hPtLS.GetEntries())
 
     #gamma-gamma
     tree_gg.Draw(draw + " >> hPtGG", strsel)

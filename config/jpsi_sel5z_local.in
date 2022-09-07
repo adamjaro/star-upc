@@ -2,6 +2,7 @@
 #input and output
 basedir_in      /home/jaroslav/analyza/star-upc-data      #input directory
 #in_name         trees/starsim/StUPC_slight14b2x2.root     #input file
+#in_name         trees/starsim/StUPC_slight14d2x1.root     #input file
 #in_name         trees/muDst/muDst_run0/StUPC_muDst_run0_all.root
 in_name         trees/muDst/muDst_run1/StUPC_muDst_run1_all.root
 
@@ -30,8 +31,9 @@ makeAllTree     0       # flag to write all triggers tree
 #sign        1
 #maxNsigPID  9999.
 #maxAbsZvtx  9999.
-#matchTof    1
-#matchBemc   0
+maxAbsZvtx      30.
+matchTof    1
+matchBemc   0
 #useBemcEff  1
 #maxAbsEta   9.e9
 

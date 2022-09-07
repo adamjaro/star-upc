@@ -19,13 +19,13 @@ def load_starlight(dy):
     ny = float( slight_tree.Draw("pT*pT >> hSlight", "rapidity>-1 && rapidity<1") )
 
     #normalize to the width of each bin, necessary for variable binning
-    for ibin in xrange(hSlight.GetNbinsX()+1):
+    for ibin in range(hSlight.GetNbinsX()+1):
         hSlight.SetBinContent(ibin, hSlight.GetBinContent(ibin)/hSlight.GetBinWidth(ibin))
 
     sigma_sl_tot = 67.958 # total Starlight cross section, ub
     sigma_sl = (ny/nall)*sigma_sl_tot/1000. # ub to mb
     sigma_sl = sigma_sl/dy # rapidity interval
-    print "sigma_sl:", sigma_sl
+    print("sigma_sl:", sigma_sl)
 
     #normalize to Starlight total cross section
     ut.norm_to_integral(hSlight, sigma_sl)
@@ -45,7 +45,7 @@ def load_starlight(dy):
 def load_ms():
 
     #model by Heikki and Bjorn
-    f = open("data/to_star_ms.txt", "read")
+    f = open("data/to_star_ms.txt", "r")
     t_sigma = []
     for line in f:
         if line[0] == "#": continue
@@ -56,7 +56,7 @@ def load_ms():
     kx = 0.1702
 
     gMS = TGraphErrors(len(t_sigma))
-    for i in xrange(len(t_sigma)):
+    for i in range(len(t_sigma)):
         gMS.SetPoint(i, t_sigma[i][0], t_sigma[i][1]*kx)
 
     gMS.SetLineColor(rt.kViolet)
@@ -71,7 +71,7 @@ def load_ms():
 def load_cck():
 
     #model by Guillermo at. al.
-    f = open("data/data-dtdy-y_0-RHIC-clean_CCK.dat", "read")
+    f = open("data/data-dtdy-y_0-RHIC-clean_CCK.dat", "r")
     sigma = []
     for line in f:
         if line[0] == "#": continue
@@ -88,7 +88,7 @@ def load_cck():
     kx = 0.1702
 
     gCCK = TGraphErrors(len(sigma))
-    for i in xrange(len(sigma)):
+    for i in range(len(sigma)):
         gCCK.SetPoint(i, sigma[i]["t"], sigma[i]["hs"]*k_auau*kx)
 
     gCCK.SetLineColor(rt.kRed)
@@ -111,7 +111,7 @@ def load_sartre():
     ut.norm_to_integral(hSartre, 0.025) # now same as Starlight
 
     gSartre = TGraphErrors(hSartre.GetNbinsX())
-    for ibin in xrange(1,hSartre.GetNbinsX()+1):
+    for ibin in range(1,hSartre.GetNbinsX()+1):
         gSartre.SetPoint(ibin-1, hSartre.GetBinCenter(ibin), hSartre.GetBinContent(ibin))
 
     gSartre.SetLineColor(rt.kYellow+1)

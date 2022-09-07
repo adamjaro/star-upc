@@ -50,11 +50,11 @@ def main():
 
     #bin centers from the data
     cen_tree = get_centers_from_tree(hPt, tree, strsel)
-    #print
+    #print()
     cen_toyMC = get_centers_from_toyMC(hPt)
 
-    for i in xrange(len(cen_tree)):
-        #print i, cen_tree[i], cen_toyMC[i], cen_tree[i] - cen_toyMC[i]
+    for i in range(len(cen_tree)):
+        #print(i, cen_tree[i], cen_toyMC[i], cen_tree[i] - cen_toyMC[i])
         pass
 
     #gr = get_data_graph(hPt, cen_tree)
@@ -100,20 +100,20 @@ def get_centers_from_tree(hPt, tree, strsel):
     inp.SetBranchStatus("jRecPt", 1)
     inp.SetBranchAddress("jRecPt", rt.AddressOf(pT, "val"))
 
-    for i in xrange(1, hPt.GetNbinsX()+1):
+    for i in range(1, hPt.GetNbinsX()+1):
 
         pt2mean = 0.
         npt = 0
         pt2min = hPt.GetBinLowEdge(i)
         pt2max = hPt.GetBinLowEdge(i) + hPt.GetBinWidth(i)
 
-        for j in xrange(inp.GetEntriesFast()):
+        for j in range(inp.GetEntriesFast()):
             inp.GetEntry(j)
             pt2 = pT.val**2
             if pt2 < pt2min or pt2 > pt2max: continue
             pt2mean += pt2
             npt += 1
-            #print pt2, pt2mean, npt
+            #print(pt2, pt2mean, npt)
 
         if npt > 0:
             pt2mean = pt2mean/npt
@@ -122,8 +122,8 @@ def get_centers_from_tree(hPt, tree, strsel):
 
         centers.append({"val":pt2mean, "err":0})
 
-        #print i, hPt.GetBinCenter(i), pt2mean, hPt.GetBinCenter(i) - pt2mean
-        #print i, hPt.GetBinCenter(i) - pt2mean
+        #print(i, hPt.GetBinCenter(i), pt2mean, hPt.GetBinCenter(i) - pt2mean)
+        #print(i, hPt.GetBinCenter(i) - pt2mean)
 
     return centers
 
@@ -137,11 +137,11 @@ def get_centers_from_toyMC(hPt):
 
     #generate the toyMC
     pt2val = []
-    for i in xrange(int(1e5)):
+    for i in range(int(1e5)):
         pt2val.append( hPt.GetRandom() )
 
     #get mean values from the toyMC
-    for i in xrange(1, hPt.GetNbinsX()+1):
+    for i in range(1, hPt.GetNbinsX()+1):
 
         pt2mean = 0.
         npt = 0
@@ -154,7 +154,7 @@ def get_centers_from_toyMC(hPt):
             if pt2 < pt2min or pt2 > pt2max: continue
             pt2mean += pt2
             npt += 1
-            #print pt2, pt2mean, npt
+            #print(pt2, pt2mean, npt)
 
         if npt > 0:
             pt2mean = pt2mean/npt
@@ -163,7 +163,7 @@ def get_centers_from_toyMC(hPt):
 
         #horizontal error from number of events in a given bin
         nev = int(hPt.GetBinContent(i))
-        #print nev
+        #print(nev)
         means = []
         j = -1
         #repeat mean calculation for samples of 'nev' events from toyMC data
@@ -171,7 +171,7 @@ def get_centers_from_toyMC(hPt):
             mval = 0
             i = 0
             while i < nev:
-            #for i in xrange(nev):
+            #for i in range(nev):
                 j += 1
                 if j >= len(pt2val):
                     mval = -999;
@@ -201,11 +201,11 @@ def get_centers_from_toyMC(hPt):
         rms = rms/len(means)
         rms = TMath.Sqrt(rms)
 
-        print pt2mean, rms
+        print(pt2mean, rms)
 
         centers.append({"val":pt2mean, "err":rms})
 
-        #print i, hPt.GetBinCenter(i), pt2mean, hPt.GetBinCenter(i) - pt2mean
+        #print(i, hPt.GetBinCenter(i), pt2mean, hPt.GetBinCenter(i) - pt2mean)
 
     return centers
 
@@ -216,7 +216,7 @@ def get_data_graph(hx, centers):
     #make graph erros from input distribution and bin centers
     gr = TGraphErrors(hx.GetNbinsX())
 
-    for i in xrange(hx.GetNbinsX()):
+    for i in range(hx.GetNbinsX()):
         gr.SetPoint(i, centers[i]["val"], hx.GetBinContent(i+1))
         gr.SetPointError(i, centers[i]["err"], hx.GetBinError(i+1))
 
