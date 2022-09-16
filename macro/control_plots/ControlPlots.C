@@ -61,12 +61,12 @@ void MakeZdc();
 //_____________________________________________________________________________
 void ControlPlots() {
 
-  string basedir = "../../../star-upc-data/ana/starsim/slight14e/sel5/";
-  //string basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5/";
+  //string basedir = "../../../star-upc-data/ana/starsim/slight14e/sel5/";
+  string basedir = "../../../star-upc-data/ana/muDst/muDst_run1/sel5/";
 
   //string in = "muDst_run1/sel2/ana_muDst_run1_all_sel2.root";
   //string in = "muDst_dev0/sel3/ana_muDst_dev0_all_sel3.root";
-  //string in = "ana_muDst_run1_all_sel5z.root";
+  string in = "ana_muDst_run1_all_sel5z.root";
   //string in = "muDst_run3/conv/sel0/ana_muDst_run3_all_conv_sel0.root";
   //string in = "muDst_run2/conv/sel0/ana_muDst_run2_all_conv_sel0b_v2.root";
   //string in = "starsim/sel2/ana_slight14a1_v2.root";
@@ -75,14 +75,14 @@ void ControlPlots() {
   //string in = "starsim/sel2/ana_slight14b1_sel2c.root";
   //string in = "starsim/sel2/ana_slight14b1_v3.root";
   //string in = "../bin/output.root";
-  string in = "ana_slight14e1x3_s6_sel5z.root";
+  //string in = "ana_slight14e1x3_s6_sel5z.root";
 
   //string in_ls = "ana_muDst_run1_all_sel5z_ls.root";
   string in_ls = "../../../star-upc-data/ana/muDst/muDst_run1/sel5/ana_muDst_run1_all_sel5z_ls.root";
 
   //Init();
 
-  Int_t iplot = 22;
+  Int_t iplot = 11;
 
   MakePlot[0] = MakeMass;
   MakePlot[1] = MakePt;
@@ -841,8 +841,10 @@ void MakePIDdEdx() {
   // n sigmas for electrons from dE/dx, positive track vs. negative
 
   Double_t pbin = 0.2;
-  Double_t pidmax = 10.;
-  Double_t mran[2] = {2.9, -3.2}; // upper negative to set off
+  //Double_t pidmax = 10.;
+  Double_t pidmax = 4.;
+  //Double_t mran[2] = {2.9, -3.2}; // upper negative to set off
+  Double_t mran[2] = {2.8, 3.2};
 
   TH2D *hpid = PrepareTH2D("hpid", pbin, -pidmax, pidmax, pbin, -pidmax, pidmax);
 
@@ -874,10 +876,10 @@ void MakePIDdEdx() {
   //gPad->SetLogz();
 
   hpid->Draw();
-  circle->Draw("same");
+  //circle->Draw("same");
   if( mran[1] > 0. ) leg->Draw("same");
 
-  invertCol(gPad);
+  //invertCol(gPad);
 
 }//MakePIDdEdx
 

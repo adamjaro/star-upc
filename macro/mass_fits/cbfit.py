@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem, TH1D

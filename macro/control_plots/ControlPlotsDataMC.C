@@ -43,8 +43,8 @@ void ControlPlotsDataMC() {
 
   Init();
 
-  Int_t set   = 2;
-  Int_t iplot = 5;
+  Int_t set   = 0;
+  Int_t iplot = 3;
 
   Int_t trkCharge = 0; // track charge to plot, 0 = both, -1 = negative, 1 = positive
 
@@ -65,7 +65,7 @@ void ControlPlotsDataMC() {
   //                       z of PV  opening angle   BEMC energy / p   rapidity  delta eta    delta phi  trk phi   trk eta
   static string lrec[] = {  "jVtxZ", "jDeltaPhi", "jT0bemcE/jT0bemcP", "jRecY", "jT0Deta",  "jT0Dphi",  "jT0phi", "jT0eta"};
   static Double_t xbin[] = {   6.,      0.01,             0.05,         0.15,     0.005,      0.008,      0.9,      0.2};
-  static Double_t xmin[] = { -110.,     2.5,              0.,           -1.3,    -0.10,       -0.1,       -4.,      -1.2};
+  static Double_t xmin[] = { -110.,     2.8,              0.,           -1.3,    -0.10,       -0.1,       -4.,      -1.2};
   static Double_t xmax[] = {  110.,     3.42,             2.,           1.3,      0.10,       0.1,        4.,       1.2};
   static string xtit[] = {
     "#it{z} of primary vertex (cm)",
@@ -105,14 +105,14 @@ void ControlPlotsDataMC() {
   // iplot                      0           1           2               3            4            5
   //                         dca in z   dca in xy  en at bemc proj   n sig el   sig for dEdx   p at BEMC
   static string lrec[] = {  "jT0dcaZ", "jT0dcaXY", "jT0EnAtBemc",   "jT0sigEl", "jT0dEdxSig", "jT0bemcP" };
-  static Double_t xbin[] = {   0.01,      0.01,         0.1,            0.1,         1e-7,        0.1 };
+  static Double_t xbin[] = {   0.05,      0.05,         0.1,            0.2,         1e-7,        0.1 };
   static Double_t xmin[] = {   -2,         0,           0.5,            -4,         0,            0 };
   static Double_t xmax[] = {   2,          4,           4,              4,           1e-5,        6 };
   static string xtit[] = {
-    "DCA along #it{z}",
-    "DCA in #it{xy} plane",
+    "DCA along #it{z} (muDst units)",
+    "DCA in #it{xy} plane (muDst units)",
     "Track energy at BEMC projection",
-    "N sigma electron",
+    "#it{n}#sigma (electron)",
     "dE/dx signal",
     "Track momentum #it{p}_{tot} at BEMC"
   };
@@ -192,7 +192,8 @@ void ControlPlotsDataMC() {
     pmc->SetMinimum(vmin);
   }
 
-  pmc->SetLineColor(kMagenta);
+  //pmc->SetLineColor(kMagenta);
+  pmc->SetLineColor(kBlue);
   pmc->SetLineWidth(3);
   pmc->SetTitle("");
   if( negFound ) gxtit[iplot] += trkChargeLab; // tracks plot
@@ -224,7 +225,7 @@ void ControlPlotsDataMC() {
   leg1->Draw("same");
   leg2->Draw("same");
 
-  invertCol(gPad);
+  //invertCol(gPad);
 
   can->SaveAs( "01fig.pdf" );
 

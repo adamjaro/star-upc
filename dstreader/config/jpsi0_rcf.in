@@ -1,0 +1,75 @@
+
+#input and output
+#basedir_in      /home/tmp/jaroslav                        #input directory
+basedir_in      /gpfs01/star/pwg/jaroslav/test/star-upcDst/trees/MC/slight14e4x1
+#basedir_in      /gpfs01/star/pwg/jaroslav/test/star-upcDst/trees/UPC_main_JpsiB_14_v0/
+#basedir_in      /gpfs01/star/pwg/jaroslav/test/star-upcDst/trees/UPC_JpsiB_14_v1
+basedir_in      /home/jaroslav/analyza/star-upcDst-data/run14/prod0/merge
+in_name         StUPC_run14_prod0_0000.root
+#in_name         StUPC_slight14e4x1_v1.root     #input file
+#in_name         merge_r14/StUPC_main_JpsiB_14_v0.list
+#in_name         merge_r14/StUPC_main_JpsiB_14_v0_0000.root
+#in_name         StUPC_main_10_0000.root
+#in_name         StUPCRP_production_0000.root
+#in_name         merge_r14/StUPC_main_JpsiB_14.list
+
+#basedir_out     /star/u/jaroslav/test/star-upcDst-data    #output directory
+basedir_out     .
+out_name        output.root                               #output file
+#out_name        dstreader/UPC_JpsiB_14_v1/jpsi0/ana_JpsiB_14_v1_jpsi0_ls.root
+
+#selection criteria
+sign            -1      # sign of dilepton pair, -1: unlike-sign, +1: like-sign, 0: no sign selection
+trgProfile      0       # trigger profile, 0: Jpsi-B, 1: zero-bias, 2: main 2014, 3: main 2010+11
+pairSel         0       # pair selection version, 0: already same vertex, 1: pair and then vertex
+minNhits        14      # min number of track hits
+maxAbsEta       1.      # max track pseudorapidity, absolute value
+maxNsigPID      3.      # max number of sigmas for TPC dE/dx PID
+matchBemc       1       # track - BEMC matching, 1: required, 0: not required
+matchTof        0       # track - TOF matching, 1: required, 0: not required
+projBemc        1       # projection to BEMC, 1: required, 0: not required, redundant with matchBemc
+useBemcEff      0       # use BEMC matching efficiency from file
+minDphiBemc     2.618   # minimal tracks opening angle at BEMC
+maxAbsZvtx      100.    # maximal Z position of vertex, absolute value
+maxAbsY         1.      # maximal pair rapidity, absolute value
+
+makeAllTree     1       # flag to write all triggers tree
+
+#overrides to the criteria
+#sign        1
+#maxNsigPID  9999.
+#trgProfile   2
+#maxAbsZvtx  100.
+#matchTof    1
+#matchBemc   0
+#minDphiBemc     0
+#useBemcEff  1
+#maxAbsEta   9.e9
+
+#bemc efficiency
+#conv/sel0, run3, ptot
+epar0   0.415
+epar1   1.014
+epar2   0.277
+epar3   0.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

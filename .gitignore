@@ -22,3 +22,4 @@ txt/
 *.root
 macro/sigma_machine/data/
 *.h~
+dstreader/build/

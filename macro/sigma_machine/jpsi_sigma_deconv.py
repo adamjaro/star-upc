@@ -234,8 +234,8 @@ def main():
     #ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.03, 0.03)
     ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.01)
 
-    ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/(GeV/c)^{2})"
-    xtit = "|#kern[0.3]{#it{t}}| ((GeV/c)^{2})"
+    ytit = "d#it{#sigma}/d#it{t}d#it{y} (mb/GeV^{2})"
+    xtit = "|#kern[0.3]{#it{t}}| (GeV^{2})"
 
     ut.put_yx_tit(frame, ytit, xtit, 1.4, 1.2)
     frame.SetMaximum(11)
@@ -298,7 +298,7 @@ def main():
     dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
     #dleg.Draw("same")
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

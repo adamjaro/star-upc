@@ -233,12 +233,13 @@ if __name__ == "__main__":
     #igg_desc = "#int_{#it{m} = %.1f}^{#it{m} = %.1f}#it{f}_{#gamma#gamma}" % (intran[0], intran[1])
     #igg_desc = "#it{n}_{#gamma#gamma,#it{J}/#psi} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
     #igg_desc = "#it{n}_{#gamma#gamma,lo} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
-    igg_desc = "#it{n}_{#gamma#gamma,hi} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
+    #igg_desc = "#it{n}_{#gamma#gamma,hi} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
+    igg_desc = "#it{n}_{#gamma#gamma} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
     #desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError(), cbkg)
     desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError())
     desc2.draw()
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
