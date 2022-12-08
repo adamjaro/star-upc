@@ -31,9 +31,9 @@ makeAllTree     0       # flag to write all triggers tree
 #sign        1
 #maxNsigPID  9999.
 #maxAbsZvtx  9999.
-maxAbsZvtx      30.
-matchTof    1
-matchBemc   0
+#maxAbsZvtx      30.
+#matchTof    1
+#matchBemc   0
 #useBemcEff  1
 #maxAbsEta   9.e9
 
