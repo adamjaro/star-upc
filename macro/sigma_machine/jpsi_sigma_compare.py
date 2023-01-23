@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 #cross section comparison
 
@@ -25,8 +25,8 @@ def main():
     gSlight = load_starlight(dy)
 
     can = ut.box_canvas()
-    #frame = gPad.DrawFrame(tmin, 1e-5, tmax, 11)
-    frame = gPad.DrawFrame(0, -0.2, tmax, 0.3)
+    frame = gPad.DrawFrame(tmin, 1e-5, tmax, 11)
+    #frame = gPad.DrawFrame(0, -0.2, tmax, 0.3)
 
     ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.055, 0.01)
 
@@ -37,7 +37,7 @@ def main():
 
     frame.Draw()
 
-    #gPad.SetLogy()
+    gPad.SetLogy()
 
     #run 14
     inp14 = TFile.Open("sigma.root", "read")
@@ -47,15 +47,17 @@ def main():
 
     #run 16
     #inp16 = TFile.Open("/home/jaroslav/sim/data_run16/postlim_04.21/subt_corr/root/JPsiPt_corr_14nn.root", "read")
-    inp16 = TFile.Open("/home/jaroslav/sim/data_run16/postlim_04.21/subt_corr/root/JPsiPt_corr_XnXn.root", "read")
-    h16 = inp16.Get("hpt2corsub_JPsicoh")
+    #inp16 = TFile.Open("/home/jaroslav/analyza/star-upc-data/AuAu_2016/postlim_04.21/subt_corr/root/JPsiPt_corr_XnXn.root", "read")
+    inp16 = TFile.Open("/home/jaroslav/analyza/star-upc-data/AuAu_2016/prepub_08.22/subt_corr/root/JPsiPt_corr_XnXn.root", "read")
+    #h16 = inp16.Get("hpt2corsub_JPsicoh")
+    h16 = inp16.Get("hpt2cor_JPsicoh_0")
     #inp16.ls()
     ut.set_H1D(h16)
     ut.set_H1D_col(h16, rt.kRed)
 
 
     #for i in range(h16.GetNbinsX()):
-    #    print i, h16.GetBinContent(i), h16.GetBinError(i)
+    #    print(i, h16.GetBinContent(i), h16.GetBinError(i))
 
     #scale to mb
     h16.Sumw2()
@@ -69,7 +71,7 @@ def main():
     h16.Draw("e1same")
 
     cleg = ut.prepare_leg(0.1, 0.96, 0.14, 0.01, 0.035)
-    cleg.AddEntry(None, "Au+Au #rightarrow J/#psi + Au+Au + XnXn, #sqrt{#it{s}_{#it{NN}}} = 200 GeV", "")
+    cleg.AddEntry("", "Au+Au #rightarrow J/#psi + Au+Au + XnXn, #sqrt{#it{s}_{#it{NN}}} = 200 GeV", "")
     cleg.Draw("same")
 
     leg = ut.prepare_leg(0.68, 0.76, 0.3, 0.16, 0.035)
@@ -80,7 +82,7 @@ def main():
 
     #gPad.SetGrid()
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #main

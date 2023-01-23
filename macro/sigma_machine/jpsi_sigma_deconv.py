@@ -5,6 +5,7 @@ from ROOT import gPad, gROOT, gStyle, TFile, gSystem
 from ROOT import TF1, vector, TMath, TGraphAsymmErrors
 
 gSystem.Load("/home/jaroslav/root/RooUnfold_Rev360/libRooUnfold")
+#gSystem.Load("/home/jaroslav/root/RooUnfold/build/libRooUnfold.so")
 from ROOT import RooUnfoldResponse, RooUnfoldBayes, RooUnfoldSvd
 
 import sys
@@ -74,8 +75,8 @@ def main():
     #infile_sl = "ana_slight14e1x2_s6_sel5z.root"
     infile_sl = "ana_slight14e1x3_s6_sel5z.root"
     #
-    basedir_sart = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
-    infile_sart = "ana_sartre14a1_sel5z_s6_v2.root"
+    #basedir_sart = "../../../star-upc-data/ana/starsim/sartre14a/sel5"
+    #infile_sart = "ana_sartre14a1_sel5z_s6_v2.root"
     #
     basedir_bgen = "../../../star-upc-data/ana/starsim/bgen14a/sel5"
     infile_bgen = "ana_bgen14a1_v0_sel5z_s6.root"
@@ -86,8 +87,8 @@ def main():
 
     #model predictions
     gSlight = load_starlight(dy)
-    gSartre = load_sartre()
-    gFlat = loat_flat_pt2()
+    #gSartre = load_sartre()
+    #gFlat = loat_flat_pt2()
     gMS = load_ms()
     gCCK = load_cck()
 
@@ -101,8 +102,8 @@ def main():
     inp_sl = TFile.Open(basedir_sl+"/"+infile_sl)
     tree_sl_gen = inp_sl.Get("jGenTree")
     #
-    inp_sart = TFile.Open(basedir_sart+"/"+infile_sart)
-    tree_sart_gen = inp_sart.Get("jGenTree")
+    #inp_sart = TFile.Open(basedir_sart+"/"+infile_sart)
+    #tree_sart_gen = inp_sart.Get("jGenTree")
     #
     inp_bgen = TFile.Open(basedir_bgen+"/"+infile_bgen)
     tree_bgen_gen = inp_bgen.Get("jGenTree")
@@ -142,13 +143,14 @@ def main():
 
     #subtract gamma-gamma and incoherent components
     hPt.Sumw2()
+    print("Data entries:", hPt.Integral())
     hPt.Add(hPtGG, -1)
-    #print("Gamma-gamma entries:", hPtGG.Integral())
-    #print("Entries after gamma-gamma subtraction:", hPt.Integral())
-    #print("Incoherent entries:", hPtIncoh.Integral())
+    print("Gamma-gamma entries:", hPtGG.Integral())
+    print("Entries after gamma-gamma subtraction:", hPt.Integral())
+    print("Incoherent entries:", hPtIncoh.Integral())
     hPt.Add(hPtIncoh, -1)
 
-    #print("Entries after all subtraction:", hPt.Integral())
+    print("Entries after all subtractions:", hPt.Integral())
 
     #scale the luminosity
     lumi_scaled = lumi*ratio_ana*ratio_zdc_vtx
@@ -171,6 +173,7 @@ def main():
     unfold_sl = RooUnfoldBayes(resp_sl, hPt, 15)
     #unfold_sl = RooUnfoldSvd(resp_sl, hPt, 15)
     hPtSl = unfold_sl.Hreco()
+    #hPtSl = unfold_sl.Hunfold()
     #ut.set_H1D(hPtSl)
     #apply the denominator and bin width
     ut.norm_to_den_w(hPtSl, den)
@@ -192,6 +195,7 @@ def main():
     #
     unfold_bgen = RooUnfoldBayes(resp_bgen, hPt, 14)
     hPtFlat = unfold_bgen.Hreco()
+    #hPtFlat = unfold_bgen.Hunfold()
     #ut.set_H1D(hPtFlat)
     #apply the denominator and bin width
     ut.norm_to_den_w(hPtFlat, den)
@@ -212,12 +216,17 @@ def main():
         hSys.SetBinContent(ibin, hPtFlat.GetBinContent(ibin))
         sig_sl = hPtSl.GetBinContent(ibin)
         sig_fl = hPtFlat.GetBinContent(ibin)
-        err_deconv = TMath.Abs(sig_fl-sig_sl)/sig_fl
+        print(sig_fl, sig_sl)
+        if sig_fl > 0:
+            err_deconv = TMath.Abs(sig_fl-sig_sl)/sig_fl
+        else:
+            err_deconv = 0
         #print("err_deconv", err_deconv)
         #sys_err += err_deconv*err_deconv
         sys_err_sq = sys_err + err_deconv*err_deconv
         sys_err_bin = TMath.Sqrt(sys_err_sq)
-        stat_err = hPtFlat.GetBinError(ibin)/hPtFlat.GetBinContent(ibin)
+        if sig_fl > 0:
+            stat_err = hPtFlat.GetBinError(ibin)/hPtFlat.GetBinContent(ibin)
         tot_err = TMath.Sqrt(stat_err*stat_err + sys_err_sq)
         #hSys.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*err_deconv)
         hSys.SetBinError(ibin, hPtFlat.GetBinContent(ibin)*sys_err_bin)
@@ -269,11 +278,11 @@ def main():
     gPad.SetLogy()
 
     cleg = ut.prepare_leg(0.1, 0.96, 0.14, 0.01, 0.035)
-    cleg.AddEntry(None, "Au+Au #rightarrow J/#psi + Au+Au + XnXn, #sqrt{#it{s}_{#it{NN}}} = 200 GeV", "")
+    cleg.AddEntry("", "Au+Au #rightarrow J/#psi + Au+Au + XnXn, #sqrt{#it{s}_{#it{NN}}} = 200 GeV", "")
     cleg.Draw("same")
 
     leg = ut.prepare_leg(0.45, 0.82, 0.18, 0.1, 0.035)
-    leg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    leg.AddEntry("", "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
     leg.AddEntry(hx, "STAR")
     hx.Draw("same")
@@ -292,13 +301,13 @@ def main():
     #legend for deconvolution method
     dleg = ut.prepare_leg(0.3, 0.75, 0.2, 0.18, 0.035)
     #dleg = ut.prepare_leg(0.3, 0.83, 0.2, 0.1, 0.035)
-    dleg.AddEntry(None, "Unfolding with:", "")
+    dleg.AddEntry("", "Unfolding with:", "")
     dleg.AddEntry(hPtSl, "Starlight", "p")
     #dleg.AddEntry(hPtSart, "Sartre", "p")
     dleg.AddEntry(hPtFlat, "Flat #it{p}_{T}^{2}", "p")
     #dleg.Draw("same")
 
-    #ut.invert_col(rt.gPad)
+    ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
@@ -308,6 +317,13 @@ def main():
     out = TFile("sigma.root", "recreate")
     gSig.Write("sigma")
     out.Close()
+
+    #integrate the cross section over |t|
+    s_tot_t = 0.
+    for ip in range(gSig.GetN()):
+        #print(ip, gSig.GetPointX(ip)-gSig.GetErrorXlow(ip), gSig.GetPointX(ip)+gSig.GetErrorXhigh(ip), gSig.GetPointY(ip))
+        s_tot_t += (gSig.GetErrorXlow(ip)+gSig.GetErrorXhigh(ip))*gSig.GetPointY(ip)
+    print("Integrated sigma from data (mb):", s_tot_t)
 
     #beep when finished
     gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")

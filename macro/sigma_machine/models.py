@@ -42,6 +42,41 @@ def load_starlight(dy):
 #end of load_starlight
 
 #_____________________________________________________________________________
+def load_starlight_y():
+
+    #Starlight cross section in |y|
+
+    slight = TFile.Open("/home/jaroslav/sim/starlight_tx/slight_AuAu_200GeV_Jpsi_coh_intmax0p34_6Mevt.root")
+    slight_tree = slight.Get("slight_tree")
+
+    hSlight = ut.prepare_TH1D("hSlight", 0.1, 0., 1.1)
+
+    nall = float( slight_tree.GetEntries() )
+    ny = float( slight_tree.Draw("TMath::Abs(rapidity) >> hSlight", "pT*pT<0.109") )
+
+    hSlight.Scale(0.5, "width")
+
+    sigma_sl_tot = 67.958 # total Starlight cross section, ub
+    sigma_sl = (ny/nall)*sigma_sl_tot/1000. # ub to mb
+    #sigma_sl = sigma_sl/(hSlight.GetBinWidth(1)*2.) # rapidity interval
+    print("sigma_sl:", sigma_sl)
+
+    #normalize to Starlight total cross section
+    ut.norm_to_integral(hSlight, sigma_sl)
+    #hSlight.Scale(sigma_sl/hSlight.Integral("width"))
+
+    #convert to graph
+    gSlight = ut.h1_to_graph(hSlight)
+
+    gSlight.SetLineColor(rt.kBlue)
+    gSlight.SetLineWidth(3)
+    #gSlight.SetLineStyle(9) # kDashDotted
+
+    return gSlight
+
+#end of load_starlight_y
+
+#_____________________________________________________________________________
 def load_ms():
 
     #model by Heikki and Bjorn
