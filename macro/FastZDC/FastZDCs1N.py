@@ -3,6 +3,8 @@
 import sys
 sys.path.append("./models")
 
+from ctypes import c_double, c_int
+
 import ROOT as rt
 from ROOT import gPad, gROOT, gSystem, gStyle, TFile, TTree, AddressOf
 from ROOT import TMath, TRandom3
@@ -51,31 +53,25 @@ def main():
     #create the output
     out = TFile.Open(outfile, "recreate")
     tree_out = TTree("jRecTree", "jRecTree")
-    gROOT.ProcessLine("struct EntD{Double_t v;}; struct EntI{Int_t v;};")
-    epos = rt.EntD()
-    eneg = rt.EntD()
-    npos = rt.EntI()
-    nneg = rt.EntI()
-    adcE = rt.EntD()
-    adcW = rt.EntD()
-    jRecM = rt.EntD()
-    jRecY = rt.EntD()
-    jRecPt = rt.EntD()
-    tree_out.Branch("epos", AddressOf(epos, "v"), "epos/D")
-    tree_out.Branch("eneg", AddressOf(eneg, "v"), "eneg/D")
-    tree_out.Branch("npos", AddressOf(npos, "v"), "npos/I")
-    tree_out.Branch("nneg", AddressOf(nneg, "v"), "nneg/I")
-    tree_out.Branch("jZDCUnAttEast", AddressOf(adcE, "v"), "jZDCUnAttEast/D")
-    tree_out.Branch("jZDCUnAttWest", AddressOf(adcW, "v"), "jZDCUnAttWest/D")
-    tree_out.Branch("jRecM", AddressOf(jRecM, "v"), "jRecM/D")
-    tree_out.Branch("jRecY", AddressOf(jRecY, "v"), "jRecY/D")
-    tree_out.Branch("jRecPt", AddressOf(jRecPt, "v"), "jRecPt/D")
+    epos = c_double(0)
+    eneg = c_double(0)
+    npos = c_int(0)
+    nneg = c_int(0)
+    adcE = c_double(0)
+    adcW = c_double(0)
+    jRecM = c_double(0)
+    jRecY = c_double(0)
+    jRecPt = c_double(0)
 
-    #inp.read(0)
-
-    inp.tree.GetEntry(0)
-
-    return
+    tree_out.Branch("epos", epos, "epos/D")
+    tree_out.Branch("eneg", eneg, "eneg/D")
+    tree_out.Branch("npos", npos, "npos/I")
+    tree_out.Branch("nneg", nneg, "nneg/I")
+    tree_out.Branch("jZDCUnAttEast", adcE, "jZDCUnAttEast/D")
+    tree_out.Branch("jZDCUnAttWest", adcW, "jZDCUnAttWest/D")
+    tree_out.Branch("jRecM", jRecM, "jRecM/D")
+    tree_out.Branch("jRecY", jRecY, "jRecY/D")
+    tree_out.Branch("jRecPt", jRecPt, "jRecPt/D")
 
     #input loop
     iev = 0
@@ -97,25 +93,25 @@ def main():
         nXX += 1
 
         #ADC from energy by the model
-        adcE.v, adcW.v = mod(inp.eneg, inp.epos)
+        adcE.value, adcW.value = mod(inp.eneg, inp.epos)
 
         #trigger condition on ADC
-        if adcE.v > adc_trg_max_east or adcW.v > adc_trg_max_west:
+        if adcE.value > adc_trg_max_east or adcW.value > adc_trg_max_west:
             continue
 
         #accepted by the trigger
         nTrig += 1
 
         #generated energy and multiplicity
-        epos.v = inp.epos
-        eneg.v = inp.eneg
-        npos.v = inp.npos
-        nneg.v = inp.nneg
+        epos.value = inp.epos
+        eneg.value = inp.eneg
+        npos.value = inp.npos
+        nneg.value = inp.nneg
 
         #J/psi kinematics
-        jRecM.v = inp.m
-        jRecY.v = inp.y
-        jRecPt.v = inp.pT
+        jRecM.value = inp.m
+        jRecY.value = inp.y
+        jRecPt.value = inp.pT
 
         #fill the output
         tree_out.Fill()

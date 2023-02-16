@@ -37,7 +37,7 @@ class STnOOnRead:
 
         #connect the input tree
         self.particles = TClonesArray("TParticle", 200)
-        #self.tree.SetBranchAddress("particles", self.particles)
+        self.tree.SetBranchAddress("particles", self.particles)
 
         #number of events in input tree
         self.nev = self.tree.GetEntriesFast()
