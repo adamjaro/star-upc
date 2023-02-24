@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from math import sqrt
+
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
 from ROOT import TF1, vector, TMath, TGraphAsymmErrors
@@ -39,8 +41,8 @@ def main():
     mmin = 2.8
     mmax = 3.2
 
-    #dy = 2. # rapidity interval, for integrated sigma
-    dy = 1.
+    dy = 2. # rapidity interval, for integrated sigma
+    #dy = 1.
 
     ngg = 131  # number of gamma-gamma from mass fit
 
@@ -216,7 +218,7 @@ def main():
         hSys.SetBinContent(ibin, hPtFlat.GetBinContent(ibin))
         sig_sl = hPtSl.GetBinContent(ibin)
         sig_fl = hPtFlat.GetBinContent(ibin)
-        print(sig_fl, sig_sl)
+        #print(sig_fl, sig_sl)
         if sig_fl > 0:
             err_deconv = TMath.Abs(sig_fl-sig_sl)/sig_fl
         else:
@@ -320,10 +322,17 @@ def main():
 
     #integrate the cross section over |t|
     s_tot_t = 0.
+    s_tot_t_err = 0.
+    print("Sigma:")
     for ip in range(gSig.GetN()):
         #print(ip, gSig.GetPointX(ip)-gSig.GetErrorXlow(ip), gSig.GetPointX(ip)+gSig.GetErrorXhigh(ip), gSig.GetPointY(ip))
-        s_tot_t += (gSig.GetErrorXlow(ip)+gSig.GetErrorXhigh(ip))*gSig.GetPointY(ip)
-    print("Integrated sigma from data (mb):", s_tot_t)
+        t_bin_len = gSig.GetErrorXlow(ip)+gSig.GetErrorXhigh(ip)
+        s_tot_t += t_bin_len*gSig.GetPointY(ip)
+        s_tot_t_err += ( t_bin_len*0.5*(gSig.GetErrorYlow(ip)+gSig.GetErrorYhigh(ip)) )**2
+        print(ip, gSig.GetPointY(ip), gSig.GetErrorYhigh(ip))
+        #s_tot_t_err += (t_bin_len*gSig.GetErrorYhigh(ip))**2
+    s_tot_t_err = sqrt(s_tot_t_err)
+    print("Integrated sigma from data (mb):", s_tot_t, "+/-", s_tot_t_err)
 
     #beep when finished
     gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")

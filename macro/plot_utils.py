@@ -320,8 +320,8 @@ def prepare_leg(xl, yl, dxl, dyl, tsiz=0.045):
 #_____________________________________________________________________________
 def add_leg_y_pt(leg, ymin, ymax, ptmax):
 
-    leg.AddEntry(None, "#bf{%2.1f < #it{y} < %2.1f}" % (ymin, ymax), "")
-    leg.AddEntry(None, "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV}", "")
+    leg.AddEntry("", "#bf{%2.1f < #it{y} < %2.1f}" % (ymin, ymax), "")
+    leg.AddEntry("", "#bf{#it{p}_{T} < "+"{0:.2f}".format(ptmax)+" GeV}", "")
 
 #_____________________________________________________________________________
 def add_leg_pt_mass(leg, ptmax, mmin, mmax):
