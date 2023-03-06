@@ -39,7 +39,8 @@ void ControlPlotsDataMC() {
   mmin = 2.8; mmax = 3.2;
   //mmin = 1.5; mmax = 5.;
 
-  ptmax = 0.18;
+  //ptmax = 0.18;
+  ptmax = 0.33;
 
   Init();
 
@@ -64,7 +65,7 @@ void ControlPlotsDataMC() {
   // iplot                     0          1               2               3         4           5         6          7
   //                       z of PV  opening angle   BEMC energy / p   rapidity  delta eta    delta phi  trk phi   trk eta
   static string lrec[] = {  "jVtxZ", "jDeltaPhi", "jT0bemcE/jT0bemcP", "jRecY", "jT0Deta",  "jT0Dphi",  "jT0phi", "jT0eta"};
-  static Double_t xbin[] = {   6.,      0.01,             0.05,         0.15,     0.005,      0.008,      0.9,      0.2};
+  static Double_t xbin[] = {   6.,      0.01,             0.05,         0.10,     0.005,      0.008,      0.9,      0.2};
   static Double_t xmin[] = { -110.,     2.8,              0.,           -1.3,    -0.10,       -0.1,       -4.,      -1.2};
   static Double_t xmax[] = {  110.,     3.42,             2.,           1.3,      0.10,       0.1,        4.,       1.2};
   static string xtit[] = {

@@ -334,7 +334,7 @@ def add_leg_mass(leg, mmin, mmax):
 
     mmin_fmt = "{0:.1f}".format(mmin)
     mmax_fmt = "{0:.1f}".format(mmax)
-    leg.AddEntry(None, "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV/c^{2}}", "")
+    leg.AddEntry("", "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV/c^{2}}", "")
 
 #_____________________________________________________________________________
 def make_uo_leg(hx, xl, yl, dxl, dyl, tsiz=0.03):
@@ -657,6 +657,11 @@ def invert_col(pad, bgcol=rt.kBlack):
             if obj.GetLineColor() == rt.kBlack:
                 obj.SetLineColor(fgcol)
                 obj.SetFillColor(bgcol)
+
+      #TLine
+      if obj.InheritsFrom( TLine.Class() ) == True:
+            if obj.GetLineColor() == rt.kBlack:
+                obj.SetLineColor(fgcol)
 
       #move to next item
       obj = next()

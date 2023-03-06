@@ -197,6 +197,7 @@ def main():
     #
     unfold_bgen = RooUnfoldBayes(resp_bgen, hPt, 14)
     hPtFlat = unfold_bgen.Hreco()
+    print("Overall AxE:", hPt.Integral()/hPtFlat.Integral())
     #hPtFlat = unfold_bgen.Hunfold()
     #ut.set_H1D(hPtFlat)
     #apply the denominator and bin width

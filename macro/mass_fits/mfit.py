@@ -34,10 +34,16 @@ if __name__ == "__main__":
     mmin = 1.12
     mmax = 5.
 
-    ymin = -1.
-    ymax = 1.
+    #ymin = -1.
+    #ymax = 1.
+    ymin = -0.2
+    ymax = 0.2
 
-    ptmax = 0.18
+    aymin = 0
+    aymax = 1
+
+    #ptmax = 0.18
+    ptmax = 0.33
 
     #alphafix = 0.694
     #nfix = 3.743
@@ -80,7 +86,8 @@ if __name__ == "__main__":
 
     #unbinned and binned input data
     nbins, mmax = ut.get_nbins(mbin, mmin, mmax)
-    strsel = "jRecY>{0:.3f} && jRecY<{1:.3f} && jRecPt<{2:.3f}".format(ymin, ymax, ptmax)
+    #strsel = "jRecY>{0:.3f} && jRecY<{1:.3f} && jRecPt<{2:.3f}".format(ymin, ymax, ptmax)
+    strsel = "TMath::Abs(jRecY)>{0:.3f} && TMath::Abs(jRecY)<{1:.3f} && jRecPt<{2:.3f}".format(aymin, aymax, ptmax)
     #unbinned data
     m.setMin(mmin)
     m.setMax(mmax)
@@ -239,7 +246,7 @@ if __name__ == "__main__":
     desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError())
     desc2.draw()
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

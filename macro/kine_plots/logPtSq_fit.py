@@ -26,6 +26,16 @@ def fit():
     ptsq_min = 1e-5
     ptsq_max = 1
 
+    #rapidity interval
+    #ymin = -1.
+    #ymax = 1.
+    ymin = -0.2
+    ymax = 0.2
+
+    aymin = 0
+    aymax = 1
+
+    #mass interval
     mmin = 2.8
     mmax = 3.2
 
@@ -33,7 +43,8 @@ def fit():
     fitran = [-0.9, 0.1]
 
     #number of gamma-gamma events
-    ngg = 131
+    #ngg = 131
+    ngg = 600
 
     #number of psi' events
     npsiP = 20
@@ -41,9 +52,12 @@ def fit():
     #input data
     pT = RooRealVar("jRecPt", "pT", 0, 10)
     m = RooRealVar("jRecM", "mass", 0, 10)
-    data_all = RooDataSet("data", "data", tree, RooArgSet(pT, m))
+    rapidity = RooRealVar("jRecY", "rapidity", -1., 1.)
+    data_all = RooDataSet("data", "data", tree, RooArgSet(pT, m, rapidity))
     #select for mass range
-    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    #strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    #strsel = "jRecM>{0:.3f} && jRecM<{1:.3f} && jRecY>{2:.3f} && jRecY<{3:.3f}".format(mmin, mmax, ymin, ymax)
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f} && TMath::Abs(jRecY)>{2:.3f} && TMath::Abs(jRecY)<{3:.3f}".format(mmin, mmax, aymin, aymax)
     data = data_all.reduce( strsel )
 
     #create log(pT^2) from pT
@@ -244,14 +258,14 @@ def fit():
     #legend for input data
     #dleg = ut.prepare_leg(0.4, 0.77, 0.14, 0.18, 0.035)
     dleg = ut.prepare_leg(0.4, 0.71, 0.16, 0.24, 0.035)
-    dleg.AddEntry(None, "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    dleg.AddEntry("", "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
     ut.add_leg_mass(dleg, mmin, mmax)
-    dleg.AddEntry(None, "AuAu, 200 GeV", "")
-    dleg.AddEntry(None, "UPC sample", "")
+    dleg.AddEntry("", "AuAu, 200 GeV", "")
+    dleg.AddEntry("", "UPC sample", "")
     dleg.AddEntry(hxl, "Data, #it{p}_{T}^{2}", "lp")
     dleg.Draw("same")
 
-    #ut.invert_col_can(can)
+    ut.invert_col_can(can)
     can.SaveAs("01fig.pdf")
 
 

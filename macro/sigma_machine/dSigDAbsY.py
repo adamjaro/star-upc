@@ -28,10 +28,10 @@ def main():
 
     can = TCanvas("can", "can", 768, 768)
 
-    frame = gPad.DrawFrame(-3.2, 0, 3.2, 40) # xmin, ymin, xmax, ymax
+    frame = gPad.DrawFrame(0, 0, 1.7, 40) # xmin, ymin, xmax, ymax
     frame.Draw()
 
-    ut.put_yx_tit(frame, "d#it{#sigma}/d#it{y} (#mub)", "#it{y}", 1.4, 1.3)
+    ut.put_yx_tit(frame, "d#it{#sigma}/d#it{y} (#mub)", "|#it{y}|", 1.4, 1.2)
 
     ut.set_margin_lbtr(gPad, 0.1, 0.09, 0.02, 0.01)
 
@@ -46,13 +46,17 @@ def main():
 
     # Integrated sigma from data (mb): 0.023004428341012642 +/- 0.0021194215697785544
     # Sigma (micro barn): 25.33529625253031 1.3670506187705376
-    #hDat = ut.prepare_TH1D("hDat", 2, -1, 1)
+    hDat = ut.prepare_TH1D_n("hDat", 1, 0, 1)
     #hDat.SetBinContent(1, 23.004) # micro barn
     #hDat.SetBinError(1, 2.119)
-    #hDat.SetBinContent(1, 25.34) # micro barn
-    #hDat.SetBinError(1, 1.37)
+    hDat.SetBinContent(1, 23.02) # micro barn
+    hDat.SetBinError(1, 1.33)
 
-    hDat1 = ut.prepare_TH1D_n("hDat1", 1, -0.2, 0.2)
+    ut.set_H1D_col(hDat, rt.kBlue)
+
+    hDat.Draw("e1same")
+
+    hDat1 = ut.prepare_TH1D_n("hDat1", 1, 0, 0.2)
     hDat1.SetBinContent(1, 32.25) # micro barn
     hDat1.SetBinError(1, 3.29)
 
@@ -70,13 +74,14 @@ def main():
 
     hDat3.Draw("e1same")
 
-    leg = ut.prepare_leg(0.14, 0.81, 0.2, 0.14, 0.035)
-    leg.AddEntry("", "#it{J/}#it{#psi} + XnXn, 200 GeV", "")
-    #leg.AddEntry(hDat, "Run 14", "lp")
+    leg = ut.prepare_leg(0.5, 0.76, 0.2, 0.2, 0.035)
+    leg.AddEntry("", "#it{J/}#it{#psi} + XnXn, 200 GeV, run 14", "")
+    leg.AddEntry(hDat, "Full interval", "lp")
+    leg.AddEntry(hDat1, "Bins", "lp")
     leg.AddEntry(gY, "Starlight", "l")
     leg.Draw("same")
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
 #_____________________________________________________________________________
