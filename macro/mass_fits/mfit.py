@@ -34,16 +34,16 @@ if __name__ == "__main__":
     mmin = 1.12
     mmax = 5.
 
-    #ymin = -1.
-    #ymax = 1.
-    ymin = -0.2
-    ymax = 0.2
+    ymin = -1.
+    ymax = 1.
+    #ymin = -0.2
+    #ymax = 0.2
 
     aymin = 0
     aymax = 1
 
     #ptmax = 0.18
-    ptmax = 0.33
+    ptmax = 0.28
 
     #alphafix = 0.694
     #nfix = 3.743
@@ -59,7 +59,8 @@ if __name__ == "__main__":
     #integration range
     #intran = [2.1, 2.6]
     #intran = [3.4, 4.6]
-    intran = [2.8, 3.2]
+    #intran = [2.8, 3.2]
+    intran = [2.75, 3.2]
 
     #cmodel = rt.kMagenta
     cmodel = rt.kBlue
@@ -177,8 +178,8 @@ if __name__ == "__main__":
     hMassLS.Draw("same")
     frame.Draw("same")
 
-    frame.SetXTitle("#it{m}_{e^{+}e^{-}} (GeV/c^{2})")
-    frame.SetYTitle( "Dielectron counts / (%.0f MeV/c^{2})" % (1000.*mbin) )
+    frame.SetXTitle("#it{m}_{e^{+}e^{-}} (GeV)")
+    frame.SetYTitle( "Dielectron counts / (%.0f MeV)" % (1000.*mbin) )
 
     #legend for fit functions
     leg = ut.prepare_leg(0.16, 0.85, 0.24, 0.1, 0.03)
@@ -231,8 +232,8 @@ if __name__ == "__main__":
     #integration range
     lin_lo = ut.cut_line(intran[0], 0.33, frame)
     lin_hi = ut.cut_line(intran[1], 0.33, frame)
-    lin_lo.Draw("same")
-    lin_hi.Draw("same")
+    #lin_lo.Draw("same")
+    #lin_hi.Draw("same")
 
     #integration result
     desc2 = pdesc(frame, 0.8, 0.6, 0.045)
@@ -241,7 +242,7 @@ if __name__ == "__main__":
     #igg_desc = "#it{n}_{#gamma#gamma,#it{J}/#psi} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
     #igg_desc = "#it{n}_{#gamma#gamma,lo} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
     #igg_desc = "#it{n}_{#gamma#gamma,hi} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
-    igg_desc = "#it{n}_{#gamma#gamma} = #int_{%.1f}^{%.1f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
+    igg_desc = "#it{n}_{#gamma#gamma} = #int_{%.2f}^{%.2f}#color[2]{#it{f}_{#gamma#gamma}}" % (intran[0], intran[1])
     #desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError(), cbkg)
     desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError())
     desc2.draw()

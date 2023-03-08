@@ -2,7 +2,7 @@
 
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
-from ROOT import TLine, TMath, TLatex
+from ROOT import TLine, TMath, TLatex, TGaxis, TF1
 
 import sys
 sys.path.append('../')
@@ -12,7 +12,7 @@ import plot_utils as ut
 #_____________________________________________________________________________
 def main():
 
-    iplot = 3
+    iplot = 2
 
     func = {}
     func[0] = pT_mass
@@ -97,13 +97,6 @@ def lpT2_mass():
 
     #data
     inp = "../../../star-upc-data/ana/muDst/muDst_run1/sel5/ana_muDst_run1_all_sel5z.root"
-    #inp = "../../../star-upc-data/ana/muDst/muDst_run1/sel5/ana_muDst_run1_all_sel5z_ls.root"
-
-    #gamma-gamma
-    #inp = "../../../star-upc-data/ana/starsim/slight14e/sel5/ana_slight14e2x1_sel5_nzvtx.root"
-
-    #incoherent
-    #inp = "../../../star-upc-data/ana/starsim/slight14e/sel5/ana_slight14e3_sel5z.root"
 
     #log_10(pT^2)
     ybin = 0.14
@@ -113,12 +106,13 @@ def lpT2_mass():
     #mass
     xbin = 0.08
     xmin = 1.2
-    xmax = 4.3
+    xmax = 4.5
 
     infile = TFile.Open(inp)
     tree = infile.Get("jRecTree")
 
-    can = ut.box_canvas()
+    nx = 900
+    can = ut.box_canvas(nx, int(768*768/nx))
 
     hPt2M = ut.prepare_TH2D("hPt2M", xbin, xmin, xmax, ybin, ymin, ymax)
 
@@ -127,12 +121,86 @@ def lpT2_mass():
     hPt2M.SetMinimum(0.98)
     hPt2M.SetContour(300)
 
-    ut.put_yx_tit(hPt2M, "log_{10}( #it{p}_{T}^{2} ) (GeV^{2})", "#it{m}_{e^{+}e^{-}} (GeV/c^{2})", 1.4, 1.3)
-    ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.02, 0.1)
+    ut.put_yx_tit(hPt2M, "log_{10}( #it{p}_{T}^{2} ) (GeV^{2})", "#it{m}_{e^{+}e^{-}} (GeV)", 1, 1.3)
+    ut.set_margin_lbtr(gPad, 0.08, 0.1, 0.02, 0.22)
 
     gPad.SetLogz()
 
     gPad.SetGrid()
+
+    #vertical line in mass
+    lin_col = rt.kYellow
+    msep = 2.75 # GeV
+    mlin = TLine(msep, ymin, msep, ymax)
+    mlin.SetLineStyle(rt.kDashed)
+    mlin.SetLineWidth(2)
+    mlin.SetLineColor(lin_col)
+    mlin.Draw("same")
+
+    mlin_des = TLatex()
+    mlin_des.SetTextSize(0.035)
+    mlin_des.SetTextColor(lin_col)
+    mlin_des.DrawLatex(msep+0.02, -4.7, "#it{m}_{e^{+}e^{-}} = "+"{0:.2f} GeV".format(msep))
+
+    #horizontal line in pT
+    pTsep = 0.28 # GeV
+    plin_pos = TMath.Log10(pTsep*pTsep)
+    plin = TLine(xmin, plin_pos, xmax, plin_pos)
+    plin.SetLineStyle(rt.kDashed)
+    plin.SetLineWidth(2)
+    plin.SetLineColor(lin_col)
+    plin.Draw("same")
+
+    plin_des = TLatex()
+    plin_des.SetTextSize(0.035)
+    plin_des.SetTextColor(lin_col)
+    plin_des.DrawLatex(3.7, plin_pos+0.2, "#it{p}_{T} = "+"{0:.2f} GeV".format(pTsep))
+
+    gStyle.SetPalette(62)
+
+    leg = ut.prepare_leg(0.15, 0.9, 0.15, 0.05, 0.035)
+    leg.AddEntry(hPt2M, "Data, unlike-sign", "")
+    leg.Draw("same")
+
+    #axis in pT^2
+
+    gxmax = hPt2M.GetXaxis().GetXmax()
+    gymin = hPt2M.GetYaxis().GetXmin()
+    gymax = hPt2M.GetYaxis().GetXmax()
+
+    fPt2 = TF1("fPt2", "TMath::Power(10,x)", TMath.Power(10, gymin), TMath.Power(10, gymax))
+
+    aPt2 = TGaxis(gxmax, gymin, gxmax, gymax, "fPt2", 510, "+G")
+    ut.set_axis(aPt2)
+    aPt2.SetLabelOffset(0.041)
+    aPt2.SetTitle("#it{p}_{T}^{2} (GeV^{2})")
+    aPt2.SetTitleOffset(1.2)
+
+    aPt2.Draw()
+
+    #axis in pT
+
+    ptmin = TMath.Sqrt( TMath.Power(10,gymin) )
+    ptmax = TMath.Sqrt( TMath.Power(10,gymax) )
+    fPt = TF1("fPt", "TMath::Sqrt(TMath::Power(10,x))", ptmin, ptmax)
+
+    dgxmax = 0.55
+    aPt = TGaxis(gxmax+dgxmax, gymin, gxmax+dgxmax, gymax, "fPt", 510, "+G")
+    ut.set_axis(aPt)
+    aPt.SetLabelOffset(0.044)
+    aPt.SetTitle("#it{p}_{T} (GeV)")
+    aPt.SetTitleOffset(1.5)
+    aPt.SetNoExponent()
+    aPt.SetMoreLogLabels()
+
+    aPt.Draw()
+
+    #offset in color axis
+    gPad.Update()
+    palette = hPt2M.GetListOfFunctions().FindObject("palette")
+    deltx = 0.4
+    palette.SetX1NDC( palette.GetX1NDC() + deltx )
+    palette.SetX2NDC( palette.GetX2NDC() + deltx )
 
     ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
@@ -182,7 +250,7 @@ def lpT2_mass_mc():
     h_gg.SetFillColor(rt.kYellow)
 
     tree_gg.Draw("TMath::Log10(jRecPt*jRecPt):jRecM >> h_gg")
-    h_gg.Scale(162/h_gg.Integral("width")) # scale the gamma-gamma to the data
+    h_gg.Scale(181/h_gg.Integral("width")) # scale the gamma-gamma to the data
     h_gg.SetContour(300)
 
     #incoherent MC
@@ -191,7 +259,7 @@ def lpT2_mass_mc():
     h_inc.SetFillColor(rt.kRed)
 
     tree_inc.Draw("TMath::Log10(jRecPt*jRecPt):jRecM >> h_inc")
-    h_inc.Scale(81/h_inc.Integral("width")) # scale the incoherent MC to the data
+    h_inc.Scale(85/h_inc.Integral("width")) # scale the incoherent MC to the data
 
     #coherent MC
     h_coh = ut.prepare_TH2D("h_coh", xbin, xmin, xmax, ybin, ymin, ymax)
@@ -199,7 +267,7 @@ def lpT2_mass_mc():
     h_coh.SetFillColor(rt.kGreen)
 
     tree_coh.Draw("TMath::Log10(jRecPt*jRecPt):jRecM >> h_coh")
-    h_coh.Scale(460/h_coh.Integral("width")) # scale the coherent MC to the data
+    h_coh.Scale(473/h_coh.Integral("width")) # scale the coherent MC to the data
 
     #like-sign data
     h_ls = ut.prepare_TH2D("h_ls", xbin, xmin, xmax, ybin, ymin, ymax)
@@ -209,7 +277,8 @@ def lpT2_mass_mc():
     tree_ls.Draw("TMath::Log10(jRecPt*jRecPt):jRecM >> h_ls", "", "boxsame")
 
     #make the plot
-    can = ut.box_canvas()
+    nx = 900
+    can = ut.box_canvas(nx, int(768*768/nx))
 
     h_gg.Scale(h_coh.GetMaximum()/h_gg.GetMaximum())# gamma-gamma range to the scale of coherent MC
 
@@ -221,58 +290,101 @@ def lpT2_mass_mc():
 
     h_ls.Draw("boxsame")
 
-    ut.put_yx_tit(h_gg, "log_{10}( #it{p}_{T}^{2} ) (GeV^{2})", "#it{m}_{e^{+}e^{-}} (GeV)", 1.4, 1.3)
+    ut.put_yx_tit(h_gg, "log_{10}( #it{p}_{T}^{2} ) (GeV^{2})", "#it{m}_{e^{+}e^{-}} (GeV)", 1, 1.3)
 
-    ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.02, 0.01)
+    ut.set_margin_lbtr(gPad, 0.08, 0.1, 0.02, 0.22)
 
     gPad.SetGrid()
 
     #vertical line in mass
-    msep = 2.8 # GeV
+    lin_col = rt.kBlue
+    lin_col = rt.kCyan
+    msep = 2.75 # GeV
     mlin = TLine(msep, ymin, msep, ymax)
     mlin.SetLineStyle(rt.kDashed)
-    mlin.SetLineWidth(4)
+    mlin.SetLineWidth(2)
+    mlin.SetLineColor(lin_col)
     mlin.Draw("same")
 
     mlin_des = TLatex()
     mlin_des.SetTextSize(0.035)
-    mlin_des.DrawLatex(2.82, -4.7, "#it{m}_{e^{+}e^{-}} = 2.8 GeV")
+    mlin_des.SetTextColor(lin_col)
+    mlin_des.DrawLatex(msep+0.02, -4.7, "#it{m}_{e^{+}e^{-}} = "+"{0:.2f} GeV".format(msep))
 
     #horizontal line in pT
-    pTsep = 0.18 # GeV
-    plin = TLine(xmin, TMath.Log10(pTsep*pTsep), xmax, TMath.Log10(pTsep*pTsep))
+    pTsep = 0.28 # GeV
+    plin_pos = TMath.Log10(pTsep*pTsep)
+    plin = TLine(xmin, plin_pos, xmax, plin_pos)
     plin.SetLineStyle(rt.kDashed)
-    plin.SetLineWidth(4)
+    plin.SetLineWidth(2)
+    plin.SetLineColor(lin_col)
     plin.Draw("same")
 
     plin_des = TLatex()
     plin_des.SetTextSize(0.035)
-    plin_des.DrawLatex(1.3, -1.3, "#it{p}_{T} = 0.18 GeV")
+    plin_des.SetTextColor(lin_col)
+    plin_des.DrawLatex(3.7, plin_pos+0.2, "#it{p}_{T} = "+"{0:.2f} GeV".format(pTsep))
 
-    ls_leg = ut.prepare_leg(0.14, 0.9, 0.15, 0.05, 0.035)
+    #legend for individual processes
+
+    ls_leg = ut.prepare_leg(0.12, 0.9, 0.15, 0.05, 0.035)
     ls_leg.AddEntry(h_ls, "Like-sign data", "f")
     ls_leg.Draw("same")
 
-    inc_leg = ut.prepare_leg(0.72, 0.9, 0.15, 0.05, 0.035)
+    inc_leg = ut.prepare_leg(0.57, 0.9, 0.15, 0.05, 0.035)
     inc_leg.AddEntry(h_inc, "Incoherent MC", "f")
     inc_leg.Draw("same")
 
-    coh_leg = ut.prepare_leg(0.72, 0.55, 0.15, 0.05, 0.035)
+    coh_leg = ut.prepare_leg(0.57, 0.25, 0.15, 0.05, 0.035)
     coh_leg.AddEntry(h_coh, "Coherent MC", "f")
     coh_leg.Draw("same")
 
-    gg_leg = ut.prepare_leg(0.14, 0.2, 0.15, 0.05, 0.035)
+    gg_leg = ut.prepare_leg(0.12, 0.14, 0.15, 0.05, 0.035)
     gg_leg.AddEntry(h_gg, "#gamma#gamma#rightarrow e^{+}e^{-} MC", "f")
     gg_leg.Draw("same")
 
+    #axis in pT^2
+
+    gxmax = h_gg.GetXaxis().GetXmax()
+    gymin = h_gg.GetYaxis().GetXmin()
+    gymax = h_gg.GetYaxis().GetXmax()
+
+    fPt2 = TF1("fPt2", "TMath::Power(10,x)", TMath.Power(10, gymin), TMath.Power(10, gymax))
+
+    aPt2 = TGaxis(gxmax, gymin, gxmax, gymax, "fPt2", 510, "+G")
+    ut.set_axis(aPt2)
+    aPt2.SetLabelOffset(0.041)
+    aPt2.SetTitle("#it{p}_{T}^{2} (GeV^{2})")
+    aPt2.SetTitleOffset(1.2)
+
+    aPt2.Draw()
+
+    #axis in pT
+
+    ptmin = TMath.Sqrt( TMath.Power(10,gymin) )
+    ptmax = TMath.Sqrt( TMath.Power(10,gymax) )
+    fPt = TF1("fPt", "TMath::Sqrt(TMath::Power(10,x))", ptmin, ptmax)
+
+    dgxmax = 0.55
+    aPt = TGaxis(gxmax+dgxmax, gymin, gxmax+dgxmax, gymax, "fPt", 510, "+G")
+    ut.set_axis(aPt)
+    aPt.SetLabelOffset(0.044)
+    aPt.SetTitle("#it{p}_{T} (GeV)")
+    aPt.SetTitleOffset(1.5)
+    aPt.SetNoExponent()
+    aPt.SetMoreLogLabels()
+
+    aPt.Draw()
+
     #gStyle.SetPalette(56)
     gStyle.SetPalette(53)
+    #gStyle.SetPalette(rt.kBird)
     ut.invert_col(rt.gPad)
 
-    #offset in color axis
+    #offset in color axis to move it outside the plot
     gPad.Update()
     palette = h_gg.GetListOfFunctions().FindObject("palette")
-    deltx = 0.2
+    deltx = 0.4
     palette.SetX1NDC( palette.GetX1NDC() + deltx )
     palette.SetX2NDC( palette.GetX2NDC() + deltx )
 
@@ -283,7 +395,7 @@ if __name__ == "__main__":
 
     gROOT.SetBatch()
     gStyle.SetPadTickX(1)
-    gStyle.SetPadTickY(1)
+    #gStyle.SetPadTickY(1)
     gStyle.SetFrameLineWidth(2)
 
     main()

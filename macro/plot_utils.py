@@ -330,10 +330,10 @@ def add_leg_pt_mass(leg, ptmax, mmin, mmax):
     add_leg_mass(leg, mmin, mmax)
 
 #_____________________________________________________________________________
-def add_leg_mass(leg, mmin, mmax):
+def add_leg_mass(leg, mmin, mmax, dig=1):
 
-    mmin_fmt = "{0:.1f}".format(mmin)
-    mmax_fmt = "{0:.1f}".format(mmax)
+    mmin_fmt = ("{0:."+str(dig)+"f}").format(mmin)
+    mmax_fmt = ("{0:."+str(dig)+"f}").format(mmax)
     leg.AddEntry("", "#bf{"+mmin_fmt+" < #it{m}_{e^{+}e^{-}} < "+mmax_fmt+" GeV/c^{2}}", "")
 
 #_____________________________________________________________________________

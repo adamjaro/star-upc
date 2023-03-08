@@ -27,16 +27,16 @@ def fit():
     ptsq_max = 1
 
     #rapidity interval
-    #ymin = -1.
-    #ymax = 1.
-    ymin = -0.2
-    ymax = 0.2
+    ymin = -1.
+    ymax = 1.
+    #ymin = -0.2
+    #ymax = 0.2
 
     aymin = 0
     aymax = 1
 
     #mass interval
-    mmin = 2.8
+    mmin = 2.75
     mmax = 3.2
 
     #range for incoherent fit
@@ -44,7 +44,7 @@ def fit():
 
     #number of gamma-gamma events
     #ngg = 131
-    ngg = 600
+    ngg = 181
 
     #number of psi' events
     npsiP = 20
@@ -259,7 +259,7 @@ def fit():
     #dleg = ut.prepare_leg(0.4, 0.77, 0.14, 0.18, 0.035)
     dleg = ut.prepare_leg(0.4, 0.71, 0.16, 0.24, 0.035)
     dleg.AddEntry("", "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
-    ut.add_leg_mass(dleg, mmin, mmax)
+    ut.add_leg_mass(dleg, mmin, mmax, 2)
     dleg.AddEntry("", "AuAu, 200 GeV", "")
     dleg.AddEntry("", "UPC sample", "")
     dleg.AddEntry(hxl, "Data, #it{p}_{T}^{2}", "lp")

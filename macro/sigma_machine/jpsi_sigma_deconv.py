@@ -38,13 +38,20 @@ def main():
     ptshort = 0.0005
 
     #mass interval
-    mmin = 2.8
+    mmin = 2.75
     mmax = 3.2
 
     dy = 2. # rapidity interval, for integrated sigma
     #dy = 1.
 
-    ngg = 131  # number of gamma-gamma from mass fit
+    #ngg = 131  # number of gamma-gamma from mass fit
+    ngg = 181
+
+    #incoherent shape
+    #inc1 = 873.04
+    #inc2 = 3.28
+    inc1 = 923.2
+    inc2 = 3.3
 
     lumi = 13871.907 # lumi in inv. ub
 
@@ -135,7 +142,7 @@ def main():
 
     #incoherent functional shape
     func_incoh_pt2 = TF1("func_incoh", "[0]*exp(-[1]*x)", 0., 10.)
-    func_incoh_pt2.SetParameters(873.04, 3.28)
+    func_incoh_pt2.SetParameters(inc1, inc2)
 
     #fill incoherent histogram from functional shape
     hPtIncoh = ut.prepare_TH1D_vec("hPtIncoh", bins)
@@ -170,7 +177,7 @@ def main():
     #Starlight response
     #resp_sl = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
     resp_sl = RooUnfoldResponse(hPt, hPt)
-    rt.fill_response_matrix(tree_sl_gen, resp_sl)
+    rt.fill_response_matrix(tree_sl_gen, resp_sl, mmin, mmax)
     #
     unfold_sl = RooUnfoldBayes(resp_sl, hPt, 15)
     #unfold_sl = RooUnfoldSvd(resp_sl, hPt, 15)
@@ -183,7 +190,7 @@ def main():
     #Sartre response
     #resp_sart = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
     #resp_sart = RooUnfoldResponse(hPt, hPt)
-    #rt.fill_response_matrix(tree_sart_gen, resp_sart)
+    #rt.fill_response_matrix(tree_sart_gen, resp_sart, mmin, mmax)
     #
     #unfold_sart = RooUnfoldBayes(resp_sart, hPt, 10)
     #hPtSart = unfold_sart.Hreco()
@@ -193,7 +200,7 @@ def main():
     #Flat pT^2 response
     #resp_bgen = RooUnfoldResponse(deconv_nbin, deconv_min, deconv_max, deconv_nbin, deconv_min, deconv_max)
     resp_bgen = RooUnfoldResponse(hPt, hPt)
-    rt.fill_response_matrix(tree_bgen_gen, resp_bgen)
+    rt.fill_response_matrix(tree_bgen_gen, resp_bgen, mmin, mmax)
     #
     unfold_bgen = RooUnfoldBayes(resp_bgen, hPt, 14)
     hPtFlat = unfold_bgen.Hreco()
