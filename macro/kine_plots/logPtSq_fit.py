@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from math import sqrt
+
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
 from ROOT import TF1, TGaxis
@@ -10,6 +12,7 @@ from ROOT import RooDataHist, RooHistPdf, RooAddPdf, RooGenericPdf, RooGaussian
 import sys
 sys.path.append('../')
 import plot_utils as ut
+from parameter_descriptor import parameter_descriptor as pdesc
 
 #_____________________________________________________________________________
 def fit():
@@ -26,12 +29,7 @@ def fit():
     ptsq_min = 1e-5
     ptsq_max = 1
 
-    #rapidity interval
-    ymin = -1.
-    ymax = 1.
-    #ymin = -0.2
-    #ymax = 0.2
-
+    #rapidity interval as |y|
     aymin = 0
     aymax = 1
 
@@ -43,7 +41,6 @@ def fit():
     fitran = [-0.9, 0.1]
 
     #number of gamma-gamma events
-    #ngg = 131
     ngg = 181
 
     #number of psi' events
@@ -56,8 +53,11 @@ def fit():
     data_all = RooDataSet("data", "data", tree, RooArgSet(pT, m, rapidity))
     #select for mass range
     #strsel = "jRecM>{0:.3f} && jRecM<{1:.3f}".format(mmin, mmax)
+    #ymin = -1.
+    #ymax = 1.
     #strsel = "jRecM>{0:.3f} && jRecM<{1:.3f} && jRecY>{2:.3f} && jRecY<{3:.3f}".format(mmin, mmax, ymin, ymax)
-    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f} && TMath::Abs(jRecY)>{2:.3f} && TMath::Abs(jRecY)<{3:.3f}".format(mmin, mmax, aymin, aymax)
+    strsel = "jRecM>{0:.3f} && jRecM<{1:.3f} && TMath::Abs(jRecY)>{2:.3f} && TMath::Abs(jRecY)<{3:.3f}"\
+      .format(mmin, mmax, aymin, aymax)
     data = data_all.reduce( strsel )
 
     #create log(pT^2) from pT
@@ -90,7 +90,7 @@ def fit():
     inc_nevt = data.sumEntries("logPtSq", "fitran")
     incpdf.setNormRange("fitran")
     aval = RooRealVar("aval", "aval", inc_nevt/incpdf.getNorm(lset))
-    print("A =", aval.getVal())
+    print("A =", aval.getVal(), aval.getError(), inc_nevt, sqrt(inc_nevt), sqrt(inc_nevt)/incpdf.getNorm(lset))
     print("b =", bval.getVal(), "+/-", bval.getError())
 
     #incoherent distribution from log_10(pT^2) function for the sum with gamma-gamma
@@ -137,11 +137,11 @@ def fit():
     gStyle.SetLineWidth(1)
 
     can.cd(1)
-    ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.01, 0)
+    ut.set_margin_lbtr(gPad, 0.11, 0.1, 0.02, 0)
 
     frame = logPtSq.frame(rf.Bins(nbins))
     frame.SetTitle("")
-    frame.SetMaximum(80)
+    frame.SetMaximum(90)
 
     frame.SetYTitle("Events / ({0:.3f}".format(ptbin)+" GeV^{2})")
     frame.SetXTitle("log_{10}( #it{p}_{T}^{2} ) (GeV^{2})")
@@ -158,6 +158,8 @@ def fit():
 
     frame.Draw()
 
+    print("chi2/ndf:", frame.chiSquare("incpdf", "data", 1))
+
     #add gamma-gamma contribution
     hGG.Draw("same")
 
@@ -167,19 +169,37 @@ def fit():
     #add psi'
     #hPsiP.Draw("same")
 
-    #legend for log_10(pT^2)
-    leg = ut.prepare_leg(0.15, 0.77, 0.28, 0.19, 0.035)
-    hxl = ut.prepare_TH1D("hxl", 1, 0, 1)
-    hxl.Draw("same")
+    #legend for log_10(pT^2) fit function
+    leg = ut.prepare_leg(0.15, 0.85, 0.28, 0.1, 0.035)
     ilin = ut.col_lin(rt.kRed, 2)
     ilin2 = ut.col_lin(rt.kRed, 2)
     ilin2.SetLineStyle(rt.kDashed)
-    leg.AddEntry(ilin, "Incoherent parametrization, fit region", "l")
-    leg.AddEntry(ilin2, "Incoherent parametrization, extrapolation region", "l")
-    leg.AddEntry(hGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
-    #leg.AddEntry(hxl, "Data", "lp")
-    leg.AddEntry(hxl, "Data, log_{10}( #it{p}_{T}^{2} )", "lp")
+    leg.AddEntry(ilin, "Incoherent par., fit region "+\
+      "{0:.2f}".format(fitran[0])+" < log_{10}(#it{p}_{T}^{2}) < "+"{0:.2f}".format(fitran[1]), "l")
+    leg.AddEntry(ilin2, "Incoherent par., extrapolation region", "l")
     leg.Draw("same")
+
+    #legend for log_10(pT^2) data
+    leg_lpt_dat = ut.prepare_leg(0.65, 0.72, 0.28, 0.1, 0.035)
+    hxl = ut.prepare_TH1D("hxl", 1, 0, 1)
+    hxl.Draw("same")
+    leg_lpt_dat.AddEntry(hxl, "Data, log_{10}( #it{p}_{T}^{2} )", "lp")
+    leg_lpt_dat.AddEntry(hGG, "#gamma#gamma#rightarrow e^{+}e^{-}", "l")
+    leg_lpt_dat.Draw("same")
+
+    #fit description
+    desc = pdesc(frame, 0.15, 0.8, 0.045)
+    desc.set_text_size(0.03)
+    desc.itemD("#chi^{2}/ndf", frame.chiSquare("incpdf", "data", 1), -1, rt.kRed)
+    desc.prec = 1
+    desc.itemD("#it{A}", aval.getVal(), sqrt(inc_nevt)/incpdf.getNorm(lset), rt.kRed)
+    desc.prec = 3
+    desc.itemR("#it{b}", bval, rt.kRed)
+    desc.draw()
+
+#    print("chi2/ndf:", frame.chiSquare("incpdf", "data", 1))
+#    print("A =", aval.getVal(), aval.getError(), inc_nevt, sqrt(inc_nevt), sqrt(inc_nevt)/incpdf.getNorm(lset))
+#    print("b =", bval.getVal(), "+/-", bval.getError())
 
     #----- plot pT^2 on the right -----
 
@@ -196,7 +216,7 @@ def fit():
     gPad.SetLogy()
     #gPad.SetLineWidth(3)
     #gPad.SetFrameLineWidth(1)
-    ut.set_margin_lbtr(gPad, 0, 0.1, 0.01, 0.15)
+    ut.set_margin_lbtr(gPad, 0, 0.1, 0.02, 0.15)
 
     ptsq_frame = ptsq.frame(rf.Bins(ptsq_nbins), rf.Title(""))
 
@@ -244,9 +264,9 @@ def fit():
     #vertical axis for pT^2 plot
     xpos = ptsq_frame.GetXaxis().GetXmax()
     ypos = ptsq_frame.GetMaximum()
-    ymin = ptsq_frame.GetMinimum()
+    vymin = ptsq_frame.GetMinimum()
 
-    ptsq_axis = TGaxis(xpos, 0, xpos, ypos, ymin, ypos, 510, "+GL")
+    ptsq_axis = TGaxis(xpos, 0, xpos, ypos, vymin, ypos, 510, "+GL")
     ut.set_axis(ptsq_axis)
     ptsq_axis.SetMoreLogLabels()
 
@@ -258,7 +278,8 @@ def fit():
     #legend for input data
     #dleg = ut.prepare_leg(0.4, 0.77, 0.14, 0.18, 0.035)
     dleg = ut.prepare_leg(0.4, 0.71, 0.16, 0.24, 0.035)
-    dleg.AddEntry("", "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    #dleg.AddEntry("", "#bf{|#kern[0.3]{#it{y}}| < 1}", "")
+    dleg.AddEntry("", "#bf{%2.1f < |#it{y}| < %2.1f}" % (aymin, aymax), "")
     ut.add_leg_mass(dleg, mmin, mmax, 2)
     dleg.AddEntry("", "AuAu, 200 GeV", "")
     dleg.AddEntry("", "UPC sample", "")

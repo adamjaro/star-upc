@@ -2,6 +2,8 @@
 
 #cross section comparison
 
+from math import sqrt
+
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile, gSystem
 
@@ -19,8 +21,8 @@ def main():
     tmax = 0.11  #   0.109  0.01 for interference range
     #tmax = 0.015
 
-    #dy = 2. # rapidity interval
-    dy = 1.
+    dy = 2. # rapidity interval
+    #dy = 1.
 
     gSlight = load_starlight(dy)
 
@@ -55,9 +57,16 @@ def main():
     ut.set_H1D(h16)
     ut.set_H1D_col(h16, rt.kRed)
 
+    stot_16 = 0
+    stot_err_16 = 0
+    for i in range(h16.GetNbinsX()):
+        #print(i, h16.GetBinContent(i), h16.GetBinError(i))
+        stot_16 += h16.GetBinWidth(i)*h16.GetBinContent(i)
+        stot_err_16 += (h16.GetBinWidth(i)*h16.GetBinError(i))**2
 
-    #for i in range(h16.GetNbinsX()):
-    #    print(i, h16.GetBinContent(i), h16.GetBinError(i))
+    stot_err_16 = sqrt(stot_err_16)
+
+    print(stot_16, stot_err_16)
 
     #scale to mb
     h16.Sumw2()

@@ -146,7 +146,7 @@ if __name__ == "__main__":
     leg2.AddEntry(lx2, "Shape from data", "l")
     leg2.Draw("same")
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

@@ -34,21 +34,12 @@ if __name__ == "__main__":
     mmin = 1.12
     mmax = 5.
 
-    ymin = -1.
-    ymax = 1.
-    #ymin = -0.2
-    #ymax = 0.2
-
     aymin = 0
     aymax = 1
 
     #ptmax = 0.18
     ptmax = 0.28
 
-    #alphafix = 0.694
-    #nfix = 3.743
-    #alphafix = 0.381
-    #nfix = 15.570
     alphafix = 0.419
     nfix = 9.450
 
@@ -80,13 +71,16 @@ if __name__ == "__main__":
     out = open("out.txt", "w")
     #log fit parameters
     loglist1 = [(x,eval(x)) for x in ["infile", "inLS"]]
-    loglist2 = [(x,eval(x)) for x in ["mbin", "mmin", "mmax", "ymin", "ymax", "ptmax", "binned"]]
+    #loglist2 = [(x,eval(x)) for x in ["mbin", "mmin", "mmax", "ymin", "ymax", "ptmax", "binned"]]
+    loglist2 = [(x,eval(x)) for x in ["mbin", "mmin", "mmax", "aymin", "aymax", "ptmax", "binned"]]
     loglist3 = [(x,eval(x)) for x in ["alphafix", "nfix", "fitran", "intran"]]
     strlog = ut.make_log_string(loglist1, loglist2, loglist3)
     ut.log_results(out, strlog+"\n")
 
     #unbinned and binned input data
     nbins, mmax = ut.get_nbins(mbin, mmin, mmax)
+    ymin = -1.
+    ymax = 1.
     #strsel = "jRecY>{0:.3f} && jRecY<{1:.3f} && jRecPt<{2:.3f}".format(ymin, ymax, ptmax)
     strsel = "TMath::Abs(jRecY)>{0:.3f} && TMath::Abs(jRecY)<{1:.3f} && jRecPt<{2:.3f}".format(aymin, aymax, ptmax)
     #unbinned data
@@ -195,7 +189,7 @@ if __name__ == "__main__":
     #legend for data and kinematics interval
     leg2 = ut.prepare_leg(0.73, 0.78, 0.22, 0.17, 0.03)
     leg2.SetMargin(0.17)
-    ut.add_leg_y_pt(leg2, ymin, ymax, ptmax)
+    ut.add_leg_ay_pt(leg2, aymin, aymax, ptmax)
     hx = ut.prepare_TH1D("hx", 1, 0, 1)
     hx.Draw("same")
     hxLS = ut.prepare_TH1D("hxLS", 1, 0, 1)

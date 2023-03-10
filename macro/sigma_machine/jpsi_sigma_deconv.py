@@ -51,7 +51,7 @@ def main():
     #inc1 = 873.04
     #inc2 = 3.28
     inc1 = 923.2
-    inc2 = 3.3
+    inc2 = 3.304
 
     lumi = 13871.907 # lumi in inv. ub
 
@@ -340,7 +340,7 @@ def main():
         print(ip, gSig.GetPointY(ip), gSig.GetErrorYhigh(ip))
         #s_tot_t_err += (t_bin_len*gSig.GetErrorYhigh(ip))**2
     s_tot_t_err = sqrt(s_tot_t_err)
-    print("Integrated sigma from data (mb):", s_tot_t, "+/-", s_tot_t_err)
+    print("Integrated sigma from data (micro barn):", s_tot_t*1e3, "+/-", s_tot_t_err*1e3)
 
     #beep when finished
     gSystem.Exec("mplayer ../computerbeep_1.mp3 > /dev/null 2>&1")

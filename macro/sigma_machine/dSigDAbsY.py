@@ -49,8 +49,8 @@ def main():
     hDat = ut.prepare_TH1D_n("hDat", 1, 0, 1)
     #hDat.SetBinContent(1, 23.004) # micro barn
     #hDat.SetBinError(1, 2.119)
-    hDat.SetBinContent(1, 23.02) # micro barn
-    hDat.SetBinError(1, 1.33)
+    hDat.SetBinContent(1, 22.84) # micro barn
+    hDat.SetBinError(1, 1.31)
 
     ut.set_H1D_col(hDat, rt.kBlue)
 
@@ -60,19 +60,19 @@ def main():
     hDat1.SetBinContent(1, 32.25) # micro barn
     hDat1.SetBinError(1, 3.29)
 
-    hDat1.Draw("e1same")
+    #hDat1.Draw("e1same")
 
     hDat2 = ut.prepare_TH1D_n("hDat2", 1, 0.2, 0.5)
     hDat2.SetBinContent(1, 33.62) # micro barn
     hDat2.SetBinError(1, 2.77)
 
-    hDat2.Draw("e1same")
+    #hDat2.Draw("e1same")
 
     hDat3 = ut.prepare_TH1D_n("hDat3", 1, 0.5, 1)
     hDat3.SetBinContent(1, 13.65) # micro barn
     hDat3.SetBinError(1, 1.82)
 
-    hDat3.Draw("e1same")
+    #hDat3.Draw("e1same")
 
     leg = ut.prepare_leg(0.5, 0.76, 0.2, 0.2, 0.035)
     leg.AddEntry("", "#it{J/}#it{#psi} + XnXn, 200 GeV, run 14", "")
@@ -81,7 +81,7 @@ def main():
     leg.AddEntry(gY, "Starlight", "l")
     leg.Draw("same")
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
 #_____________________________________________________________________________

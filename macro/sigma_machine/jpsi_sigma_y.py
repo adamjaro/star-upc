@@ -27,14 +27,14 @@ def main():
     #aymax = 1
 
     #number of gamma-gamma from mass fit
-    ngg = 162 # |y| < 1
+    ngg = 181 # |y| < 1
     #ngg = 74 # |y| < 0.2
     #ngg = 62 # 0.2 < |y| < 0.5
     #ngg = 27 # 0.5 < |y| < 1
 
     #incoherent shape
-    inc1 = 873.04 # |y| < 1  80.6/2 = 40.3
-    inc2 = 3.28
+    inc1 = 923.2 # |y| < 1  80.6/2 = 40.3
+    inc2 = 3.304
     #inc1 = 270.8 # |y| < 0.2    24.4/0.4 = 61
     #inc2 = 3.77
     #inc1 = 328.35 # 0.2 < |y| < 0.5   30.9/0.6 = 51.5
@@ -46,7 +46,7 @@ def main():
     tmax = 0.109
 
     #mass interval
-    mmin = 2.8
+    mmin = 2.75
     mmax = 3.2
 
     lumi = 13871.907 # lumi in inv. ub

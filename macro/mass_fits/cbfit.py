@@ -69,7 +69,7 @@ if __name__ == "__main__":
     m.setMax(mmax)
     m.setRange("fitran", fitran[0], fitran[1])
     dataIN = RooDataSet("data", "data", tree, RooArgSet(m,y,pT));
-    data = dataIN.reduce(strsel);
+    data = dataIN.reduce(rf.Cut(strsel))#, rf.EventRange(0, 10000));
     #binned data
     hMass = TH1D("hMass", "hMass", nbins, mmin, mmax)
     tree.Draw("jRecM >> hMass", strsel)
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     leg2.AddEntry(0, "#bf{#it{p}_{T} < %.3f GeV}" % ptmax, "")
     leg2.Draw("same")
 
-    #ut.invert_col(gPad)
+    ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'
