@@ -56,6 +56,18 @@ def main():
 
     hDat.Draw("e1same")
 
+    hSys = ut.prepare_TH1D_n("hSys", 1, 0, 1)
+    hSys.SetOption("E2")
+    hSys.SetFillColor(rt.kOrange+1)
+    hSys.SetLineColor(rt.kOrange)
+
+    hSys.SetBinContent(1, 22.84) # micro barn
+    hSys.SetBinError(1, 3.37)
+
+    hSys.Draw("e2same")
+
+    hDat.Draw("e1same")
+
     hDat1 = ut.prepare_TH1D_n("hDat1", 1, 0, 0.2)
     hDat1.SetBinContent(1, 32.25) # micro barn
     hDat1.SetBinError(1, 3.29)

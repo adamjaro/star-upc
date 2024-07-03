@@ -241,7 +241,7 @@ if __name__ == "__main__":
     desc2.itemD(igg_desc, intBkg.getVal(), intBkg.getError())
     desc2.draw()
 
-    ut.invert_col(gPad)
+    #ut.invert_col(gPad)
     can.SaveAs("01fig.pdf")
 
     #to prevent 'pure virtual method called'

@@ -121,6 +121,12 @@ def main():
     #print("bins:", ut.get_nbins(ptbin, ptmin, ptmax))
 
     bins = ut.get_bins_vec_2pt(ptbin, ptlon, ptmin, ptmax, ptmid)
+
+    #bins = x=rt.vector(rt.double)((0.0,0.000625,0.0025,0.005625,0.01,0.015625,0.0225,0.030625,0.04,0.050625,\
+    #    0.0625,0.075625,0.09,0.105625,0.1225))
+
+    print(bins)
+
     #bins = ut.get_bins_vec_3pt(ptshort, ptbin, ptlon, ptmin, ptmax, ptlow, ptmid)
     #print("bins2:", bins.size()-1)
 
@@ -213,15 +219,20 @@ def main():
     #hPtFlat.SetMarkerSize(1.3)
 
     #systematical errors
+    lumi_err = 0.1
     err_zdc_acc = 0.1
     err_bemc_eff = 0.03
+    ngg_err = 0.0127
+    ninc_err = 0.02689
     #sys_err = rt.TMath.Sqrt(err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff)
-    sys_err = err_zdc_acc*err_zdc_acc + err_bemc_eff*err_bemc_eff
+    sys_err = lumi_err**2 + err_zdc_acc**2 + err_bemc_eff**2 + ngg_err**2 + ninc_err**2
     #print("Total sys err:", sys_err)
     hSys = ut.prepare_TH1D_vec("hSys", bins)
     hSys.SetOption("E2")
-    hSys.SetFillColor(rt.kOrange+1)
-    hSys.SetLineColor(rt.kOrange)
+    #hSys.SetFillColor(rt.kOrange+1)
+    #hSys.SetLineColor(rt.kOrange)
+    #hSys.SetFillColor(rt.kGreen)
+    hSys.SetFillColor(rt.kGray)
     for ibin in range(1,hPtFlat.GetNbinsX()+1):
         hSys.SetBinContent(ibin, hPtFlat.GetBinContent(ibin))
         sig_sl = hPtSl.GetBinContent(ibin)
@@ -231,7 +242,7 @@ def main():
             err_deconv = TMath.Abs(sig_fl-sig_sl)/sig_fl
         else:
             err_deconv = 0
-        #print("err_deconv", err_deconv)
+        print("err_deconv:", ibin, err_deconv)
         #sys_err += err_deconv*err_deconv
         sys_err_sq = sys_err + err_deconv*err_deconv
         sys_err_bin = TMath.Sqrt(sys_err_sq)
@@ -263,7 +274,7 @@ def main():
     frame.SetMinimum(1e-5)  # 3e-5
     frame.Draw()
 
-    #hSys.Draw("e2same")
+    hSys.Draw("e2same")
 
     #bin center points from data
     #gSig = apply_centers(hPtFlat, hPtCen)
@@ -282,6 +293,16 @@ def main():
     gSlight.Draw("lsame")
 
     gSig.Draw("P")
+
+    #systematic error
+    #hSys = hPt.Clone("hSys")
+
+
+    #for ip in range(gSig.GetN()):
+        #print(ip, gSig.GetPointX(ip)-gSig.GetErrorXlow(ip), gSig.GetPointX(ip)+gSig.GetErrorXhigh(ip), gSig.GetPointY(ip))
+
+
+
 
     frame.Draw("same")
 
@@ -326,6 +347,7 @@ def main():
     #save the cross section to output file
     out = TFile("sigma.root", "recreate")
     gSig.Write("sigma")
+    hSys.Write("sigma_sys")
     out.Close()
 
     #integrate the cross section over |t|
@@ -337,7 +359,7 @@ def main():
         t_bin_len = gSig.GetErrorXlow(ip)+gSig.GetErrorXhigh(ip)
         s_tot_t += t_bin_len*gSig.GetPointY(ip)
         s_tot_t_err += ( t_bin_len*0.5*(gSig.GetErrorYlow(ip)+gSig.GetErrorYhigh(ip)) )**2
-        print(ip, gSig.GetPointY(ip), gSig.GetErrorYhigh(ip))
+        #print(ip, gSig.GetPointY(ip), gSig.GetErrorYhigh(ip))
         #s_tot_t_err += (t_bin_len*gSig.GetErrorYhigh(ip))**2
     s_tot_t_err = sqrt(s_tot_t_err)
     print("Integrated sigma from data (micro barn):", s_tot_t*1e3, "+/-", s_tot_t_err*1e3)

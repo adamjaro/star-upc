@@ -44,8 +44,14 @@ def main():
     #run 14
     inp14 = TFile.Open("sigma.root", "read")
     gSig = inp14.Get("sigma")
+    hSys = inp14.Get("sigma_sys")
     ut.set_H1D_col(gSig, rt.kBlack)
-    inp14.Close()
+    ut.set_H1D_col(hSys, rt.kBlack)
+    hSys.SetOption("E2")
+    #hSys.SetLineColor(rt.kGreen)
+    hSys.SetLineColor(rt.kGray)
+    hSys.SetFillColor(rt.kGray)
+    #inp14.Close()
 
     #run 16
     #inp16 = TFile.Open("/home/jaroslav/sim/data_run16/postlim_04.21/subt_corr/root/JPsiPt_corr_14nn.root", "read")
@@ -73,9 +79,10 @@ def main():
     h16.Scale(1e-3)
 
     #Starlight
-    gSlight.Draw("lsame")
+    #gSlight.Draw("lsame")
 
     #data
+    hSys.Draw("e2same")
     gSig.Draw("psame")
     h16.Draw("e1same")
 
@@ -86,12 +93,12 @@ def main():
     leg = ut.prepare_leg(0.68, 0.76, 0.3, 0.16, 0.035)
     leg.AddEntry(gSig, "Run 14", "lp")
     leg.AddEntry(h16, "Run 16", "lp")
-    leg.AddEntry(gSlight, "STARLIGHT", "l")
+    #leg.AddEntry(gSlight, "STARLIGHT", "l")
     leg.Draw("same")
 
     #gPad.SetGrid()
 
-    ut.invert_col(rt.gPad)
+    #ut.invert_col(rt.gPad)
     can.SaveAs("01fig.pdf")
 
 #main

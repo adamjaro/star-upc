@@ -178,7 +178,26 @@ def loat_flat_pt2():
 
 #end of loat_flat_pt2
 
+#_____________________________________________________________________________
+def load_PhysRevD105_2022(inp):
 
+    #PHYSICAL REVIEW D 105, 054023 (2022)
+
+    f = open(inp, "r")
+    t_sigma = []
+    for line in f:
+        point = line.split("\t")
+        t_sigma.append([float(point[2]), float(point[4])])
+
+    gSig = TGraphErrors(len(t_sigma))
+    for i in range(len(t_sigma)):
+        gSig.SetPoint(i, t_sigma[i][0], t_sigma[i][1])
+
+    gSig.SetLineWidth(3)
+
+    return gSig
+
+#load_PhysRevD105_2022
 
 
 

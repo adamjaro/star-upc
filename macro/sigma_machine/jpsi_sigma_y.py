@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from math import sqrt
+
 import ROOT as rt
 from ROOT import gPad, gROOT, gStyle, TFile
 from ROOT import TGraphAsymmErrors, TF1
@@ -170,10 +172,42 @@ def main():
     den = Reta*br*zdc_acc*trg_eff*bbceff*ratio_tof*lumi_scaled
 
 
+    #leading systematic contributions
+    lumi_err = 0.1
+    zdc_acc_err = 0.1
+    bemc_eff_err = 0.03    
+    ngg_err = 6./hY.GetBinContent(1)
+    print("ngg_err:", ngg_err)
+
+    #incoherent error
+    inc1_err = 68.8 # error on parameter inc1
+
+    #upper limit on inc1
+    func_incoh_pt2.SetParameters(inc1+inc1_err, inc2)
+    ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
+    ninc_up = hPtIncoh.Integral()
+
+    #lower limit on inc1
+    func_incoh_pt2.SetParameters(inc1-inc1_err, inc2)
+    ut.fill_h1_tf(hPtIncoh, func_incoh_pt2, rt.kRed)
+    ninc_low = hPtIncoh.Integral()
+
+    #difference in incoherent events
+    ninc_delt = ninc_up - ninc_low
+
+    #evaluate the incoherent error
+    ninc_err = ninc_delt/hY.GetBinContent(1)
+    print("ninc_err:", ninc_err)
+
+    sys_err = lumi_err**2 + zdc_acc_err**2 + bemc_eff_err**2 + ngg_err**2 + ninc_err**2
+    sys_err = sqrt(sys_err)
+
+    print("sys_err:", sys_err)
+
     #calculate the cross section
     sigma = hY.GetBinContent(1)/(axe*den*hY.GetBinWidth(1)*2)
     sigma_err = hY.GetBinError(1)/(axe*den*hY.GetBinWidth(1)*2)
-    print("Sigma (micro barn):", sigma, "+/-", sigma_err)
+    print("Sigma (micro barn):", sigma, "+/-", sigma_err, "+/-", sigma*sys_err)
 
     return
 
